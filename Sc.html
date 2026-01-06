@@ -1,0 +1,882 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>無題</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2e0a0258-5075-806e-be5b-d9fece7f7eb0" class="page sans"><header><h1 class="page-title" dir="auto"></h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8080-927f-cb941960ee1f" class="">&lt;!doctype html&gt;<br/>&lt;html lang=&quot;ja&quot;&gt;<br/>&lt;head&gt;<br/>&lt;meta charset=&quot;utf-8&quot;&gt;<br/>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;<br/>&lt;title&gt;おじ.exe（中山ダ1800）&lt;/title&gt;<br/>&lt;style&gt;<br/>:root { --pad: 16px; --radius: 14px; }<br/>body {<br/>margin: 0;<br/>font-family: -apple-system, system-ui, &quot;Hiragino Sans&quot;, &quot;Noto Sans JP&quot;, sans-serif;<br/>background:#f6f7f9;<br/>color:#111;<br/>}<br/>.wrap { max-width: 720px; margin: 0 auto; padding: var(--pad); }<br/>.card {<br/>background: #fff;<br/>border-radius: var(--radius);<br/>padding: var(--pad);<br/>box-shadow: 0 6px 20px rgba(0,0,0,.06);<br/>}<br/>h1 { font-size: 18px; margin: 0 0 10px; }<br/>.sub { font-size: 13px; color:#555; margin: 0 0 14px; line-height: 1.4; }<br/>.q { font-size: 18px; margin: 12px 0 12px; line-height: 1.4; }<br/>.row { display: flex; gap: 10px; flex-wrap: wrap; }<br/>button {<br/>flex: 1;<br/>min-width: 140px;<br/>padding: 14px 12px;<br/>border-radius: 12px;<br/>border: 1px solid #e3e6ea;<br/>background: #fff;<br/>font-size: 16px;<br/>font-weight: 600;<br/>cursor: pointer;<br/>}<br/>button.primary { background: #111; color: #fff; border-color: #111; }<br/>button.danger { background: #fff1f1; border-color: #ffd5d5; }<br/>button.ghost { background:#f0f2f5; border-color:#f0f2f5; font-weight:600; }<br/>button:active { transform: translateY(1px); }<br/>.meta { margin-top: 12px; display: grid; gap: 10px; }<br/>label { font-size: 12px; color:#444; display:block; margin-bottom:4px; }<br/>input, select {<br/>width: 100%; box-sizing: border-box;<br/>padding: 10px 12px;<br/>border-radius: 12px; border:1px solid #e3e6ea;<br/>font-size: 14px; background:#fff;<br/>}<br/>.pill {<br/>display:inline-block; padding: 6px 10px;<br/>border-radius: 999px; background:#f0f2f5;<br/>font-size: 12px; margin-right: 6px;<br/>}<br/>.result {<br/>margin-top: 14px;<br/>padding: 12px;<br/>border-radius: 12px;<br/>background:#f7f7ff;<br/>border:1px solid #e6e6ff;<br/>}<br/>.result.bad { background:#fff6f6; border-color:#ffdede; }<br/>.result.good { background:#f2fff7; border-color:#c8f2da; }<br/>.small { font-size: 12px; color:#666; margin-top: 6px; line-height: 1.45; }<br/>.hr { height: 1px; background:#eef1f4; margin: 12px 0; }<br/>.log { font-size: 13px; color:#222; line-height: 1.5; }<br/>.log-item { padding: 8px 0; border-top: 1px solid #eef1f4; }<br/>.muted { color:#666; }<br/>.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }<br/>.footer { margin-top: 14px; display:flex; gap:10px; flex-wrap: wrap; }<br/>&lt;/style&gt;<br/>&lt;/head&gt;<br/>&lt;body&gt;<br/>&lt;div class=&quot;wrap&quot;&gt;<br/>&lt;div class=&quot;card&quot;&gt;<br/>&lt;h1&gt;🐎 おじ.exe（中山ダ1800）&lt;/h1&gt;<br/>&lt;p class=&quot;sub&quot;&gt;<br/>目的：迷わない／感情で買わない／決めた手順通りに動く&lt;br&gt;<br/>固定：<br/>&lt;span class=&quot;pill&quot;&gt;複勝1点&lt;/span&gt;<br/>&lt;span class=&quot;pill&quot;&gt;1R 500円&lt;/span&gt;<br/>&lt;span class=&quot;pill&quot;&gt;候補 最大3頭&lt;/span&gt;<br/>&lt;span class=&quot;pill&quot;&gt;迷ったら 見送り&lt;/span&gt;<br/>&lt;/p&gt;</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e0a0258-5075-80d7-bbd1-fff03d8aa6f7" class="code code-wrap"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">&lt;div class=&quot;meta&quot; id=&quot;metaBox&quot;&gt;
+  &lt;div&gt;
+    &lt;label&gt;レース名（ログ用）&lt;/label&gt;
+    &lt;input id=&quot;raceName&quot; placeholder=&quot;例：◯月◯日 中山10R など&quot;&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;row&quot;&gt;
+    &lt;div style=&quot;flex:1&quot;&gt;
+      &lt;label&gt;馬場&lt;/label&gt;
+      &lt;select id=&quot;track&quot;&gt;
+        &lt;option value=&quot;良&quot;&gt;良&lt;/option&gt;
+        &lt;option value=&quot;稍重&quot;&gt;稍重&lt;/option&gt;
+        &lt;option value=&quot;重&quot;&gt;重&lt;/option&gt;
+        &lt;option value=&quot;不良&quot;&gt;不良&lt;/option&gt;
+      &lt;/select&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;flex:1&quot;&gt;
+      &lt;label&gt;頭数&lt;/label&gt;
+      &lt;input id=&quot;fieldSize&quot; type=&quot;number&quot; inputmode=&quot;numeric&quot; min=&quot;1&quot; max=&quot;18&quot; placeholder=&quot;例：16&quot;&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;hr&quot;&gt;&lt;/div&gt;
+
+&lt;div id=&quot;flow&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;out&quot;&gt;&lt;/div&gt;
+
+&lt;div class=&quot;footer&quot;&gt;
+  &lt;button class=&quot;ghost&quot; id=&quot;backBtn&quot; style=&quot;display:none&quot;&gt;← 戻る&lt;/button&gt;
+  &lt;button class=&quot;ghost&quot; id=&quot;resetBtn&quot;&gt;リセット&lt;/button&gt;
+&lt;/div&gt;
+</code></pre></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8000-89aa-dc4c46d6fa4e" class="">&lt;/div&gt;</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80ed-a610-db59736936bb" class="">&lt;div class=&quot;card&quot; style=&quot;margin-top:14px;&quot;&gt;<br/>&lt;h1&gt;📒 ログ（端末内に保存）&lt;/h1&gt;<br/>&lt;p class=&quot;sub&quot;&gt;買う / 見送り と「止まった理由・負け筋」だけ残す。※この端末のブラウザに保存（外には送られない）&lt;/p&gt;<br/>&lt;div class=&quot;row&quot;&gt;<br/>&lt;button class=&quot;ghost&quot; id=&quot;exportBtn&quot;&gt;CSVコピー&lt;/button&gt;<br/>&lt;button class=&quot;ghost danger&quot; id=&quot;clearLogBtn&quot;&gt;ログ全消し&lt;/button&gt;<br/>&lt;/div&gt;<br/>&lt;div id=&quot;logBox&quot; class=&quot;log&quot; style=&quot;margin-top:10px;&quot;&gt;&lt;/div&gt;<br/>&lt;/div&gt;<br/>&lt;/div&gt;</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8077-929a-c10cc2fee0cc" class="">&lt;script&gt;<br/>(function(){<br/>const RULE = {<br/>course: &quot;中山ダ1800&quot;,<br/>betType: &quot;複勝&quot;,<br/>stakeYen: 500<br/>};</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8087-a262-c2e9e2f1fe56" class="">const EXTREME = {<br/>fieldMin: 8,<br/>fieldMax: 18,<br/>trackExtreme: [&quot;不良&quot;]<br/>};</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80c1-ae85-f9a57aef99c7" class="">const FLOW = [<br/>{<br/>id: &quot;q1&quot;,<br/>q: &quot;【買う資格】このレースは中山ダ1800？&quot;,<br/>yes: &quot;q2&quot;,<br/>noEnd: &quot;対象条件外（中山ダ1800ではない）&quot;<br/>},<br/>{<br/>id: &quot;q2&quot;,<br/>q: &quot;【買う資格】頭数・馬場は極端？&quot;,<br/>hint: &quot;※目安：頭数が少なすぎ/多すぎ、馬場が極端。迷ったら「はい（極端）」→見送り。&quot;,<br/>yesEnd: &quot;頭数/馬場が極端でリスク過大&quot;,<br/>no: &quot;q3&quot;,<br/>showAutoCheck: true<br/>},<br/>{<br/>id: &quot;q3&quot;,<br/>q: &quot;【パターン】A/B/C のどれか1つに決められる？&quot;,<br/>yes: &quot;pickPattern&quot;,<br/>noEnd: &quot;パターンが決められない（=展開が読めない）&quot;<br/>}<br/>];</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-800b-aa8b-c3cb473d0f8e" class="">const PATTERNS = [<br/>{<br/>key: &quot;A&quot;,<br/>title: &quot;パターンA：先行安定&quot;,<br/>desc: &quot;逃げ・先行が少ない／隊列がすんなり&quot;,<br/>restriction: &quot;4角6番手以内しか買わない&quot;<br/>},<br/>{<br/>key: &quot;B&quot;,<br/>title: &quot;パターンB：前が潰れる&quot;,<br/>desc: &quot;逃げ・先行が多い／同型が競りそう&quot;,<br/>restriction: &quot;逃げ馬は買わない／4角3〜8番手だけ残す&quot;<br/>},<br/>{<br/>key: &quot;C&quot;,<br/>title: &quot;パターンC：道悪・パワー&quot;,<br/>desc: &quot;重〜不良／時計がかかる&quot;,<br/>restriction: &quot;4角5番手以内／揉まれ弱そうなら切る&quot;<br/>}<br/>];</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8089-b3a2-d08fae392aa4" class="">const state = {<br/>stack: [],<br/>cur: &quot;q1&quot;,<br/>pattern: null,<br/>stopReason: null,<br/>decision: null<br/>};</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8051-a2de-cde5028a8739" class="">const flowEl = document.getElementById(&quot;flow&quot;);<br/>const outEl  = document.getElementById(&quot;out&quot;);<br/>const backBtn = document.getElementById(&quot;backBtn&quot;);<br/>const resetBtn = document.getElementById(&quot;resetBtn&quot;);<br/>const exportBtn = document.getElementById(&quot;exportBtn&quot;);<br/>const clearLogBtn = document.getElementById(&quot;clearLogBtn&quot;);<br/>const logBox = document.getElementById(&quot;logBox&quot;);</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-800d-8bae-e7107a43dd3d" class="">function $(id){ return document.getElementById(id); }</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80ba-8383-dc152819a7fd" class="">function getMeta(){<br/>return {<br/>raceName: $(&quot;raceName&quot;).value.trim() || &quot;(未入力)&quot;,<br/>track: $(&quot;track&quot;).value,<br/>fieldSize: Number($(&quot;fieldSize&quot;).value || 0)<br/>};<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8061-a3fd-e3da32691a24" class="">function isExtreme(meta){<br/>const field = meta.fieldSize;<br/>const trackExtreme = EXTREME.trackExtreme.indexOf(meta.track) &gt;= 0;<br/>const fieldExtreme = field &amp;&amp; (field &lt; EXTREME.fieldMin || field &gt; EXTREME.fieldMax);<br/>if (!field) return true; // 未入力なら慎重側<br/>return trackExtreme || fieldExtreme;<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80d1-b165-df81a854c325" class="">function render(){<br/>outEl.innerHTML = &quot;&quot;;<br/>backBtn.style.display = state.stack.length ? &quot;&quot; : &quot;none&quot;;</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e0a0258-5075-80e5-96a8-ee37d540afad" class="code code-wrap"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">if (state.cur === &quot;pickPattern&quot;) { renderPatternPicker(); return; }
+if (state.cur === &quot;finalBuy&quot;) { renderFinalBuy(); return; }
+if (state.cur === &quot;finalNo&quot;) { renderFinalNo(); return; }
+
+const node = FLOW.find(function(x){ return x.id === state.cur; });
+if (!node) return;
+
+const meta = getMeta();
+var autoLine = &quot;&quot;;
+if (node.showAutoCheck){
+  const ex = isExtreme(meta);
+  autoLine =
+    &#x27;&lt;div class=&quot;small&quot;&gt;&#x27; +
+    &#x27;自動判定（目安）：&lt;span class=&quot;mono&quot;&gt;&#x27; +
+    (ex ? &quot;極端っぽい → 見送り寄り&quot; : &quot;極端ではなさそう → 続行可&quot;) +
+    &quot;&lt;/span&gt;&lt;br&gt;&quot; +
+    &#x27;&lt;span class=&quot;muted&quot;&gt;頭数目安：&#x27; + EXTREME.fieldMin +
+    &quot;未満は極端扱い / 馬場「&quot; + EXTREME.trackExtreme.join(&quot;・&quot;) +
+    &quot;」は極端扱い&lt;/span&gt;&lt;/div&gt;&quot;;
+}
+
+flowEl.innerHTML =
+  &#x27;&lt;div class=&quot;q&quot;&gt;&#x27; + escapeHtml(node.q) + &quot;&lt;/div&gt;&quot; +
+  (node.hint ? &#x27;&lt;div class=&quot;small muted&quot;&gt;&#x27; + escapeHtml(node.hint) + &quot;&lt;/div&gt;&quot; : &quot;&quot;) +
+  autoLine +
+  &#x27;&lt;div class=&quot;row&quot; style=&quot;margin-top:12px;&quot;&gt;&#x27; +
+    &#x27;&lt;button class=&quot;primary&quot; id=&quot;yesBtn&quot;&gt;はい&lt;/button&gt;&#x27; +
+    &#x27;&lt;button class=&quot;danger&quot; id=&quot;noBtn&quot;&gt;いいえ&lt;/button&gt;&#x27; +
+  &quot;&lt;/div&gt;&quot;;
+
+$(&quot;yesBtn&quot;).onclick = function(){ onYes(node); };
+$(&quot;noBtn&quot;).onclick  = function(){ onNo(node); };
+</code></pre></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8013-a678-f080ebd4f54f" class="">}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80fa-aa9b-f11741e87b3a" class="">function onYes(node){<br/>pushState();<br/>if (<a href="http://node.id/">node.id</a> === &quot;q2&quot;){<br/>endNo(node.yesEnd);<br/>return;<br/>}<br/>state.cur = node.yes;<br/>render();<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80cb-8514-fa7ba94a78a7" class="">function onNo(node){<br/>if (node.noEnd){<br/>pushState();<br/>endNo(node.noEnd);<br/>return;<br/>}<br/>if (<a href="http://node.id/">node.id</a> === &quot;q2&quot;){<br/>pushState();<br/>state.cur = <a href="http://node.no/">node.no</a>;<br/>render();<br/>return;<br/>}<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8084-9553-fe99224dd87a" class="">function renderPatternPicker(){<br/>var html = &#x27;&lt;div class=&quot;q&quot;&gt;パターンを1つ選ぶ（A/B/C）&lt;/div&gt;&#x27; +<br/>&#x27;&lt;div class=&quot;small muted&quot;&gt;パターンが決められないなら、戻って「いいえ」→見送り。&lt;/div&gt;&#x27; +<br/>&#x27;&lt;div style=&quot;display:grid; gap:10px; margin-top:12px;&quot;&gt;&#x27;;<br/>PATTERNS.forEach(function(p){<br/>html +=<br/>&#x27;&lt;button class=&quot;ghost&quot; data-key=&quot;&#x27; + p.key + &#x27;&quot;&gt;&#x27; +<br/>&#x27;&lt;div style=&quot;text-align:left;&quot;&gt;&#x27; +<br/>&#x27;&lt;div style=&quot;font-weight:800; font-size:15px;&quot;&gt;&#x27; + escapeHtml(p.title) + &quot;&lt;/div&gt;&quot; +<br/>&#x27;&lt;div class=&quot;small muted&quot;&gt;&#x27; + escapeHtml(p.desc) + &quot;&lt;/div&gt;&quot; +<br/>&#x27;&lt;div class=&quot;small&quot;&gt;&lt;span class=&quot;pill&quot;&gt;制限&lt;/span&gt;&#x27; + escapeHtml(p.restriction) + &quot;&lt;/div&gt;&quot; +<br/>&quot;&lt;/div&gt;&quot; +<br/>&quot;&lt;/button&gt;&quot;;<br/>});<br/>html += &quot;&lt;/div&gt;&quot;;<br/>flowEl.innerHTML = html;</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e0a0258-5075-80f8-ad3e-c4d30d73bd06" class="code code-wrap"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">var buttons = flowEl.querySelectorAll(&quot;button[data-key]&quot;);
+buttons.forEach(function(btn){
+  btn.onclick = function(){
+    state.pattern = btn.getAttribute(&quot;data-key&quot;);
+    pushState();
+    state.cur = &quot;finalBuy&quot;;
+    render();
+  };
+});
+</code></pre></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8029-88bb-f89025b0e118" class="">}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-808a-90f9-d0375107c252" class="">function renderFinalBuy(){<br/>const meta = getMeta();<br/>const p = PATTERNS.find(function(x){ return x.key === state.pattern; });<br/>const textLines = [<br/>&quot;パターン：&quot; + (p ? p.key : &quot;-&quot;),<br/>&quot;制限：&quot; + (p ? p.restriction : &quot;-&quot;),<br/>&quot;買い目：&quot; + RULE.betType + &quot; 1点 &quot; + RULE.stakeYen + &quot;円&quot;,<br/>&quot;メモ：負け筋を1つ書く（例：同型に競られる／位置が取れない／前が総崩れ）&quot;<br/>];</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e0a0258-5075-8082-a5a8-ec53f8ad52f2" class="code code-wrap"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">state.decision = &quot;買う&quot;;
+state.stopReason = null;
+
+flowEl.innerHTML =
+  &#x27;&lt;div class=&quot;result good&quot;&gt;&#x27; +
+    &#x27;&lt;div style=&quot;font-weight:900; font-size:18px;&quot;&gt;✅ 結論：買う&lt;/div&gt;&#x27; +
+    &#x27;&lt;div class=&quot;small&quot;&gt;条件を通過しました。最後に「負け筋」を1つだけ書いて終了。&lt;/div&gt;&#x27; +
+  &#x27;&lt;/div&gt;&#x27; +
+  &#x27;&lt;div class=&quot;meta&quot; style=&quot;margin-top:12px;&quot;&gt;&#x27; +
+    &#x27;&lt;div&gt;&lt;label&gt;負け筋（1つだけ）&lt;/label&gt;&#x27; +
+      &#x27;&lt;input id=&quot;loseNote&quot; placeholder=&quot;例：同型に競られる / 位置が取れない など&quot;&gt;&lt;/div&gt;&#x27; +
+    &#x27;&lt;div&gt;&lt;label&gt;買う馬（例：◯番／馬名） ※任意&lt;/label&gt;&#x27; +
+      &#x27;&lt;input id=&quot;pickHorse&quot; placeholder=&quot;例：7番 〇〇&quot;&gt;&lt;/div&gt;&#x27; +
+  &#x27;&lt;/div&gt;&#x27; +
+  &#x27;&lt;div class=&quot;row&quot; style=&quot;margin-top:12px;&quot;&gt;&#x27; +
+    &#x27;&lt;button class=&quot;primary&quot; id=&quot;saveBuyBtn&quot;&gt;ログ保存&lt;/button&gt;&#x27; +
+    &#x27;&lt;button class=&quot;ghost&quot; id=&quot;copyBtn&quot;&gt;要約コピー&lt;/button&gt;&#x27; +
+  &#x27;&lt;/div&gt;&#x27; +
+  &#x27;&lt;div class=&quot;small muted&quot; style=&quot;margin-top:10px;&quot;&gt;&#x27; +
+    &#x27;&lt;div&gt;&lt;span class=&quot;pill&quot;&gt;レース&lt;/span&gt;&#x27; + escapeHtml(meta.raceName) +
+    &#x27; / &lt;span class=&quot;pill&quot;&gt;馬場&lt;/span&gt;&#x27; + escapeHtml(meta.track) +
+    &#x27; / &lt;span class=&quot;pill&quot;&gt;頭数&lt;/span&gt;&#x27; + (meta.fieldSize || &quot;-&quot;) + &quot;&lt;/div&gt;&quot; +
+    &#x27;&lt;div class=&quot;hr&quot;&gt;&lt;/div&gt;&#x27; +
+    &#x27;&lt;div class=&quot;mono&quot; style=&quot;white-space:pre-wrap;&quot;&gt;&#x27; +
+      escapeHtml(textLines.join(&quot;\\n&quot;)) +
+    &quot;&lt;/div&gt;&quot; +
+  &quot;&lt;/div&gt;&quot;;
+
+$(&quot;copyBtn&quot;).onclick = function(){
+  const lose = (document.getElementById(&quot;loseNote&quot;).value || &quot;&quot;).trim();
+  const horse = (document.getElementById(&quot;pickHorse&quot;).value || &quot;&quot;).trim();
+  const summary = [
+    &quot;結論：買う&quot;,
+    &quot;パターン：&quot; + (p ? p.key : &quot;-&quot;),
+    &quot;制限：&quot; + (p ? p.restriction : &quot;-&quot;),
+    &quot;本命：&quot; + (horse || &quot;(未入力)&quot;),
+    &quot;負け筋：&quot; + (lose || &quot;(未入力)&quot;),
+    &quot;買い目：&quot; + RULE.betType + &quot; 1点 &quot; + RULE.stakeYen + &quot;円&quot;
+  ].join(&quot;\\n&quot;);
+  copyToClipboard(summary);
+  showToast(&quot;コピーしました&quot;);
+};
+
+$(&quot;saveBuyBtn&quot;).onclick = function(){
+  const lose = (document.getElementById(&quot;loseNote&quot;).value || &quot;&quot;).trim();
+  const horse = (document.getElementById(&quot;pickHorse&quot;).value || &quot;&quot;).trim();
+  saveLog({
+    ...meta,
+    decision: &quot;買う&quot;,
+    pattern: p ? p.key : &quot;&quot;,
+    restriction: p ? p.restriction : &quot;&quot;,
+    horse: horse,
+    note: lose,
+    reason: &quot;&quot;
+  });
+  showToast(&quot;ログ保存しました&quot;);
+  renderLog();
+};
+</code></pre></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-801d-89dc-d46c4612149a" class="">}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8040-9886-c13ad6bd27f4" class="">function renderFinalNo(){<br/>const meta = getMeta();<br/>state.decision = &quot;見送り&quot;;</p></div><div style="display:contents" dir="auto"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2e0a0258-5075-803a-baa0-d4d922c1a807" class="code code-wrap"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">flowEl.innerHTML =
+  &#x27;&lt;div class=&quot;result bad&quot;&gt;&#x27; +
+    &#x27;&lt;div style=&quot;font-weight:900; font-size:18px;&quot;&gt;❌ 結論：見送り&lt;/div&gt;&#x27; +
+    &#x27;&lt;div class=&quot;small&quot;&gt;止まった理由：&lt;span class=&quot;mono&quot;&gt;&#x27; +
+      escapeHtml(state.stopReason || &quot;-&quot;) +
+    &quot;&lt;/span&gt;&lt;/div&gt;&quot; +
+  &quot;&lt;/div&gt;&quot; +
+  &#x27;&lt;div class=&quot;row&quot; style=&quot;margin-top:12px;&quot;&gt;&#x27; +
+    &#x27;&lt;button class=&quot;primary&quot; id=&quot;saveNoBtn&quot;&gt;ログ保存&lt;/button&gt;&#x27; +
+    &#x27;&lt;button class=&quot;ghost&quot; id=&quot;copyNoBtn&quot;&gt;要約コピー&lt;/button&gt;&#x27; +
+  &quot;&lt;/div&gt;&quot; +
+  &#x27;&lt;div class=&quot;small muted&quot; style=&quot;margin-top:10px;&quot;&gt;&#x27; +
+    &#x27;&lt;div&gt;&lt;span class=&quot;pill&quot;&gt;レース&lt;/span&gt;&#x27; + escapeHtml(meta.raceName) +
+    &#x27; / &lt;span class=&quot;pill&quot;&gt;馬場&lt;/span&gt;&#x27; + escapeHtml(meta.track) +
+    &#x27; / &lt;span class=&quot;pill&quot;&gt;頭数&lt;/span&gt;&#x27; + (meta.fieldSize || &quot;-&quot;) + &quot;&lt;/div&gt;&quot; +
+  &quot;&lt;/div&gt;&quot;;
+
+$(&quot;copyNoBtn&quot;).onclick = function(){
+  const summary = [
+    &quot;結論：見送り&quot;,
+    &quot;理由：&quot; + (state.stopReason || &quot;-&quot;)
+  ].join(&quot;\\n&quot;);
+  copyToClipboard(summary);
+  showToast(&quot;コピーしました&quot;);
+};
+
+$(&quot;saveNoBtn&quot;).onclick = function(){
+  saveLog({
+    ...meta,
+    decision: &quot;見送り&quot;,
+    pattern: &quot;&quot;,
+    restriction: &quot;&quot;,
+    horse: &quot;&quot;,
+    note: &quot;&quot;,
+    reason: state.stopReason || &quot;&quot;
+  });
+  showToast(&quot;ログ保存しました&quot;);
+  renderLog();
+};
+</code></pre></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80f6-9a91-f729a3994395" class="">}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-805d-99e7-f6fb15c44bfc" class="">function endNo(reason){<br/>state.stopReason = reason;<br/>state.cur = &quot;finalNo&quot;;<br/>render();<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80e3-a245-efe851e98da4" class="">function pushState(){<br/>state.stack.push({<br/>cur: state.cur,<br/>pattern: state.pattern,<br/>stopReason: state.stopReason,<br/>decision: state.decision<br/>});<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80f7-99f4-c9b01523a75d" class="">function popState(){<br/>const prev = state.stack.pop();<br/>if (!prev) return;<br/>state.cur = prev.cur;<br/>state.pattern = prev.pattern;<br/>state.stopReason = prev.stopReason;<br/>state.decision = prev.decision;<br/>render();<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80d4-9f45-d631670b164e" class="">backBtn.onclick = popState;<br/>resetBtn.onclick = function(){<br/>state.stack = [];<br/>state.cur = &quot;q1&quot;;<br/>state.pattern = null;<br/>state.stopReason = null;<br/>state.decision = null;<br/>render();<br/>};</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-808b-b935-e0744e9bb14f" class="">const LS_KEY = &quot;oji_keiba_log_v2&quot;;</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-806e-89ad-d1a55faf2a9c" class="">function loadLog(){<br/>try { return JSON.parse(localStorage.getItem(LS_KEY) || &quot;[]&quot;); }<br/>catch(e){ return []; }<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80b6-a4e3-ed1df4bc36eb" class="">function saveLog(entry){<br/>const log = loadLog();<br/>log.unshift({<br/>ts: new Date().toISOString(),<br/>...entry<br/>});<br/>localStorage.setItem(LS_KEY, JSON.stringify(log));<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8041-9873-fb165ae5a377" class="">function clearLog(){<br/>localStorage.removeItem(LS_KEY);<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-809e-afa8-e6e19240d779" class="">function renderLog(){<br/>const log = loadLog();<br/>if (!log.length){<br/>logBox.innerHTML = &#x27;&lt;div class=&quot;muted&quot;&gt;まだログはありません。&lt;/div&gt;&#x27;;<br/>return;<br/>}<br/>logBox.innerHTML = log.slice(0,30).map(function(x){<br/>const dt = new Date(x.ts);<br/>const when = isFinite(dt) ? dt.toLocaleString(&quot;ja-JP&quot;) : x.ts;<br/>const meta = x.raceName + &quot;（&quot; + (x.track || &quot;-&quot;) + &quot; / &quot; + (x.fieldSize || &quot;-&quot;) + &quot;）&quot;;<br/>const extra = x.decision === &quot;買う&quot;<br/>? &quot;パターン:&quot; + (x.pattern || &quot;-&quot;) + &quot; / 本命:&quot; + (x.horse || &quot;-&quot;) + &quot; / 負け筋:&quot; + (x.note || &quot;-&quot;)<br/>: &quot;理由:&quot; + (x.reason || &quot;-&quot;);<br/>return (<br/>&#x27;&lt;div class=&quot;log-item&quot;&gt;&#x27; +<br/>&#x27;&lt;div&gt;&lt;b&gt;&#x27; + escapeHtml(x.decision) + &#x27;&lt;/b&gt; &#x27; +<br/>&#x27;&lt;span class=&quot;muted&quot;&gt;— &#x27; + escapeHtml(meta) + &#x27;&lt;/span&gt;&lt;/div&gt;&#x27; +<br/>&#x27;&lt;div class=&quot;muted&quot;&gt;&#x27; + escapeHtml(extra) + &#x27;&lt;/div&gt;&#x27; +<br/>&#x27;&lt;div class=&quot;muted small&quot;&gt;&#x27; + escapeHtml(when) + &#x27;&lt;/div&gt;&#x27; +<br/>&#x27;&lt;/div&gt;&#x27;<br/>);<br/>}).join(&quot;&quot;);<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8024-8109-d08c93d6b0bd" class="">exportBtn.onclick = function(){<br/>const log = loadLog();<br/>const header = [&quot;ts&quot;,&quot;raceName&quot;,&quot;track&quot;,&quot;fieldSize&quot;,&quot;decision&quot;,&quot;pattern&quot;,&quot;restriction&quot;,&quot;horse&quot;,&quot;note&quot;,&quot;reason&quot;];<br/>const rows = log.map(function(x){<br/>return header.map(function(k){ return csvEscape(String(x[k] || &quot;&quot;)); }).join(&quot;,&quot;);<br/>});<br/>const csv = [header.join(&quot;,&quot;), ...rows].join(&quot;\n&quot;);<br/>copyToClipboard(csv);<br/>showToast(&quot;CSVをコピーしました&quot;);<br/>};</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80e5-8e8f-fc2acd6c97ab" class="">clearLogBtn.onclick = function(){<br/>clearLog();<br/>renderLog();<br/>showToast(&quot;ログを消しました&quot;);<br/>};</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8004-b84d-fe463eec1b09" class="">function escapeHtml(s){<br/>return String(s).replace(/[&amp;&lt;&gt;\&quot;&#x27;]/g, function(c){<br/>return ({ &quot;&amp;&quot;:&quot;&amp;&quot;,&quot;&lt;&quot;:&quot;&lt;&quot;,&quot;&gt;&quot;:&quot;&gt;&quot;,&quot;\&quot;&quot;:&quot;&quot;&quot;,&quot;&#x27;&quot;:&quot;&#x27;&quot; })[c];<br/>});<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8029-a8a8-de08bffd3b92" class="">function csvEscape(s){<br/>if (/[\&quot;,\n]/.test(s)) return &#x27;&quot;&#x27; + s.replace(/\&quot;/g,&#x27;&quot;&quot;&#x27;) + &#x27;&quot;&#x27;;<br/>return s;<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80fb-b062-ca621f386465" class="">function copyToClipboard(text){<br/>if (navigator.clipboard &amp;&amp; navigator.clipboard.writeText){<br/>navigator.clipboard.writeText(text).catch(function(){});<br/>} else {<br/>const ta = document.createElement(&quot;textarea&quot;);<br/>ta.value = text;<br/>document.body.appendChild(ta);<br/>ta.select();<br/>document.execCommand(&quot;copy&quot;);<br/>document.body.removeChild(ta);<br/>}<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-8074-8ba0-e04f31f5746a" class="">var toastTimer = null;<br/>function showToast(msg){<br/>clearTimeout(toastTimer);<br/>var el = document.getElementById(&quot;toast&quot;);<br/>if (!el){<br/>el = document.createElement(&quot;div&quot;);<br/><a href="http://el.id/">el.id</a> = &quot;toast&quot;;<br/>el.style.position = &quot;fixed&quot;;<br/>el.style.left = &quot;50%&quot;;<br/>el.style.bottom = &quot;18px&quot;;<br/>el.style.transform = &quot;translateX(-50%)&quot;;<br/>el.style.background = &quot;rgba(17,17,17,.92)&quot;;<br/>el.style.color = &quot;#fff&quot;;<br/>el.style.padding = &quot;10px 12px&quot;;<br/>el.style.borderRadius = &quot;12px&quot;;<br/>el.style.fontSize = &quot;13px&quot;;<br/>el.style.zIndex = &quot;9999&quot;;<br/>el.style.maxWidth = &quot;86vw&quot;;<br/>el.style.textAlign = &quot;center&quot;;<br/>document.body.appendChild(el);<br/>}<br/>el.textContent = msg;<br/>el.style.display = &quot;block&quot;;<br/>toastTimer = setTimeout(function(){ el.style.display = &quot;none&quot;; }, 1200);<br/>}</p></div><div style="display:contents" dir="auto"><p id="2e0a0258-5075-80bf-bccf-dd2b5ab04891" class="">render();<br/>renderLog();<br/>})();<br/>&lt;/script&gt;<br/>&lt;/body&gt;<br/>&lt;/html&gt;</p></div></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
