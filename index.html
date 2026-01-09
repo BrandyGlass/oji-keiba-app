@@ -31,6 +31,7 @@
       background:rgba(0,0,0,.18); color:rgba(233,238,252,.85);
       margin-right:6px; margin-bottom:6px;
     }
+    .hr{ height:1px; background:var(--line); margin:14px 0; }
     .q{
       background:rgba(0,0,0,.18);
       border:1px solid var(--line);
@@ -38,7 +39,7 @@
       padding:14px;
       margin:12px 0;
     }
-    .qTitle{ font-weight:900; margin:0 0 10px; }
+    .qTitle{ font-weight:1000; margin:0 0 10px; }
     .btnRow{ display:flex; gap:10px; flex-wrap:wrap; }
     button{
       border:1px solid var(--line);
@@ -47,7 +48,7 @@
       border-radius:16px;
       padding:14px 14px;
       font-size:16px;
-      font-weight:900;
+      font-weight:1000;
       cursor:pointer;
       flex:1;
       min-width:160px;
@@ -58,7 +59,6 @@
     .note{ font-size:12px; color:rgba(233,238,252,.65); line-height:1.5; margin-top:10px; }
     .hide{ display:none; }
 
-    /* rating chips */
     .row{
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
       padding:10px; border:1px solid var(--line); border-radius:14px;
@@ -85,7 +85,6 @@
       background:#e9eefc; color:#0b1220; border-color:transparent;
     }
 
-    /* inputs */
     .inputs{ display:flex; gap:10px; flex-wrap:wrap; }
     .field{ flex:1; min-width:160px; }
     label{ display:block; font-size:12px; color:rgba(233,238,252,.7); margin-bottom:6px; }
@@ -97,10 +96,11 @@
       border-radius:14px;
       padding:14px 12px;
       font-size:16px;
-      font-weight:900;
+      font-weight:1000;
       outline:none;
     }
-    input::placeholder{ color:rgba(233,238,252,.35); font-weight:700; }
+    input::placeholder{ color:rgba(233,238,252,.35); font-weight:800; }
+
     .bigMsg{
       font-size:16px; line-height:1.6;
       background:rgba(0,0,0,.18);
@@ -121,8 +121,37 @@
       font-size:14px;
       text-align:left;
     }
-    th{ color:#cfe0ff; font-weight:900; }
+    th{ color:#cfe0ff; font-weight:1000; }
     .right{ text-align:right; }
+
+    .chk{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .chk label{
+      display:flex; align-items:center; gap:8px;
+      background:rgba(0,0,0,.14);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 12px;
+      font-size:14px;
+      color:rgba(233,238,252,.9);
+      margin:0;
+      cursor:pointer;
+    }
+    .chk input{ width:auto; padding:0; }
+
+    a.dl{
+      display:inline-block;
+      margin-top:10px;
+      color:#cfe0ff;
+      text-decoration:none;
+      border:1px solid var(--line);
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(0,0,0,.14);
+      font-weight:900;
+    }
 
     .toast{
       position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
@@ -138,12 +167,11 @@
 <body>
   <div class="wrap">
 
-    <!-- Header -->
     <div class="card">
       <h1>おじ.exe（競馬プロジェクト）</h1>
       <p class="sub">
         目的：迷わない／感情で買わない／決めた手順通りに動く<br>
-        STEP0〜STEP4 実装済み（次：STEP5〜ログ強化）。
+        STEP0〜STEP6＋CSVログ（ローカル保存）まで実装。
       </p>
       <span class="pill">複勝1点</span>
       <span class="pill">1R 500円</span>
@@ -213,8 +241,7 @@
     <section id="step2" class="card hide">
       <h2>STEP2｜候補抽出（番号で最大3頭）</h2>
       <p class="sub">
-        この工程では<strong>本命を決めない</strong>。<br>
-        「変な負け方をしにくそう」な馬を<strong>番号で</strong>最大3頭まで置くだけ。人気・オッズは見ない。
+        本命は決めない。「変な負け方をしにくそう」な馬を番号で最大3頭。人気・オッズは見ない。
       </p>
 
       <div class="q">
@@ -236,8 +263,7 @@
         </div>
 
         <p class="note">
-          ルール：数字のみ／同じ番号は不可。<br>
-          馬①が書けない＝候補が出ない → 見送りが合理的。
+          ルール：数字のみ／同じ番号は不可。馬①が書けない＝見送りが合理的。
         </p>
 
         <div class="btnRow" style="margin-top:12px;">
@@ -250,49 +276,37 @@
     <!-- STEP3-① -->
     <section id="step3_1" class="card hide">
       <h2>STEP3-①｜コース × 距離（最優先）</h2>
-      <p class="sub">
-        選択肢で評価する（迷ったら下げる）。<br>
-        ◎2 / ◯1 / △0 / ×-2（※点数化はSTEP4でやる）
-      </p>
+      <p class="sub">迷ったら下げる。◎2 / ◯1 / △0 / ×-2</p>
       <div id="s31_list"></div>
 
       <div class="btnRow" style="margin-top:12px;">
         <button class="primary" id="toStep3_2">次へ（②へ）</button>
         <button class="danger" id="skipFromS3_1">今回は見送る</button>
       </div>
-      <p class="note">書けない（選べない）が出たら見送りでOK。</p>
     </section>
 
     <!-- STEP3-② -->
     <section id="step3_2" class="card hide">
       <h2>STEP3-②｜流れ × 脚質（負け筋の少なさ）</h2>
-      <p class="sub">
-        勝ち方ではなく「どう負けるか」を先に決める。迷ったら下げる。<br>
-        ◎2 / ◯1 / △0 / ×-2
-      </p>
+      <p class="sub">迷ったら下げる。◎2 / ◯1 / △0 / ×-2</p>
       <div id="s32_list"></div>
 
       <div class="btnRow" style="margin-top:12px;">
         <button class="primary" id="toStep3_3">次へ（③へ）</button>
         <button class="danger" id="skipFromS3_2">今回は見送る</button>
       </div>
-      <p class="note">負け筋が2つ以上浮かぶ感じなら△か×で良い（それが正直）。</p>
     </section>
 
     <!-- STEP3-③ -->
     <section id="step3_3" class="card hide">
       <h2>STEP3-③｜騎手（減点専用）</h2>
-      <p class="sub">
-        ここは加点しない。「壊さないか」だけ。<br>
-        OK 0 / 不安 -0.5 / NG -1
-      </p>
+      <p class="sub">加点しない。OK 0 / 不安 -0.5 / NG -1</p>
       <div id="s33_list"></div>
 
       <div class="btnRow" style="margin-top:12px;">
         <button class="primary" id="toStep4">STEP4（点数化）へ</button>
         <button class="danger" id="skipFromS3_3">今回は見送る</button>
       </div>
-      <p class="note">不明は「不安」扱いにしてOK（迷ったらブレーキ）。</p>
     </section>
 
     <!-- STEP4 -->
@@ -300,18 +314,86 @@
       <h2>STEP4｜点数化（機械的に本命を決める）</h2>
       <p class="sub">
         合計点 = ① + ② + ③。トップが本命。<br>
-        同点：① → ② → ③ → それでも同点なら見送り。<br>
-        さらに、トップが <strong>1点未満</strong> なら見送り推奨。
+        同点：①→②→③→それでも同点なら見送り。トップが1点未満なら見送り推奨。
       </p>
 
       <div id="s4_out" class="bigMsg"></div>
 
       <div class="btnRow" style="margin-top:12px;">
-        <button class="primary" id="goStep5">STEP5へ（※次で実装）</button>
+        <button class="primary" id="goStep5">STEP5へ進む</button>
         <button class="danger" id="skipFromStep4">今回は見送る</button>
         <button class="ghost" id="restart">最初から</button>
       </div>
-      <p class="note">STEP5〜は次で「0番チェック→結論→ログ強化」を入れる。</p>
+    </section>
+
+    <!-- STEP5 -->
+    <section id="step5" class="card hide">
+      <h2>STEP5｜0番チェック（パドック無し・事実のみ）</h2>
+      <p class="sub">
+        ここは最後のブレーキ。<br>
+        馬体重±12kgは強制見送り。直前情報はフラグ（見送り条件に自動反映）。
+      </p>
+
+      <div class="q">
+        <p class="qTitle">Q5-1：馬体重（前走比）は？（例：+6 / -4）</p>
+        <div class="inputs">
+          <div class="field" style="min-width:240px;">
+            <label>前走比（kg）</label>
+            <input id="weightDiff" inputmode="numeric" placeholder="例：+6" />
+          </div>
+        </div>
+        <p class="note">±12kg以上なら強制見送り（型の安全装置）。</p>
+      </div>
+
+      <div class="q">
+        <p class="qTitle">Q5-2：直前情報（事実フラグ）</p>
+        <div class="chk">
+          <label><input type="checkbox" id="f_cancel" /> 出走取消／条件の大きな変更</label>
+          <label><input type="checkbox" id="f_jockey" /> 騎手の急な乗り替わり</label>
+          <label><input type="checkbox" id="f_track" /> 馬場が想定とズレた（重→不良など）</label>
+        </div>
+        <p class="note">フラグが立ったら「見送り条件」に自動で入る（即終了ではない）。</p>
+      </div>
+
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="primary" id="toStep6">STEP6（結論）へ</button>
+        <button class="danger" id="skipFromStep5">今回は見送る</button>
+      </div>
+    </section>
+
+    <!-- STEP6 -->
+    <section id="step6" class="card hide">
+      <h2>STEP6｜結論（固定文）</h2>
+      <p class="sub">
+        ここで「負け筋（1つだけ）」をボタンで選ぶ。選べないなら見送りでOK。
+      </p>
+
+      <div class="q">
+        <p class="qTitle">負け筋（1つだけ）</p>
+        <div class="btnRow" style="gap:8px;">
+          <button class="ghost risk" data-risk="前が止まらない">前が止まらない</button>
+          <button class="ghost risk" data-risk="位置取り後ろすぎ">位置取り後ろすぎ</button>
+          <button class="ghost risk" data-risk="外々ロス">外々ロス</button>
+          <button class="ghost risk" data-risk="スピード負け">スピード負け</button>
+          <button class="ghost risk" data-risk="捲り合戦に巻き込まれる">捲り合戦に巻き込まれる</button>
+        </div>
+        <p class="note">※1つだけ。押したら選択状態になる。</p>
+      </div>
+
+      <div id="s6_out" class="bigMsg"></div>
+
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="primary" id="finalizeBuy">BUYで保存</button>
+        <button class="danger" id="finalizeSkip">見送りで保存</button>
+        <button class="ghost" id="restart3">最初から</button>
+      </div>
+
+      <div class="q" style="margin-top:14px;">
+        <p class="qTitle">ログ（CSV）</p>
+        <div class="mono" id="logArea"></div>
+        <a class="dl" id="downloadCsv" href="#" download="oji-keiba-log.csv">CSVをダウンロード</a>
+        <p class="note">※ログはこの端末のブラウザに保存される（localStorage）。</p>
+      </div>
     </section>
 
     <!-- SKIP -->
@@ -322,7 +404,7 @@
         <div style="font-weight:1000; margin-bottom:6px;">✅ 見送りを選択しました</div>
         <div class="mono" id="skipReason"></div>
         <div style="margin-top:10px; font-size:12px; color:rgba(233,238,252,.7);">
-          No bet is a bet. 見送れる日は、型が守れている日。
+          No bet is a bet.
         </div>
       </div>
       <div class="btnRow" style="margin-top:12px;">
@@ -342,45 +424,49 @@
   const state = {
     step0_q1: null,
     step0_q2: null,
-    step1_q3: null,       // graded?
-    step1_q4: null,       // course pick
-    candidates: [],       // [int...]
-    eval: {},             // { [horseNo]: { s1:'◎|◯|△|×', s2:'◎|◯|△|×', s3:'OK|不安|NG' } }
-    s4: null              // computed results
+    step1_q3: null,
+    step1_q4: null,
+    candidates: [],
+    eval: {},
+    s4: null,
+    step5: {
+      weightDiff: null,
+      weightAbs12: false,
+      flags: { cancel:false, jockey:false, track:false }
+    },
+    risk: null
   };
 
+  // ===== UI helpers =====
   function showToast(msg){
     toast.textContent = msg;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 1100);
   }
-
   function showSection(id){
-    ["step0","step1","step2","step3_1","step3_2","step3_3","step4","skip"].forEach(s => $(s).classList.add("hide"));
+    ["step0","step1","step2","step3_1","step3_2","step3_3","step4","step5","step6","skip"].forEach(s => $(s).classList.add("hide"));
     $(id).classList.remove("hide");
     window.scrollTo({top:0, behavior:"smooth"});
   }
-
   function showEl(id){ $(id).classList.remove("hide"); }
-
   function setFromData(setStr){
     if(!setStr) return;
     const [k,v] = setStr.split(":");
     state[k] = v;
   }
 
+  // ===== SKIP =====
   function goSkip(reasonKey){
     const map = {
       today_limit: "STEP0で終了：最大3レース/日が守れない → 今日は見送り。",
       money_rule:  "STEP0で終了：500円固定が守れない → このレースは見送り。",
       not_target:  "STEP1で終了：重賞でも得意条件でもない → 見送り。",
       user_skip:   "おじ判断：今回は見送る（正解ルート）。",
-      step2_invalid:"STEP2で終了：候補（馬①）が書けない／入力が不正 → 見送り。"
+      step5_weight:"STEP5で終了：馬体重 前走比±12kg以上 → 強制見送り。"
     };
     $("skipReason").textContent =
       (map[reasonKey] || "見送りを選択しました。") +
       "\n\n-- 状態 --\n" + JSON.stringify(state, null, 2);
-
     showSection("skip");
   }
 
@@ -395,20 +481,19 @@
       showEl(btn.dataset.next);
       showToast("次へ");
     }
-
     if(btn.dataset.skip){
       goSkip(btn.dataset.skip);
     }
   });
 
-  // STEP0 -> STEP1
+  // ===== STEP0 -> STEP1 =====
   $("goStep1").addEventListener("click", () => {
     if(state.step0_q1 !== "yes"){ return; }
     state.step0_q2 = "yes";
     showSection("step1");
   });
 
-  // STEP1
+  // ===== STEP1 =====
   function passTarget(summaryLines){
     $("passSummary").textContent = summaryLines.join("\n");
     showEl("step1_pass");
@@ -454,13 +539,13 @@
   $("goStep2").addEventListener("click", () => showSection("step2"));
   $("skipHere").addEventListener("click", () => goSkip("user_skip"));
 
-  // STEP2 validation
+  // ===== STEP2 =====
   function parseHorseInput(val){
     const s = (val || "").trim();
     if(s === "") return null;
+    // allow + or -? not for horse no. digits only.
     if(!/^\d+$/.test(s)) return NaN;
-    const n = parseInt(s, 10);
-    return n;
+    return parseInt(s, 10);
   }
 
   function validateCandidates(){
@@ -468,33 +553,17 @@
     const n2 = parseHorseInput($("h2").value);
     const n3 = parseHorseInput($("h3").value);
 
-    // horse1 required
-    if(n1 === null){
-      showToast("馬①は必須");
-      return { ok:false, reason:"馬①が空です" };
-    }
-    if(Number.isNaN(n1) || Number.isNaN(n2) || Number.isNaN(n3)){
-      showToast("数字のみで入力");
-      return { ok:false, reason:"数字以外が含まれています" };
-    }
+    if(n1 === null){ showToast("馬①は必須"); return {ok:false}; }
+    if(Number.isNaN(n1) || Number.isNaN(n2) || Number.isNaN(n3)){ showToast("数字のみ"); return {ok:false}; }
 
-    // range: allow 1..18 (日本競馬の想定). 0 or >18 is error.
     const arr = [n1, n2, n3].filter(v => v !== null);
     for(const n of arr){
-      if(n < 1 || n > 18){
-        showToast("番号は1〜18");
-        return { ok:false, reason:"範囲外の番号があります" };
-      }
+      if(n < 1 || n > 18){ showToast("番号は1〜18"); return {ok:false}; }
     }
-
-    // unique
     const set = new Set(arr);
-    if(set.size !== arr.length){
-      showToast("同じ番号は不可");
-      return { ok:false, reason:"重複があります" };
-    }
+    if(set.size !== arr.length){ showToast("同じ番号は不可"); return {ok:false}; }
 
-    return { ok:true, candidates: arr };
+    return {ok:true, candidates:arr};
   }
 
   function initEval(){
@@ -505,10 +574,8 @@
   }
 
   function renderRatings(containerId, key, options){
-    // key: 's1' or 's2' or 's3'
     const el = $(containerId);
     el.innerHTML = "";
-
     for(const h of state.candidates){
       const row = document.createElement("div");
       row.className = "row";
@@ -528,7 +595,6 @@
         b.textContent = opt;
         b.addEventListener("click", () => {
           state.eval[h][key] = opt;
-          // update UI
           [...seg.querySelectorAll("button")].forEach(x => x.classList.remove("on"));
           b.classList.add("on");
           showToast(`馬${h}：${opt}`);
@@ -545,47 +611,35 @@
     return state.candidates.every(h => state.eval[h][key]);
   }
 
-  // STEP2 -> STEP3-①
   $("toStep3_1").addEventListener("click", () => {
     const v = validateCandidates();
-    if(!v.ok){
-      // keep user on step2, but allow manual skip
-      return;
-    }
+    if(!v.ok) return;
+
     state.candidates = v.candidates;
     initEval();
-
-    // render STEP3 screens
-    renderRatings("s31_list", "s1", ["◎","◯","△","×"]);
-    renderRatings("s32_list", "s2", ["◎","◯","△","×"]);
-    renderRatings("s33_list", "s3", ["OK","不安","NG"]);
+    renderRatings("s31_list","s1",["◎","◯","△","×"]);
+    renderRatings("s32_list","s2",["◎","◯","△","×"]);
+    renderRatings("s33_list","s3",["OK","不安","NG"]);
 
     showSection("step3_1");
   });
 
   $("skipFromStep2").addEventListener("click", () => goSkip("user_skip"));
 
-  // STEP3-① -> STEP3-②
+  // ===== STEP3 =====
   $("toStep3_2").addEventListener("click", () => {
-    if(!allPicked("s1")){
-      showToast("①を全馬選択");
-      return;
-    }
+    if(!allPicked("s1")){ showToast("①を全馬選択"); return; }
     showSection("step3_2");
   });
   $("skipFromS3_1").addEventListener("click", () => goSkip("user_skip"));
 
-  // STEP3-② -> STEP3-③
   $("toStep3_3").addEventListener("click", () => {
-    if(!allPicked("s2")){
-      showToast("②を全馬選択");
-      return;
-    }
+    if(!allPicked("s2")){ showToast("②を全馬選択"); return; }
     showSection("step3_3");
   });
   $("skipFromS3_2").addEventListener("click", () => goSkip("user_skip"));
 
-  // STEP3-③ -> STEP4
+  // ===== STEP4 =====
   const scoreMap12 = { "◎":2, "◯":1, "△":0, "×":-2 };
   const scoreMap3  = { "OK":0, "不安":-0.5, "NG":-1 };
 
@@ -594,12 +648,11 @@
       const e = state.eval[h];
       const s1 = scoreMap12[e.s1];
       const s2 = scoreMap12[e.s2];
-      const s3 = scoreMap3[e.s3] ?? -0.5;
+      const s3 = scoreMap3[e.s3];
       const total = s1 + s2 + s3;
       return { h, e, s1, s2, s3, total };
     });
 
-    // sort by: total desc, then s1 desc, then s2 desc, then s3 desc
     const sorted = [...rows].sort((a,b) => {
       if(b.total !== a.total) return b.total - a.total;
       if(b.s1 !== a.s1) return b.s1 - a.s1;
@@ -608,47 +661,33 @@
       return 0;
     });
 
-    // check tie for top with tie-breakers
     const top = sorted[0];
     const sameTotal = sorted.filter(r => r.total === top.total);
     let decided = top;
     let tieUnresolved = false;
 
     if(sameTotal.length > 1){
-      // apply tie-breaker explicitly; if still tied on s1,s2,s3 then unresolved
       const best = sameTotal.filter(r => r.s1 === Math.max(...sameTotal.map(x=>x.s1)));
       const best2 = best.filter(r => r.s2 === Math.max(...best.map(x=>x.s2)));
       const best3 = best2.filter(r => r.s3 === Math.max(...best2.map(x=>x.s3)));
-      if(best3.length === 1){
-        decided = best3[0];
-      }else{
-        tieUnresolved = true;
-      }
+      if(best3.length === 1) decided = best3[0];
+      else tieUnresolved = true;
     }
 
     const recommendSkip = tieUnresolved || decided.total < 1;
-
     return { rows, sorted, decided, tieUnresolved, recommendSkip };
   }
 
   function renderStep4(res){
     const out = $("s4_out");
-
     const table = document.createElement("table");
     table.innerHTML = `
       <thead>
-        <tr>
-          <th>馬番</th>
-          <th>①</th>
-          <th>②</th>
-          <th>③</th>
-          <th class="right">合計</th>
-        </tr>
+        <tr><th>馬番</th><th>①</th><th>②</th><th>③</th><th class="right">合計</th></tr>
       </thead>
       <tbody></tbody>
     `;
     const tb = table.querySelector("tbody");
-
     for(const r of res.sorted){
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -670,14 +709,11 @@
 
     if(res.tieUnresolved){
       header.textContent = "⚠️ 同点が解消できない → 見送り推奨";
-      msg.textContent =
-        "同点ルール（①→②→③）でも決めきれない。\n" +
-        "この時点で止めるのが型。\n";
+      msg.textContent = "同点ルール（①→②→③）でも決めきれない。ここで止めるのが型。";
     }else{
       header.textContent = `✅ 本命：馬${res.decided.h}（合計 ${res.decided.total.toFixed(1)} 点）`;
-      msg.textContent =
-        `内訳：①${res.decided.e.s1} / ②${res.decided.e.s2} / ③${res.decided.e.s3}\n` +
-        (res.decided.total < 1 ? "※トップが1点未満 → 見送り推奨\n" : "");
+      msg.textContent = `内訳：①${res.decided.e.s1} / ②${res.decided.e.s2} / ③${res.decided.e.s3}\n` +
+        (res.decided.total < 1 ? "※トップが1点未満 → 見送り推奨" : "");
     }
 
     out.innerHTML = "";
@@ -685,21 +721,10 @@
     out.appendChild(table);
     out.appendChild(document.createElement("div")).className = "hr";
     out.appendChild(msg);
-
-    if(res.recommendSkip){
-      out.appendChild(document.createElement("div")).className = "hr";
-      const b = document.createElement("div");
-      b.className = "mono";
-      b.textContent = "No bet is a bet. 見送れる日は、型が守れている日。";
-      out.appendChild(b);
-    }
   }
 
   $("toStep4").addEventListener("click", () => {
-    if(!allPicked("s3")){
-      showToast("③を全馬選択");
-      return;
-    }
+    if(!allPicked("s3")){ showToast("③を全馬選択"); return; }
     const res = computeStep4();
     state.s4 = res;
     renderStep4(res);
@@ -707,13 +732,218 @@
   });
   $("skipFromS3_3").addEventListener("click", () => goSkip("user_skip"));
 
-  // STEP4 buttons
   $("skipFromStep4").addEventListener("click", () => goSkip("user_skip"));
   $("goStep5").addEventListener("click", () => {
-    showToast("STEP5は次で実装");
+    // reset step5 inputs
+    $("weightDiff").value = "";
+    $("f_cancel").checked = false;
+    $("f_jockey").checked = false;
+    $("f_track").checked = false;
+    state.step5.weightDiff = null;
+    state.step5.weightAbs12 = false;
+    state.step5.flags = { cancel:false, jockey:false, track:false };
+    state.risk = null;
+    // reset risk buttons UI
+    document.querySelectorAll("button.risk").forEach(b => b.classList.remove("on"));
+    showSection("step5");
   });
 
-  // Restart
+  // ===== STEP5 =====
+  function parseWeightDiff(s){
+    const t = (s || "").trim();
+    if(t === "") return null;
+    // allow +6, -4, 6
+    if(!/^[+-]?\d+$/.test(t)) return NaN;
+    return parseInt(t, 10);
+  }
+
+  function collectStep5(){
+    const wd = parseWeightDiff($("weightDiff").value);
+    if(wd === null){ showToast("馬体重（前走比）を入れて"); return {ok:false}; }
+    if(Number.isNaN(wd)){ showToast("+6 / -4 みたいに"); return {ok:false}; }
+
+    state.step5.weightDiff = wd;
+    state.step5.weightAbs12 = Math.abs(wd) >= 12;
+
+    state.step5.flags = {
+      cancel: $("f_cancel").checked,
+      jockey: $("f_jockey").checked,
+      track:  $("f_track").checked
+    };
+
+    return {ok:true};
+  }
+
+  $("skipFromStep5").addEventListener("click", () => goSkip("user_skip"));
+
+  // ===== STEP6 =====
+  function explainAim(decided){
+    const e = decided.e;
+    // short deterministic text
+    if(e.s1 === "◎" && e.s2 === "◎") return "①②が揃っていて崩れにくい";
+    if(e.s1 === "◎" && e.s2 === "◯") return "①を軸に、②は許容";
+    if(e.s1 === "◯" && e.s2 === "◎") return "②の噛み合いで勝負";
+    if((e.s1 === "×") || (e.s2 === "×")) return "×が混じるため根拠が薄い（見送り寄り）";
+    return "根拠は薄め。無理しない";
+  }
+
+  function flagsText(flags){
+    const arr = [];
+    if(flags.cancel) arr.push("出走取消/条件変更");
+    if(flags.jockey) arr.push("急な乗り替わり");
+    if(flags.track)  arr.push("馬場ズレ");
+    return arr.length ? arr.join("・") : "なし";
+  }
+
+  function buildConclusion(decision){
+    const s4 = state.s4;
+    const dec = s4?.decided;
+    if(!dec) return "（本命がありません）";
+
+    const aim = explainAim(dec);
+    const condFlags = flagsText(state.step5.flags);
+
+    const lines = [];
+    lines.push(`結論：${decision}`);
+    lines.push(`本命：馬${dec.h}（合計 ${dec.total.toFixed(1)}点）`);
+    lines.push(`狙い：${aim}`);
+    lines.push(`リスク：${state.risk || "（未選択）"}`);
+    lines.push(`買い目：馬${dec.h} 複勝1点 500円`);
+    lines.push(`見送り条件：馬体重±12kg以上／直前情報フラグON（${condFlags}）`);
+    return lines.join("\n");
+  }
+
+  function renderStep6(){
+    const out = $("s6_out");
+    const s4 = state.s4;
+    const dec = s4.decided;
+
+    const warn = [];
+    if(s4.recommendSkip) warn.push("STEP4の判定：見送り推奨");
+    if(state.step5.flags.cancel || state.step5.flags.jockey || state.step5.flags.track){
+      warn.push("STEP5：直前情報フラグON（見送り条件に該当）");
+    }
+
+    out.innerHTML = "";
+    if(warn.length){
+      const w = document.createElement("div");
+      w.className = "mono";
+      w.textContent = "⚠️ " + warn.join(" / ");
+      out.appendChild(w);
+      out.appendChild(document.createElement("div")).className = "hr";
+    }
+
+    const autoDecision = (s4.recommendSkip ? "見送り（推奨）" : "買う");
+    const pre = document.createElement("div");
+    pre.className = "mono";
+    pre.textContent = buildConclusion(autoDecision);
+    out.appendChild(pre);
+  }
+
+  $("toStep6").addEventListener("click", () => {
+    const ok = collectStep5();
+    if(!ok.ok) return;
+
+    if(state.step5.weightAbs12){
+      goSkip("step5_weight");
+      return;
+    }
+
+    showSection("step6");
+    renderStep6();
+    loadLogUI();
+  });
+
+  // risk buttons
+  document.querySelectorAll("button.risk").forEach(b => {
+    b.addEventListener("click", () => {
+      document.querySelectorAll("button.risk").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      state.risk = b.dataset.risk;
+      showToast(`負け筋：${state.risk}`);
+      renderStep6();
+    });
+  });
+
+  // ===== CSV LOG (localStorage) =====
+  const LOG_KEY = "oji_keiba_log_csv_v1";
+
+  function nowJST(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+  }
+
+  function getCourseLabel(){
+    if(state.step1_q4 === "graded") return "重賞";
+    if(state.step1_q4 === "nakayama_d1800") return "中山ダ1800";
+    if(state.step1_q4 === "tokyo_d1600") return "東京ダ1600";
+    return "不明";
+  }
+
+  function getCandidatesStr(){
+    return state.candidates.join("-");
+  }
+
+  function getTop(){
+    return state.s4?.decided;
+  }
+
+  function appendLog(decision){
+    const top = getTop();
+    const course = getCourseLabel();
+    const condFlags = flagsText(state.step5.flags);
+    const row = [
+      nowJST(),
+      course,
+      getCandidatesStr(),
+      top ? String(top.h) : "",
+      top ? top.total.toFixed(1) : "",
+      state.step5.weightDiff ?? "",
+      condFlags,
+      state.risk ?? "",
+      decision
+    ].map(x => String(x).replaceAll('"','""')); // escape
+
+    const line = `"${row.join('","')}"`;
+    const prev = localStorage.getItem(LOG_KEY);
+    if(prev){
+      localStorage.setItem(LOG_KEY, prev + "\n" + line);
+    }else{
+      const header = `"ts","course","candidates","main","score","weightDiff","flags","risk","decision"`;
+      localStorage.setItem(LOG_KEY, header + "\n" + line);
+    }
+  }
+
+  function loadLogUI(){
+    const csv = localStorage.getItem(LOG_KEY) || `"ts","course","candidates","main","score","weightDiff","flags","risk","decision"`;
+    $("logArea").textContent = csv;
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    $("downloadCsv").href = url;
+  }
+
+  $("finalizeBuy").addEventListener("click", () => {
+    if(!state.risk){
+      showToast("負け筋を1つ選んで");
+      return;
+    }
+    appendLog("BUY");
+    showToast("保存した");
+    loadLogUI();
+  });
+
+  $("finalizeSkip").addEventListener("click", () => {
+    appendLog("SKIP");
+    showToast("保存した");
+    loadLogUI();
+  });
+
+  // ===== Restart =====
   function resetAll(){
     state.step0_q1 = null;
     state.step0_q2 = null;
@@ -722,28 +952,33 @@
     state.candidates = [];
     state.eval = {};
     state.s4 = null;
+    state.step5 = { weightDiff:null, weightAbs12:false, flags:{cancel:false,jockey:false,track:false} };
+    state.risk = null;
 
     $("step0_q2").classList.add("hide");
     $("step1_q4").classList.add("hide");
     $("step1_pass").classList.add("hide");
 
-    $("h1").value = "";
-    $("h2").value = "";
-    $("h3").value = "";
-
-    $("s31_list").innerHTML = "";
-    $("s32_list").innerHTML = "";
-    $("s33_list").innerHTML = "";
+    $("h1").value = ""; $("h2").value = ""; $("h3").value = "";
+    $("s31_list").innerHTML = ""; $("s32_list").innerHTML = ""; $("s33_list").innerHTML = "";
     $("s4_out").innerHTML = "";
+    $("weightDiff").value = "";
+    $("f_cancel").checked = false; $("f_jockey").checked = false; $("f_track").checked = false;
+    state.risk = null;
+    document.querySelectorAll("button.risk").forEach(b => b.classList.remove("on"));
+    $("s6_out").innerHTML = "";
 
     showSection("step0");
     showToast("リセット");
   }
+
   $("restart").addEventListener("click", resetAll);
   $("restart2").addEventListener("click", resetAll);
+  $("restart3").addEventListener("click", resetAll);
 
   // Init
   showSection("step0");
+  loadLogUI();
 })();
 </script>
 </body>
