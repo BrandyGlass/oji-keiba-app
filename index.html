@@ -12,7 +12,7 @@
       font-family:-apple-system, system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
       background:#0b1220; color:#e9eefc;
     }
-    .wrap{ max-width:820px; margin:0 auto; padding:var(--pad); }
+    .wrap{ max-width:860px; margin:0 auto; padding:var(--pad); }
     .card{
       background:rgba(255,255,255,.06);
       border:1px solid var(--line);
@@ -24,7 +24,7 @@
     }
     h1{ font-size:22px; margin:0 0 6px; }
     h2{ font-size:16px; margin:0 0 10px; color:#cfe0ff; }
-    .sub{ font-size:13px; color:rgba(233,238,252,.75); line-height:1.5; margin:0 0 14px; }
+    .sub{ font-size:13px; color:rgba(233,238,252,.75); line-height:1.55; margin:0 0 14px; }
     .pill{
       display:inline-block; font-size:12px; padding:6px 10px;
       border-radius:999px; border:1px solid var(--line);
@@ -56,6 +56,10 @@
     button.primary{ background:#e9eefc; color:#0b1220; border-color:transparent; }
     button.danger{ background:rgba(255,80,80,.12); border-color:rgba(255,80,80,.22); color:#ffd7d7; }
     button.ghost{ background:transparent; }
+    button:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
     .note{ font-size:12px; color:rgba(233,238,252,.65); line-height:1.5; margin-top:10px; }
     .hide{ display:none; }
 
@@ -88,7 +92,7 @@
     .inputs{ display:flex; gap:10px; flex-wrap:wrap; }
     .field{ flex:1; min-width:160px; }
     label{ display:block; font-size:12px; color:rgba(233,238,252,.7); margin-bottom:6px; }
-    input{
+    input, select{
       width:100%;
       border:1px solid var(--line);
       background:rgba(0,0,0,.18);
@@ -100,6 +104,7 @@
       outline:none;
     }
     input::placeholder{ color:rgba(233,238,252,.35); font-weight:800; }
+    select option{ color:#0b1220; }
 
     .bigMsg{
       font-size:16px; line-height:1.6;
@@ -111,7 +116,7 @@
     }
     .mono{
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:12px; color:rgba(233,238,252,.8);
+      font-size:12px; color:rgba(233,238,252,.82);
       white-space:pre-wrap;
     }
     table{ width:100%; border-collapse:collapse; margin-top:10px; }
@@ -162,6 +167,39 @@
       max-width:92vw;
     }
     .toast.show{ opacity:1; }
+
+    /* fixed header (race label) */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:5;
+      margin:0 0 14px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .topbar .left{
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+      font-weight:900; font-size:13px; color:rgba(233,238,252,.92);
+    }
+    .topbar .right{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .mini{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      font-size:12px;
+    }
   </style>
 </head>
 <body>
@@ -170,8 +208,8 @@
     <div class="card">
       <h1>おじ.exe（競馬プロジェクト）</h1>
       <p class="sub">
-        目的：迷わない／感情で買わない／決めた手順通りに動く<br>
-        STEP0〜STEP6＋CSVログ（ローカル保存）まで実装。
+        目的：迷わない／感情で買わない／決めた手順通りに動く。<br>
+        STEP-1（レース固定）→ STEP0〜6（判断）→ CSVログ（保存）。
       </p>
       <span class="pill">複勝1点</span>
       <span class="pill">1R 500円</span>
@@ -180,8 +218,78 @@
       <span class="pill">東京芝1400：一時停止</span>
     </div>
 
+    <!-- Fixed race header -->
+    <div id="topbar" class="topbar hide">
+      <div class="left">
+        <span class="mini" id="tb_date">📅 ----</span>
+        <span class="mini" id="tb_track">🏟 ----</span>
+        <span class="mini" id="tb_race">🎯 --R</span>
+        <span class="mini" id="tb_label">----</span>
+      </div>
+      <div class="right">
+        <button class="ghost" id="tb_restart" style="min-width:120px; padding:10px 12px; font-size:14px;">最初から</button>
+      </div>
+    </div>
+
+    <!-- STEP-1 -->
+    <section id="stepm1" class="card">
+      <h2>STEP-1｜レース情報（最初に固定）</h2>
+      <p class="sub">
+        この画面で「今日は何のレースを扱うか」を固定します。<br>
+        ここで迷わないことが、型を守る一番の近道です。
+      </p>
+
+      <div class="q">
+        <p class="qTitle">入力（必須）</p>
+        <div class="inputs">
+          <div class="field" style="min-width:240px;">
+            <label>日付（競馬日）</label>
+            <input id="m1_date" type="date" />
+            <div class="note">※デフォルトは今日。過去・未来の日付も選べます。</div>
+          </div>
+
+          <div class="field">
+            <label>競馬場</label>
+            <select id="m1_track">
+              <option value="">選択してください</option>
+              <option value="中山">中山</option>
+              <option value="東京">東京</option>
+              <option value="その他">その他</option>
+            </select>
+            <div class="note">※「その他」は得意条件に該当しません（STEP1で通常判定）。</div>
+          </div>
+
+          <div class="field" style="min-width:180px;">
+            <label>レース番号</label>
+            <select id="m1_raceNo">
+              <option value="">選択してください</option>
+              <option value="1">1R</option><option value="2">2R</option><option value="3">3R</option><option value="4">4R</option>
+              <option value="5">5R</option><option value="6">6R</option><option value="7">7R</option><option value="8">8R</option>
+              <option value="9">9R</option><option value="10">10R</option><option value="11">11R</option><option value="12">12R</option>
+            </select>
+            <div class="note">※手入力不可。必ず選択してください。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="qTitle">このレース（自動表示）</p>
+        <div class="mono" id="m1_preview">未入力</div>
+        <div class="hr"></div>
+        <div class="mono" id="m1_limits">本日の記録：- 件（残り - 件）</div>
+        <div class="mono" id="m1_dup"></div>
+        <p class="note">※この先は、決めたレースを前提に進みます。戻って変更はしません。</p>
+      </div>
+
+      <div class="btnRow">
+        <button class="primary" id="m1_next" disabled>次へ（STEP0へ）</button>
+        <button class="danger" id="m1_skip">今日は見送る</button>
+      </div>
+      <p class="note">見送りは正解ルートです。</p>
+    </section>
+
     <!-- STEP0 -->
-    <section id="step0" class="card">
+    <section id="step0" class="card hide">
       <h2>STEP0｜前提確認（10秒）</h2>
 
       <div class="q">
@@ -245,7 +353,7 @@
       </p>
 
       <div class="q">
-        <p class="qTitle">Q2：候補馬の番号（最大3頭）</p>
+        <p class="qTitle">候補馬の番号（最大3頭）</p>
 
         <div class="inputs">
           <div class="field">
@@ -330,19 +438,17 @@
     <section id="step5" class="card hide">
       <h2>STEP5｜0番チェック（パドック無し・事実のみ）</h2>
       <p class="sub">
-        ここは最後のブレーキ。<br>
-        馬体重±12kgは強制見送り。直前情報はフラグ（見送り条件に自動反映）。
+        ここは最後のブレーキ。馬体重±12kg以上は強制見送り。直前情報はフラグ（見送り条件に自動反映）。
       </p>
 
       <div class="q">
-        <p class="qTitle">Q5-1：馬体重（前走比）は？（例：+6 / -4）</p>
-        <div class="inputs">
-          <div class="field" style="min-width:240px;">
-            <label>前走比（kg）</label>
-            <input id="weightDiff" inputmode="numeric" placeholder="例：+6" />
-          </div>
+        <p class="qTitle">Q5-1：馬体重は前走比 ±12kg以上？（わからなければ「不明」）</p>
+        <div class="btnRow" style="gap:8px;">
+          <button class="ghost" id="w_yes" data-w="yes">はい（±12以上）</button>
+          <button class="ghost" id="w_no" data-w="no">いいえ（±11以内）</button>
+          <button class="ghost" id="w_unknown" data-w="unknown">不明</button>
         </div>
-        <p class="note">±12kg以上なら強制見送り（型の安全装置）。</p>
+        <p class="note">「はい」は強制見送り。それ以外は続行。</p>
       </div>
 
       <div class="q">
@@ -376,6 +482,9 @@
           <button class="ghost risk" data-risk="外々ロス">外々ロス</button>
           <button class="ghost risk" data-risk="スピード負け">スピード負け</button>
           <button class="ghost risk" data-risk="捲り合戦に巻き込まれる">捲り合戦に巻き込まれる</button>
+          <button class="ghost risk" data-risk="包まれる/進路なし">包まれる/進路なし</button>
+          <button class="ghost risk" data-risk="出遅れ">出遅れ</button>
+          <button class="ghost risk" data-risk="砂かぶり（ダート）">砂かぶり（ダート）</button>
         </div>
         <p class="note">※1つだけ。押したら選択状態になる。</p>
       </div>
@@ -421,7 +530,13 @@
   const $ = (id) => document.getElementById(id);
   const toast = $("toast");
 
+  const LOG_KEY = "oji_keiba_log_csv_v2"; // bump version for new columns
+  const SAVE_GUARD_MS = 1800;
+
   const state = {
+    // STEP-1
+    m1: { date: null, track: null, raceNo: null, label: null },
+
     step0_q1: null,
     step0_q2: null,
     step1_q3: null,
@@ -429,12 +544,16 @@
     candidates: [],
     eval: {},
     s4: null,
+
     step5: {
-      weightDiff: null,
-      weightAbs12: false,
+      weight12: null, // "yes"|"no"|"unknown"
       flags: { cancel:false, jockey:false, track:false }
     },
-    risk: null
+
+    risk: null,
+
+    // save guard
+    lastSaveAt: 0
   };
 
   // ===== UI helpers =====
@@ -443,16 +562,98 @@
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 1100);
   }
+
   function showSection(id){
-    ["step0","step1","step2","step3_1","step3_2","step3_3","step4","step5","step6","skip"].forEach(s => $(s).classList.add("hide"));
+    ["stepm1","step0","step1","step2","step3_1","step3_2","step3_3","step4","step5","step6","skip"]
+      .forEach(s => $(s).classList.add("hide"));
     $(id).classList.remove("hide");
     window.scrollTo({top:0, behavior:"smooth"});
   }
+
   function showEl(id){ $(id).classList.remove("hide"); }
+
   function setFromData(setStr){
     if(!setStr) return;
     const [k,v] = setStr.split(":");
     state[k] = v;
+  }
+
+  function setTopbarVisible(on){
+    const tb = $("topbar");
+    if(on) tb.classList.remove("hide");
+    else tb.classList.add("hide");
+  }
+
+  function updateTopbar(){
+    $("tb_date").textContent  = `📅 ${state.m1.date || "----"}`;
+    $("tb_track").textContent = `🏟 ${state.m1.track || "----"}`;
+    $("tb_race").textContent  = `🎯 ${state.m1.raceNo ? state.m1.raceNo + "R" : "--R"}`;
+    $("tb_label").textContent = state.m1.label || "----";
+  }
+
+  // ===== Date helper =====
+  function todayISO(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function nowJST(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+  }
+
+  // ===== CSV helpers =====
+  function getCsvOrHeader(){
+    return localStorage.getItem(LOG_KEY) ||
+      `"ts","date","track","raceNo","raceLabel","course","candidates","main","score","weight12","flags","risk","decision"`;
+  }
+
+  function setCsv(csv){
+    localStorage.setItem(LOG_KEY, csv);
+  }
+
+  function appendCsvLine(line){
+    const prev = localStorage.getItem(LOG_KEY);
+    if(prev) setCsv(prev + "\n" + line);
+    else setCsv(getCsvOrHeader() + "\n" + line);
+  }
+
+  function parseCsvLines(csv){
+    return (csv || "").split(/\r?\n/).filter(x => x.trim().length > 0);
+  }
+
+  function countLogsByDate(dateISO){
+    const lines = parseCsvLines(getCsvOrHeader());
+    // header + rows
+    let c = 0;
+    for(let i=1;i<lines.length;i++){
+      const line = lines[i];
+      // naive parse: second field is "date"
+      // format: "ts","date","track",...
+      const m = line.match(/^"[^"]*","([^"]*)"/);
+      if(m && m[1] === dateISO) c++;
+    }
+    return c;
+  }
+
+  function hasSameRaceRecorded(dateISO, track, raceNo){
+    const lines = parseCsvLines(getCsvOrHeader());
+    for(let i=1;i<lines.length;i++){
+      const line = lines[i];
+      // "ts","date","track","raceNo",...
+      const parts = line.split('","').map(s => s.replace(/^"/,'').replace(/"$/,''));
+      const d = parts[1], t = parts[2], r = parts[3];
+      if(d === dateISO && t === track && r === String(raceNo)) return true;
+    }
+    return false;
   }
 
   // ===== SKIP =====
@@ -462,11 +663,15 @@
       money_rule:  "STEP0で終了：500円固定が守れない → このレースは見送り。",
       not_target:  "STEP1で終了：重賞でも得意条件でもない → 見送り。",
       user_skip:   "おじ判断：今回は見送る（正解ルート）。",
-      step5_weight:"STEP5で終了：馬体重 前走比±12kg以上 → 強制見送り。"
+      step5_weight:"STEP5で終了：馬体重 前走比±12kg以上 → 強制見送り。",
+      day_full:    "STEP-1で終了：本日3レースに到達 → ルールにより見送り。",
+      dup_race:    "STEP-1で終了：同一レースが既に記録済み → 変更 or 見送り。"
     };
     $("skipReason").textContent =
       (map[reasonKey] || "見送りを選択しました。") +
       "\n\n-- 状態 --\n" + JSON.stringify(state, null, 2);
+    setTopbarVisible(true);
+    updateTopbar();
     showSection("skip");
   }
 
@@ -484,6 +689,90 @@
     if(btn.dataset.skip){
       goSkip(btn.dataset.skip);
     }
+  });
+
+  // ===== STEP-1 (entry) =====
+  function buildRaceLabel(){
+    if(!state.m1.date || !state.m1.track || !state.m1.raceNo) return null;
+    return `${state.m1.date} ${state.m1.track}${state.m1.raceNo}R`;
+  }
+
+  function updateM1Preview(){
+    const d = $("m1_date").value;
+    const t = $("m1_track").value;
+    const r = $("m1_raceNo").value;
+
+    state.m1.date = d || null;
+    state.m1.track = t || null;
+    state.m1.raceNo = r ? parseInt(r, 10) : null;
+    state.m1.label = buildRaceLabel();
+
+    const label = state.m1.label || "未入力";
+    $("m1_preview").textContent = state.m1.label
+      ? `📅 ${state.m1.date}\n🏟 ${state.m1.track}\n🎯 ${state.m1.raceNo}R\n\n${label}`
+      : "未入力";
+
+    const dateISO = state.m1.date;
+    let dayCount = 0;
+    if(dateISO) dayCount = countLogsByDate(dateISO);
+    const remain = dateISO ? Math.max(0, 3 - dayCount) : "-";
+    $("m1_limits").textContent = dateISO
+      ? `本日の記録：${dayCount}件（残り${remain}件）`
+      : `本日の記録：- 件（残り - 件）`;
+
+    let dupMsg = "";
+    if(state.m1.date && state.m1.track && state.m1.raceNo){
+      const dup = hasSameRaceRecorded(state.m1.date, state.m1.track, state.m1.raceNo);
+      dupMsg = dup ? `⚠ このレースは既に記録済みです（${label}）` : "";
+    }
+    $("m1_dup").textContent = dupMsg;
+
+    // enable/disable next
+    let canNext = !!(state.m1.date && state.m1.track && state.m1.raceNo);
+
+    // rule: day limit
+    if(state.m1.date){
+      const dayCountNow = countLogsByDate(state.m1.date);
+      if(dayCountNow >= 3){
+        canNext = false;
+      }
+    }
+
+    // rule: duplicate race
+    if(state.m1.date && state.m1.track && state.m1.raceNo){
+      if(hasSameRaceRecorded(state.m1.date, state.m1.track, state.m1.raceNo)){
+        canNext = false;
+      }
+    }
+
+    $("m1_next").disabled = !canNext;
+
+    // update topbar when filled
+    setTopbarVisible(!!(state.m1.date || state.m1.track || state.m1.raceNo));
+    updateTopbar();
+  }
+
+  $("m1_date").value = todayISO();
+  updateM1Preview();
+
+  ["m1_date","m1_track","m1_raceNo"].forEach(id => {
+    $(id).addEventListener("change", updateM1Preview);
+  });
+
+  $("m1_skip").addEventListener("click", () => goSkip("user_skip"));
+
+  $("m1_next").addEventListener("click", () => {
+    if(!state.m1.date || !state.m1.track || !state.m1.raceNo){
+      showToast("全部選んで");
+      return;
+    }
+    // enforce rules again
+    const dayCount = countLogsByDate(state.m1.date);
+    if(dayCount >= 3){ goSkip("day_full"); return; }
+    if(hasSameRaceRecorded(state.m1.date, state.m1.track, state.m1.raceNo)){ goSkip("dup_race"); return; }
+
+    // lock in and proceed
+    showSection("step0");
   });
 
   // ===== STEP0 -> STEP1 =====
@@ -512,6 +801,8 @@
 
   $("isGradedNo").addEventListener("click", () => {
     state.step1_q3 = "no";
+
+    // if track is その他 => it is not a preferred condition; still allow normal flow (STEP1_q4 shows)
     showEl("step1_q4");
     showToast("得意条件を選ぶ");
   });
@@ -543,7 +834,6 @@
   function parseHorseInput(val){
     const s = (val || "").trim();
     if(s === "") return null;
-    // allow + or -? not for horse no. digits only.
     if(!/^\d+$/.test(s)) return NaN;
     return parseInt(s, 10);
   }
@@ -733,66 +1023,54 @@
   $("skipFromS3_3").addEventListener("click", () => goSkip("user_skip"));
 
   $("skipFromStep4").addEventListener("click", () => goSkip("user_skip"));
+
   $("goStep5").addEventListener("click", () => {
-    // reset step5 inputs
-    $("weightDiff").value = "";
+    // reset step5
+    state.step5.weight12 = null;
+    state.step5.flags = { cancel:false, jockey:false, track:false };
     $("f_cancel").checked = false;
     $("f_jockey").checked = false;
     $("f_track").checked = false;
-    state.step5.weightDiff = null;
-    state.step5.weightAbs12 = false;
-    state.step5.flags = { cancel:false, jockey:false, track:false };
+
+    // reset weight buttons UI
+    ["w_yes","w_no","w_unknown"].forEach(id => $(id).classList.remove("on"));
+
+    // reset risk
     state.risk = null;
-    // reset risk buttons UI
     document.querySelectorAll("button.risk").forEach(b => b.classList.remove("on"));
+
     showSection("step5");
   });
 
-  // ===== STEP5 =====
-  function parseWeightDiff(s){
-    const t = (s || "").trim();
-    if(t === "") return null;
-    // allow +6, -4, 6
-    if(!/^[+-]?\d+$/.test(t)) return NaN;
-    return parseInt(t, 10);
+  // weight button behavior
+  function setWeightChoice(v){
+    state.step5.weight12 = v;
+    ["w_yes","w_no","w_unknown"].forEach(id => $(id).classList.remove("on"));
+    if(v === "yes") $("w_yes").classList.add("on");
+    if(v === "no") $("w_no").classList.add("on");
+    if(v === "unknown") $("w_unknown").classList.add("on");
+    showToast(`馬体重：${v === "yes" ? "はい" : v === "no" ? "いいえ" : "不明"}`);
   }
+  $("w_yes").addEventListener("click", () => setWeightChoice("yes"));
+  $("w_no").addEventListener("click", () => setWeightChoice("no"));
+  $("w_unknown").addEventListener("click", () => setWeightChoice("unknown"));
 
-  function collectStep5(){
-    const wd = parseWeightDiff($("weightDiff").value);
-    if(wd === null){ showToast("馬体重（前走比）を入れて"); return {ok:false}; }
-    if(Number.isNaN(wd)){ showToast("+6 / -4 みたいに"); return {ok:false}; }
-
-    state.step5.weightDiff = wd;
-    state.step5.weightAbs12 = Math.abs(wd) >= 12;
-
-    state.step5.flags = {
-      cancel: $("f_cancel").checked,
-      jockey: $("f_jockey").checked,
-      track:  $("f_track").checked
-    };
-
-    return {ok:true};
-  }
-
-  $("skipFromStep5").addEventListener("click", () => goSkip("user_skip"));
-
-  // ===== STEP6 =====
-  function explainAim(decided){
-    const e = decided.e;
-    // short deterministic text
-    if(e.s1 === "◎" && e.s2 === "◎") return "①②が揃っていて崩れにくい";
-    if(e.s1 === "◎" && e.s2 === "◯") return "①を軸に、②は許容";
-    if(e.s1 === "◯" && e.s2 === "◎") return "②の噛み合いで勝負";
-    if((e.s1 === "×") || (e.s2 === "×")) return "×が混じるため根拠が薄い（見送り寄り）";
-    return "根拠は薄め。無理しない";
-  }
-
+  // ===== STEP5 -> STEP6 =====
   function flagsText(flags){
     const arr = [];
     if(flags.cancel) arr.push("出走取消/条件変更");
     if(flags.jockey) arr.push("急な乗り替わり");
     if(flags.track)  arr.push("馬場ズレ");
     return arr.length ? arr.join("・") : "なし";
+  }
+
+  function explainAim(decided){
+    const e = decided.e;
+    if(e.s1 === "◎" && e.s2 === "◎") return "①②が揃っていて崩れにくい";
+    if(e.s1 === "◎" && e.s2 === "◯") return "①を軸に、②は許容";
+    if(e.s1 === "◯" && e.s2 === "◎") return "②の噛み合いで勝負";
+    if((e.s1 === "×") || (e.s2 === "×")) return "×が混じるため根拠が薄い（見送り寄り）";
+    return "根拠は薄め。無理しない";
   }
 
   function buildConclusion(decision){
@@ -802,14 +1080,18 @@
 
     const aim = explainAim(dec);
     const condFlags = flagsText(state.step5.flags);
+    const w = state.step5.weight12;
+    const wText = (w === "yes") ? "はい（±12以上）" : (w === "no") ? "いいえ（±11以内）" : "不明";
 
     const lines = [];
     lines.push(`結論：${decision}`);
+    lines.push(`レース：${state.m1.label || "----"}`);
     lines.push(`本命：馬${dec.h}（合計 ${dec.total.toFixed(1)}点）`);
     lines.push(`狙い：${aim}`);
     lines.push(`リスク：${state.risk || "（未選択）"}`);
     lines.push(`買い目：馬${dec.h} 複勝1点 500円`);
     lines.push(`見送り条件：馬体重±12kg以上／直前情報フラグON（${condFlags}）`);
+    lines.push(`馬体重チェック：${wText}`);
     return lines.join("\n");
   }
 
@@ -841,10 +1123,21 @@
   }
 
   $("toStep6").addEventListener("click", () => {
-    const ok = collectStep5();
-    if(!ok.ok) return;
+    // collect flags
+    state.step5.flags = {
+      cancel: $("f_cancel").checked,
+      jockey: $("f_jockey").checked,
+      track:  $("f_track").checked
+    };
 
-    if(state.step5.weightAbs12){
+    // enforce weight choice
+    if(!state.step5.weight12){
+      showToast("馬体重（はい/いいえ/不明）を選んで");
+      return;
+    }
+
+    // force skip if weight yes
+    if(state.step5.weight12 === "yes"){
       goSkip("step5_weight");
       return;
     }
@@ -853,6 +1146,8 @@
     renderStep6();
     loadLogUI();
   });
+
+  $("skipFromStep5").addEventListener("click", () => goSkip("user_skip"));
 
   // risk buttons
   document.querySelectorAll("button.risk").forEach(b => {
@@ -865,20 +1160,18 @@
     });
   });
 
-  // ===== CSV LOG (localStorage) =====
-  const LOG_KEY = "oji_keiba_log_csv_v1";
-
-  function nowJST(){
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    const hh = String(d.getHours()).padStart(2,"0");
-    const mi = String(d.getMinutes()).padStart(2,"0");
-    return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+  // ===== LOG UI =====
+  function loadLogUI(){
+    const csv = getCsvOrHeader();
+    $("logArea").textContent = csv;
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    $("downloadCsv").href = url;
   }
 
   function getCourseLabel(){
+    // "course" = decision basis category (for your own analysis)
+    // We keep it simple.
     if(state.step1_q4 === "graded") return "重賞";
     if(state.step1_q4 === "nakayama_d1800") return "中山ダ1800";
     if(state.step1_q4 === "tokyo_d1600") return "東京ダ1600";
@@ -893,38 +1186,70 @@
     return state.s4?.decided;
   }
 
+  function isDuplicateLastRow(date, track, raceNo, decision){
+    const lines = parseCsvLines(getCsvOrHeader());
+    if(lines.length < 2) return false;
+    const last = lines[lines.length - 1];
+    const parts = last.split('","').map(s => s.replace(/^"/,'').replace(/"$/,''));
+    // header: ts(0), date(1), track(2), raceNo(3), ... decision(last)
+    return (parts[1] === date && parts[2] === track && parts[3] === String(raceNo) && parts[parts.length-1] === decision);
+  }
+
   function appendLog(decision){
     const top = getTop();
-    const course = getCourseLabel();
-    const condFlags = flagsText(state.step5.flags);
+    const flags = flagsText(state.step5.flags);
+
     const row = [
       nowJST(),
-      course,
+      state.m1.date ?? "",
+      state.m1.track ?? "",
+      state.m1.raceNo ?? "",
+      state.m1.label ?? "",
+      getCourseLabel(),
       getCandidatesStr(),
       top ? String(top.h) : "",
       top ? top.total.toFixed(1) : "",
-      state.step5.weightDiff ?? "",
-      condFlags,
+      state.step5.weight12 ?? "",
+      flags,
       state.risk ?? "",
       decision
-    ].map(x => String(x).replaceAll('"','""')); // escape
+    ].map(x => String(x).replaceAll('"','""'));
 
     const line = `"${row.join('","')}"`;
-    const prev = localStorage.getItem(LOG_KEY);
-    if(prev){
-      localStorage.setItem(LOG_KEY, prev + "\n" + line);
-    }else{
-      const header = `"ts","course","candidates","main","score","weightDiff","flags","risk","decision"`;
-      localStorage.setItem(LOG_KEY, header + "\n" + line);
-    }
+    appendCsvLine(line);
   }
 
-  function loadLogUI(){
-    const csv = localStorage.getItem(LOG_KEY) || `"ts","course","candidates","main","score","weightDiff","flags","risk","decision"`;
-    $("logArea").textContent = csv;
-    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    $("downloadCsv").href = url;
+  function guardSaveButtons(disabled){
+    $("finalizeBuy").disabled = disabled;
+    $("finalizeSkip").disabled = disabled;
+  }
+
+  function saveWithGuard(decision){
+    const now = Date.now();
+    if(now - state.lastSaveAt < SAVE_GUARD_MS){
+      showToast("連打防止：少し待って");
+      return;
+    }
+
+    // simple duplicate check on last row
+    if(state.m1.date && state.m1.track && state.m1.raceNo){
+      if(isDuplicateLastRow(state.m1.date, state.m1.track, state.m1.raceNo, decision)){
+        showToast("同じ内容は保存しない");
+        return;
+      }
+    }
+
+    state.lastSaveAt = now;
+
+    guardSaveButtons(true);
+    try{
+      appendLog(decision);
+      showToast("保存した");
+      loadLogUI();
+    }finally{
+      // re-enable after short delay
+      setTimeout(() => guardSaveButtons(false), SAVE_GUARD_MS);
+    }
   }
 
   $("finalizeBuy").addEventListener("click", () => {
@@ -932,19 +1257,16 @@
       showToast("負け筋を1つ選んで");
       return;
     }
-    appendLog("BUY");
-    showToast("保存した");
-    loadLogUI();
+    saveWithGuard("BUY");
   });
 
   $("finalizeSkip").addEventListener("click", () => {
-    appendLog("SKIP");
-    showToast("保存した");
-    loadLogUI();
+    saveWithGuard("SKIP");
   });
 
   // ===== Restart =====
   function resetAll(){
+    // keep log
     state.step0_q1 = null;
     state.step0_q2 = null;
     state.step1_q3 = null;
@@ -952,9 +1274,11 @@
     state.candidates = [];
     state.eval = {};
     state.s4 = null;
-    state.step5 = { weightDiff:null, weightAbs12:false, flags:{cancel:false,jockey:false,track:false} };
+    state.step5 = { weight12:null, flags:{cancel:false,jockey:false,track:false} };
     state.risk = null;
+    state.lastSaveAt = 0;
 
+    // reset UI bits
     $("step0_q2").classList.add("hide");
     $("step1_q4").classList.add("hide");
     $("step1_pass").classList.add("hide");
@@ -962,23 +1286,41 @@
     $("h1").value = ""; $("h2").value = ""; $("h3").value = "";
     $("s31_list").innerHTML = ""; $("s32_list").innerHTML = ""; $("s33_list").innerHTML = "";
     $("s4_out").innerHTML = "";
-    $("weightDiff").value = "";
+
     $("f_cancel").checked = false; $("f_jockey").checked = false; $("f_track").checked = false;
-    state.risk = null;
+    ["w_yes","w_no","w_unknown"].forEach(id => $(id).classList.remove("on"));
     document.querySelectorAll("button.risk").forEach(b => b.classList.remove("on"));
     $("s6_out").innerHTML = "";
 
-    showSection("step0");
+    // return to entry step
+    showSection("stepm1");
     showToast("リセット");
+    updateM1Preview();
+    loadLogUI();
   }
 
   $("restart").addEventListener("click", resetAll);
   $("restart2").addEventListener("click", resetAll);
   $("restart3").addEventListener("click", resetAll);
+  $("tb_restart").addEventListener("click", resetAll);
+
+  // ===== small: topbar always on after step-1 =====
+  function afterEntryTopbarOn(){
+    setTopbarVisible(true);
+    updateTopbar();
+  }
+
+  // whenever leaving entry step, show topbar
+  const origShowSection = showSection;
+  showSection = function(id){
+    origShowSection(id);
+    if(id !== "stepm1") afterEntryTopbarOn();
+    if(id === "stepm1") setTopbarVisible(!!(state.m1.date || state.m1.track || state.m1.raceNo));
+  };
 
   // Init
-  showSection("step0");
   loadLogUI();
+  showSection("stepm1");
 })();
 </script>
 </body>
