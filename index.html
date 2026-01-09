@@ -31,7 +31,6 @@
       background:rgba(0,0,0,.18); color:rgba(233,238,252,.85);
       margin-right:6px; margin-bottom:6px;
     }
-    .hr{ height:1px; background:var(--line); margin:14px 0; }
     .q{
       background:rgba(0,0,0,.18);
       border:1px solid var(--line);
@@ -39,7 +38,7 @@
       padding:14px;
       margin:12px 0;
     }
-    .qTitle{ font-weight:800; margin:0 0 10px; }
+    .qTitle{ font-weight:900; margin:0 0 10px; }
     .btnRow{ display:flex; gap:10px; flex-wrap:wrap; }
     button{
       border:1px solid var(--line);
@@ -48,15 +47,60 @@
       border-radius:16px;
       padding:14px 14px;
       font-size:16px;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
       flex:1;
       min-width:160px;
     }
     button.primary{ background:#e9eefc; color:#0b1220; border-color:transparent; }
     button.danger{ background:rgba(255,80,80,.12); border-color:rgba(255,80,80,.22); color:#ffd7d7; }
+    button.ghost{ background:transparent; }
     .note{ font-size:12px; color:rgba(233,238,252,.65); line-height:1.5; margin-top:10px; }
     .hide{ display:none; }
+
+    /* rating chips */
+    .row{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      padding:10px; border:1px solid var(--line); border-radius:14px;
+      background:rgba(0,0,0,.14); margin:10px 0;
+    }
+    .badge{
+      font-weight:1000;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:14px;
+      min-width:68px;
+      text-align:center;
+    }
+    .seg{
+      display:flex; gap:8px; flex-wrap:wrap; flex:1;
+    }
+    .seg button{
+      min-width:72px; flex:0 0 auto; padding:10px 12px; font-size:14px;
+      border-radius:999px;
+    }
+    .seg button.on{
+      background:#e9eefc; color:#0b1220; border-color:transparent;
+    }
+
+    /* inputs */
+    .inputs{ display:flex; gap:10px; flex-wrap:wrap; }
+    .field{ flex:1; min-width:160px; }
+    label{ display:block; font-size:12px; color:rgba(233,238,252,.7); margin-bottom:6px; }
+    input{
+      width:100%;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      color:#e9eefc;
+      border-radius:14px;
+      padding:14px 12px;
+      font-size:16px;
+      font-weight:900;
+      outline:none;
+    }
+    input::placeholder{ color:rgba(233,238,252,.35); font-weight:700; }
     .bigMsg{
       font-size:16px; line-height:1.6;
       background:rgba(0,0,0,.18);
@@ -70,6 +114,16 @@
       font-size:12px; color:rgba(233,238,252,.8);
       white-space:pre-wrap;
     }
+    table{ width:100%; border-collapse:collapse; margin-top:10px; }
+    th,td{
+      border-bottom:1px solid var(--line);
+      padding:10px 8px;
+      font-size:14px;
+      text-align:left;
+    }
+    th{ color:#cfe0ff; font-weight:900; }
+    .right{ text-align:right; }
+
     .toast{
       position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
       background:rgba(0,0,0,.75); border:1px solid var(--line);
@@ -89,12 +143,13 @@
       <h1>おじ.exe（競馬プロジェクト）</h1>
       <p class="sub">
         目的：迷わない／感情で買わない／決めた手順通りに動く<br>
-        入口（STEP0〜STEP1）実装済み。次でSTEP2以降を入れる。
+        STEP0〜STEP4 実装済み（次：STEP5〜ログ強化）。
       </p>
       <span class="pill">複勝1点</span>
       <span class="pill">1R 500円</span>
       <span class="pill">最大3レース/日</span>
       <span class="pill">得意条件：中山ダ1800 / 東京ダ1600</span>
+      <span class="pill">東京芝1400：一時停止</span>
     </div>
 
     <!-- STEP0 -->
@@ -144,27 +199,119 @@
       </div>
 
       <div id="step1_pass" class="bigMsg hide">
-        <div style="font-weight:900; margin-bottom:6px;">✅ 対象レース：OK</div>
+        <div style="font-weight:1000; margin-bottom:6px;">✅ 対象レース：OK</div>
         <div class="mono" id="passSummary"></div>
         <div class="btnRow" style="margin-top:12px;">
           <button class="primary" id="goStep2">STEP2へ進む</button>
           <button class="danger" id="skipHere">今回は見送る</button>
         </div>
-        <p class="note">※STEP2以降は次の実装で本体化します（いまは遷移確認）。</p>
+        <p class="note">見送りは正解ルート。迷ったら止める。</p>
       </div>
     </section>
 
-    <!-- STEP2 (placeholder) -->
+    <!-- STEP2 -->
     <section id="step2" class="card hide">
-      <h2>STEP2｜候補抽出（※準備中）</h2>
+      <h2>STEP2｜候補抽出（番号で最大3頭）</h2>
       <p class="sub">
-        次の実装でここに「候補抽出の質問＋見送りボタン」を入れ込みます。<br>
-        いまは入口が正しく動くかの確認用。
+        この工程では<strong>本命を決めない</strong>。<br>
+        「変な負け方をしにくそう」な馬を<strong>番号で</strong>最大3頭まで置くだけ。人気・オッズは見ない。
       </p>
-      <div class="btnRow">
-        <button class="danger" id="skipFromStep2">今回は見送る</button>
-        <button class="primary" id="restart">最初から</button>
+
+      <div class="q">
+        <p class="qTitle">Q2：候補馬の番号（最大3頭）</p>
+
+        <div class="inputs">
+          <div class="field">
+            <label>馬①（必須）</label>
+            <input id="h1" inputmode="numeric" placeholder="例：7" />
+          </div>
+          <div class="field">
+            <label>馬②（任意）</label>
+            <input id="h2" inputmode="numeric" placeholder="例：12" />
+          </div>
+          <div class="field">
+            <label>馬③（任意）</label>
+            <input id="h3" inputmode="numeric" placeholder="例：3" />
+          </div>
+        </div>
+
+        <p class="note">
+          ルール：数字のみ／同じ番号は不可。<br>
+          馬①が書けない＝候補が出ない → 見送りが合理的。
+        </p>
+
+        <div class="btnRow" style="margin-top:12px;">
+          <button class="primary" id="toStep3_1">STEP3へ進む</button>
+          <button class="danger" id="skipFromStep2">今回は見送る</button>
+        </div>
       </div>
+    </section>
+
+    <!-- STEP3-① -->
+    <section id="step3_1" class="card hide">
+      <h2>STEP3-①｜コース × 距離（最優先）</h2>
+      <p class="sub">
+        選択肢で評価する（迷ったら下げる）。<br>
+        ◎2 / ◯1 / △0 / ×-2（※点数化はSTEP4でやる）
+      </p>
+      <div id="s31_list"></div>
+
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="primary" id="toStep3_2">次へ（②へ）</button>
+        <button class="danger" id="skipFromS3_1">今回は見送る</button>
+      </div>
+      <p class="note">書けない（選べない）が出たら見送りでOK。</p>
+    </section>
+
+    <!-- STEP3-② -->
+    <section id="step3_2" class="card hide">
+      <h2>STEP3-②｜流れ × 脚質（負け筋の少なさ）</h2>
+      <p class="sub">
+        勝ち方ではなく「どう負けるか」を先に決める。迷ったら下げる。<br>
+        ◎2 / ◯1 / △0 / ×-2
+      </p>
+      <div id="s32_list"></div>
+
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="primary" id="toStep3_3">次へ（③へ）</button>
+        <button class="danger" id="skipFromS3_2">今回は見送る</button>
+      </div>
+      <p class="note">負け筋が2つ以上浮かぶ感じなら△か×で良い（それが正直）。</p>
+    </section>
+
+    <!-- STEP3-③ -->
+    <section id="step3_3" class="card hide">
+      <h2>STEP3-③｜騎手（減点専用）</h2>
+      <p class="sub">
+        ここは加点しない。「壊さないか」だけ。<br>
+        OK 0 / 不安 -0.5 / NG -1
+      </p>
+      <div id="s33_list"></div>
+
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="primary" id="toStep4">STEP4（点数化）へ</button>
+        <button class="danger" id="skipFromS3_3">今回は見送る</button>
+      </div>
+      <p class="note">不明は「不安」扱いにしてOK（迷ったらブレーキ）。</p>
+    </section>
+
+    <!-- STEP4 -->
+    <section id="step4" class="card hide">
+      <h2>STEP4｜点数化（機械的に本命を決める）</h2>
+      <p class="sub">
+        合計点 = ① + ② + ③。トップが本命。<br>
+        同点：① → ② → ③ → それでも同点なら見送り。<br>
+        さらに、トップが <strong>1点未満</strong> なら見送り推奨。
+      </p>
+
+      <div id="s4_out" class="bigMsg"></div>
+
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="primary" id="goStep5">STEP5へ（※次で実装）</button>
+        <button class="danger" id="skipFromStep4">今回は見送る</button>
+        <button class="ghost" id="restart">最初から</button>
+      </div>
+      <p class="note">STEP5〜は次で「0番チェック→結論→ログ強化」を入れる。</p>
     </section>
 
     <!-- SKIP -->
@@ -172,7 +319,7 @@
       <h2>見送り</h2>
       <p class="sub">見送りは正解ルート。型に従った判断です。</p>
       <div class="bigMsg">
-        <div style="font-weight:900; margin-bottom:6px;">✅ 見送りを選択しました</div>
+        <div style="font-weight:1000; margin-bottom:6px;">✅ 見送りを選択しました</div>
         <div class="mono" id="skipReason"></div>
         <div style="margin-top:10px; font-size:12px; color:rgba(233,238,252,.7);">
           No bet is a bet. 見送れる日は、型が守れている日。
@@ -197,6 +344,9 @@
     step0_q2: null,
     step1_q3: null,       // graded?
     step1_q4: null,       // course pick
+    candidates: [],       // [int...]
+    eval: {},             // { [horseNo]: { s1:'◎|◯|△|×', s2:'◎|◯|△|×', s3:'OK|不安|NG' } }
+    s4: null              // computed results
   };
 
   function showToast(msg){
@@ -206,17 +356,14 @@
   }
 
   function showSection(id){
-    ["step0","step1","step2","skip"].forEach(s => $(s).classList.add("hide"));
+    ["step0","step1","step2","step3_1","step3_2","step3_3","step4","skip"].forEach(s => $(s).classList.add("hide"));
     $(id).classList.remove("hide");
     window.scrollTo({top:0, behavior:"smooth"});
   }
 
-  function showEl(id){
-    $(id).classList.remove("hide");
-  }
+  function showEl(id){ $(id).classList.remove("hide"); }
 
   function setFromData(setStr){
-    // "key:value"
     if(!setStr) return;
     const [k,v] = setStr.split(":");
     state[k] = v;
@@ -227,7 +374,8 @@
       today_limit: "STEP0で終了：最大3レース/日が守れない → 今日は見送り。",
       money_rule:  "STEP0で終了：500円固定が守れない → このレースは見送り。",
       not_target:  "STEP1で終了：重賞でも得意条件でもない → 見送り。",
-      user_skip:   "おじ判断：今回は見送る（正解ルート）。"
+      user_skip:   "おじ判断：今回は見送る（正解ルート）。",
+      step2_invalid:"STEP2で終了：候補（馬①）が書けない／入力が不正 → 見送り。"
     };
     $("skipReason").textContent =
       (map[reasonKey] || "見送りを選択しました。") +
@@ -236,21 +384,18 @@
     showSection("skip");
   }
 
-  // Global click handlers for data attributes
+  // Global click handler for data attributes
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if(!btn) return;
 
-    // set state
     setFromData(btn.dataset.set);
 
-    // show next element
     if(btn.dataset.next){
       showEl(btn.dataset.next);
       showToast("次へ");
     }
 
-    // skip
     if(btn.dataset.skip){
       goSkip(btn.dataset.skip);
     }
@@ -263,7 +408,7 @@
     showSection("step1");
   });
 
-  // STEP1: graded yes -> pass
+  // STEP1
   function passTarget(summaryLines){
     $("passSummary").textContent = summaryLines.join("\n");
     showEl("step1_pass");
@@ -276,18 +421,16 @@
     passTarget([
       "対象：重賞（G1〜G3）",
       "注意：500円固定／最大3レース/日は絶対",
-      "次：STEP2（候補抽出）へ"
+      "次：STEP2（候補番号）へ"
     ]);
   });
 
-  // STEP1: graded no -> show Q4
   $("isGradedNo").addEventListener("click", () => {
     state.step1_q3 = "no";
     showEl("step1_q4");
     showToast("得意条件を選ぶ");
   });
 
-  // Q4 pick
   $("step1_q4").addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if(!btn || !btn.dataset.pick) return;
@@ -304,14 +447,271 @@
     passTarget([
       `対象：得意条件（${label}）`,
       "注意：500円固定／最大3レース/日は絶対",
-      "次：STEP2（候補抽出）へ"
+      "次：STEP2（候補番号）へ"
     ]);
   });
 
-  // Pass -> Step2 (placeholder)
   $("goStep2").addEventListener("click", () => showSection("step2"));
   $("skipHere").addEventListener("click", () => goSkip("user_skip"));
+
+  // STEP2 validation
+  function parseHorseInput(val){
+    const s = (val || "").trim();
+    if(s === "") return null;
+    if(!/^\d+$/.test(s)) return NaN;
+    const n = parseInt(s, 10);
+    return n;
+  }
+
+  function validateCandidates(){
+    const n1 = parseHorseInput($("h1").value);
+    const n2 = parseHorseInput($("h2").value);
+    const n3 = parseHorseInput($("h3").value);
+
+    // horse1 required
+    if(n1 === null){
+      showToast("馬①は必須");
+      return { ok:false, reason:"馬①が空です" };
+    }
+    if(Number.isNaN(n1) || Number.isNaN(n2) || Number.isNaN(n3)){
+      showToast("数字のみで入力");
+      return { ok:false, reason:"数字以外が含まれています" };
+    }
+
+    // range: allow 1..18 (日本競馬の想定). 0 or >18 is error.
+    const arr = [n1, n2, n3].filter(v => v !== null);
+    for(const n of arr){
+      if(n < 1 || n > 18){
+        showToast("番号は1〜18");
+        return { ok:false, reason:"範囲外の番号があります" };
+      }
+    }
+
+    // unique
+    const set = new Set(arr);
+    if(set.size !== arr.length){
+      showToast("同じ番号は不可");
+      return { ok:false, reason:"重複があります" };
+    }
+
+    return { ok:true, candidates: arr };
+  }
+
+  function initEval(){
+    state.eval = {};
+    for(const h of state.candidates){
+      state.eval[h] = { s1:null, s2:null, s3:null };
+    }
+  }
+
+  function renderRatings(containerId, key, options){
+    // key: 's1' or 's2' or 's3'
+    const el = $(containerId);
+    el.innerHTML = "";
+
+    for(const h of state.candidates){
+      const row = document.createElement("div");
+      row.className = "row";
+
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      badge.textContent = `馬${h}`;
+      row.appendChild(badge);
+
+      const seg = document.createElement("div");
+      seg.className = "seg";
+
+      for(const opt of options){
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "ghost";
+        b.textContent = opt;
+        b.addEventListener("click", () => {
+          state.eval[h][key] = opt;
+          // update UI
+          [...seg.querySelectorAll("button")].forEach(x => x.classList.remove("on"));
+          b.classList.add("on");
+          showToast(`馬${h}：${opt}`);
+        });
+        seg.appendChild(b);
+      }
+
+      row.appendChild(seg);
+      el.appendChild(row);
+    }
+  }
+
+  function allPicked(key){
+    return state.candidates.every(h => state.eval[h][key]);
+  }
+
+  // STEP2 -> STEP3-①
+  $("toStep3_1").addEventListener("click", () => {
+    const v = validateCandidates();
+    if(!v.ok){
+      // keep user on step2, but allow manual skip
+      return;
+    }
+    state.candidates = v.candidates;
+    initEval();
+
+    // render STEP3 screens
+    renderRatings("s31_list", "s1", ["◎","◯","△","×"]);
+    renderRatings("s32_list", "s2", ["◎","◯","△","×"]);
+    renderRatings("s33_list", "s3", ["OK","不安","NG"]);
+
+    showSection("step3_1");
+  });
+
   $("skipFromStep2").addEventListener("click", () => goSkip("user_skip"));
+
+  // STEP3-① -> STEP3-②
+  $("toStep3_2").addEventListener("click", () => {
+    if(!allPicked("s1")){
+      showToast("①を全馬選択");
+      return;
+    }
+    showSection("step3_2");
+  });
+  $("skipFromS3_1").addEventListener("click", () => goSkip("user_skip"));
+
+  // STEP3-② -> STEP3-③
+  $("toStep3_3").addEventListener("click", () => {
+    if(!allPicked("s2")){
+      showToast("②を全馬選択");
+      return;
+    }
+    showSection("step3_3");
+  });
+  $("skipFromS3_2").addEventListener("click", () => goSkip("user_skip"));
+
+  // STEP3-③ -> STEP4
+  const scoreMap12 = { "◎":2, "◯":1, "△":0, "×":-2 };
+  const scoreMap3  = { "OK":0, "不安":-0.5, "NG":-1 };
+
+  function computeStep4(){
+    const rows = state.candidates.map(h => {
+      const e = state.eval[h];
+      const s1 = scoreMap12[e.s1];
+      const s2 = scoreMap12[e.s2];
+      const s3 = scoreMap3[e.s3] ?? -0.5;
+      const total = s1 + s2 + s3;
+      return { h, e, s1, s2, s3, total };
+    });
+
+    // sort by: total desc, then s1 desc, then s2 desc, then s3 desc
+    const sorted = [...rows].sort((a,b) => {
+      if(b.total !== a.total) return b.total - a.total;
+      if(b.s1 !== a.s1) return b.s1 - a.s1;
+      if(b.s2 !== a.s2) return b.s2 - a.s2;
+      if(b.s3 !== a.s3) return b.s3 - a.s3;
+      return 0;
+    });
+
+    // check tie for top with tie-breakers
+    const top = sorted[0];
+    const sameTotal = sorted.filter(r => r.total === top.total);
+    let decided = top;
+    let tieUnresolved = false;
+
+    if(sameTotal.length > 1){
+      // apply tie-breaker explicitly; if still tied on s1,s2,s3 then unresolved
+      const best = sameTotal.filter(r => r.s1 === Math.max(...sameTotal.map(x=>x.s1)));
+      const best2 = best.filter(r => r.s2 === Math.max(...best.map(x=>x.s2)));
+      const best3 = best2.filter(r => r.s3 === Math.max(...best2.map(x=>x.s3)));
+      if(best3.length === 1){
+        decided = best3[0];
+      }else{
+        tieUnresolved = true;
+      }
+    }
+
+    const recommendSkip = tieUnresolved || decided.total < 1;
+
+    return { rows, sorted, decided, tieUnresolved, recommendSkip };
+  }
+
+  function renderStep4(res){
+    const out = $("s4_out");
+
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>馬番</th>
+          <th>①</th>
+          <th>②</th>
+          <th>③</th>
+          <th class="right">合計</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+    const tb = table.querySelector("tbody");
+
+    for(const r of res.sorted){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="font-weight:1000;">${r.h}</td>
+        <td>${r.e.s1}</td>
+        <td>${r.e.s2}</td>
+        <td>${r.e.s3}</td>
+        <td class="right" style="font-weight:1000;">${r.total.toFixed(1)}</td>
+      `;
+      tb.appendChild(tr);
+    }
+
+    const header = document.createElement("div");
+    header.style.fontWeight = "1000";
+    header.style.marginBottom = "8px";
+
+    const msg = document.createElement("div");
+    msg.className = "mono";
+
+    if(res.tieUnresolved){
+      header.textContent = "⚠️ 同点が解消できない → 見送り推奨";
+      msg.textContent =
+        "同点ルール（①→②→③）でも決めきれない。\n" +
+        "この時点で止めるのが型。\n";
+    }else{
+      header.textContent = `✅ 本命：馬${res.decided.h}（合計 ${res.decided.total.toFixed(1)} 点）`;
+      msg.textContent =
+        `内訳：①${res.decided.e.s1} / ②${res.decided.e.s2} / ③${res.decided.e.s3}\n` +
+        (res.decided.total < 1 ? "※トップが1点未満 → 見送り推奨\n" : "");
+    }
+
+    out.innerHTML = "";
+    out.appendChild(header);
+    out.appendChild(table);
+    out.appendChild(document.createElement("div")).className = "hr";
+    out.appendChild(msg);
+
+    if(res.recommendSkip){
+      out.appendChild(document.createElement("div")).className = "hr";
+      const b = document.createElement("div");
+      b.className = "mono";
+      b.textContent = "No bet is a bet. 見送れる日は、型が守れている日。";
+      out.appendChild(b);
+    }
+  }
+
+  $("toStep4").addEventListener("click", () => {
+    if(!allPicked("s3")){
+      showToast("③を全馬選択");
+      return;
+    }
+    const res = computeStep4();
+    state.s4 = res;
+    renderStep4(res);
+    showSection("step4");
+  });
+  $("skipFromS3_3").addEventListener("click", () => goSkip("user_skip"));
+
+  // STEP4 buttons
+  $("skipFromStep4").addEventListener("click", () => goSkip("user_skip"));
+  $("goStep5").addEventListener("click", () => {
+    showToast("STEP5は次で実装");
+  });
 
   // Restart
   function resetAll(){
@@ -319,10 +719,22 @@
     state.step0_q2 = null;
     state.step1_q3 = null;
     state.step1_q4 = null;
+    state.candidates = [];
+    state.eval = {};
+    state.s4 = null;
 
     $("step0_q2").classList.add("hide");
     $("step1_q4").classList.add("hide");
     $("step1_pass").classList.add("hide");
+
+    $("h1").value = "";
+    $("h2").value = "";
+    $("h3").value = "";
+
+    $("s31_list").innerHTML = "";
+    $("s32_list").innerHTML = "";
+    $("s33_list").innerHTML = "";
+    $("s4_out").innerHTML = "";
 
     showSection("step0");
     showToast("リセット");
