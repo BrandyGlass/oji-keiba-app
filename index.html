@@ -8,7 +8,6 @@
     :root{
       --bg:#0b1220;
       --card:#101a2f;
-      --card2:#0e1730;
       --line:rgba(255,255,255,.10);
       --text:#eaf0ff;
       --muted:rgba(234,240,255,.72);
@@ -18,10 +17,7 @@
       --bad:#ff5d73;
       --btn:#e9f0ff;
       --btnText:#0c1220;
-      --btn2:#192748;
-      --btn2Text:#eaf0ff;
       --radius:16px;
-      --pad:16px;
       --shadow:0 14px 40px rgba(0,0,0,.35);
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans:-apple-system, system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
@@ -30,9 +26,10 @@
     body{
       margin:0;
       font-family:var(--sans);
-      background: radial-gradient(1200px 600px at 20% 0%, rgba(100,140,255,.18), transparent 60%),
-                  radial-gradient(900px 700px at 90% 10%, rgba(255,120,170,.10), transparent 55%),
-                  var(--bg);
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(100,140,255,.18), transparent 60%),
+        radial-gradient(900px 700px at 90% 10%, rgba(255,120,170,.10), transparent 55%),
+        var(--bg);
       color:var(--text);
     }
     .wrap{ max-width:820px; margin:0 auto; padding:24px 16px 40px; }
@@ -44,7 +41,7 @@
       box-shadow:var(--shadow);
       margin-bottom:14px;
     }
-    .title{ font-weight:800; font-size:22px; letter-spacing:.2px; }
+    .title{ font-weight:900; font-size:22px; letter-spacing:.2px; }
     .sub{ margin-top:6px; color:var(--muted); line-height:1.55; }
     .chips{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
     .chip{
@@ -65,12 +62,10 @@
       padding:18px;
       margin:14px 0;
     }
-    .card h2{
-      margin:0 0 10px;
-      font-size:18px;
-      letter-spacing:.2px;
-    }
+    .card h2{ margin:0 0 10px; font-size:18px; letter-spacing:.2px; }
     .note{ color:var(--muted); font-size:13px; line-height:1.55; }
+    .small{ font-size:12px; color:var(--muted2); line-height:1.55; }
+    .mono{ font-family:var(--mono); }
     .hr{ height:1px; background:var(--line); margin:14px 0; }
 
     label{ display:block; font-size:13px; color:var(--muted); margin:10px 0 6px; }
@@ -85,62 +80,40 @@
     }
     textarea{ min-height:84px; resize:vertical; }
     input::placeholder, textarea::placeholder{ color: rgba(234,240,255,.35); }
+
     .row{ display:flex; gap:12px; flex-wrap:wrap; }
     .col{ flex:1; min-width:180px; }
+
     .btnRow{ display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
     button{
       border:none;
       border-radius:16px;
       padding:14px 14px;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
     }
-    button.primary{
-      background:var(--btn);
-      color:var(--btnText);
-      flex:1;
-      min-width:210px;
-    }
+    button.primary{ background:var(--btn); color:var(--btnText); flex:1; min-width:210px; }
     button.secondary{
       background:rgba(255,255,255,.06);
       border:1px solid var(--line);
-      color:var(--btn2Text);
-      flex:1;
-      min-width:210px;
+      color:var(--text);
+      flex:1; min-width:210px;
     }
     button.danger{
       background:rgba(255,93,115,.12);
       border:1px solid rgba(255,93,115,.35);
       color:#ffd3da;
-      flex:1;
-      min-width:210px;
+      flex:1; min-width:210px;
     }
-    button:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      filter:saturate(.6);
-    }
+    button:disabled{ opacity:.45; cursor:not-allowed; filter:saturate(.6); }
+
     .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:rgba(255,255,255,.03);
-      font-size:12px;
-      color:var(--muted);
-      margin-right:8px;
-      margin-bottom:8px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border:1px solid var(--line);
+      border-radius:999px; background:rgba(255,255,255,.03);
+      font-size:12px; color:var(--muted);
+      margin-right:8px; margin-bottom:8px;
     }
-    .big{
-      font-size:18px;
-      font-weight:900;
-      letter-spacing:.2px;
-    }
-    .ok{ color:var(--good); }
-    .ng{ color:var(--bad); }
-    .warn{ color:var(--warn); }
 
     .qbox{
       border:1px solid var(--line);
@@ -150,16 +123,16 @@
       margin-top:12px;
     }
     .qtitle{ font-weight:900; font-size:16px; margin:0 0 10px; }
+
     .choices{ display:flex; gap:10px; flex-wrap:wrap; }
     .choice{
-      flex:1;
-      min-width:140px;
+      flex:1; min-width:140px;
       background:rgba(255,255,255,.06);
       border:1px solid var(--line);
       color:var(--text);
       padding:12px 12px;
       border-radius:14px;
-      font-weight:800;
+      font-weight:900;
       text-align:center;
       cursor:pointer;
       user-select:none;
@@ -175,31 +148,31 @@
       border-color:rgba(255,93,115,.45);
     }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      overflow:hidden;
-      border-radius:16px;
+    /* STEP4 cards */
+    .resultCard{
       border:1px solid var(--line);
-      background:rgba(0,0,0,.16);
+      border-radius:18px;
+      padding:14px;
+      background: rgba(255,255,255,.05);
     }
-    th, td{
-      padding:10px 10px;
-      border-bottom:1px solid var(--line);
-      font-size:13px;
-      text-align:left;
+    .resultCard.good{ border-color: rgba(56,217,129,.45); background: rgba(56,217,129,.10); }
+    .resultCard.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.10); }
+    .resultCard.bad{  border-color: rgba(255,93,115,.45); background: rgba(255,93,115,.10); }
+    .big{ font-size:18px; font-weight:900; letter-spacing:.2px; }
+    .ok{ color:var(--good); }
+    .warnTxt{ color:var(--warn); }
+    .ng{ color:var(--bad); }
+    .pillRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.12);
+      font-size:12px; color:var(--muted);
+      white-space:nowrap;
     }
-    th{ color:var(--muted); font-weight:800; }
-    tr:last-child td{ border-bottom:none; }
-    .mono{ font-family:var(--mono); }
-    .small{ font-size:12px; color:var(--muted2); line-height:1.5; }
 
-    .footer{
-      margin-top:16px;
-      color:var(--muted2);
-      font-size:12px;
-      line-height:1.55;
-    }
+    .footer{ margin-top:16px; color:var(--muted2); font-size:12px; line-height:1.55; }
   </style>
 </head>
 <body>
@@ -218,7 +191,7 @@
       </div>
     </div>
 
-    <!-- STEP-1: レース情報 -->
+    <!-- 入口：レース固定 -->
     <div class="card" id="cardRace">
       <h2>入口｜レースを固定（戻らない）</h2>
       <div class="note">ここで「今日どのレースを対象にするか」を固定します。この先は戻って変更しません。</div>
@@ -276,11 +249,11 @@
           <select id="course">
             <option value="中山ダ1800">中山ダ1800</option>
             <option value="東京ダ1600">東京ダ1600</option>
-            <option value="東京芝1400">東京芝1400（停止中）</option>
+            <option value="東京芝1400（停止中）">東京芝1400（停止中）</option>
             <option value="重賞">重賞（G1〜G3）</option>
             <option value="その他">その他（基本見送り）</option>
           </select>
-          <div class="small">※「東京芝1400」はいま停止扱い。やりたくなったら後で解除できます。</div>
+          <div class="small">※「東京芝1400」はいま停止扱い。</div>
         </div>
       </div>
 
@@ -296,9 +269,7 @@
         <button class="danger" id="btnSkipToday">今日は見送る（ログ保存）</button>
       </div>
 
-      <div class="footer">
-        「今日は見送る」は正解ルート。ルールを守る方が回収率が上がる。
-      </div>
+      <div class="footer">「今日は見送る」は正解ルート。ルールを守る方が回収率が上がる。</div>
     </div>
 
     <!-- STEP0 -->
@@ -332,9 +303,7 @@
     <!-- STEP1 -->
     <div class="card" id="cardStep1" style="display:none;">
       <h2>STEP1｜対象レース判定（即断）</h2>
-      <div class="note">
-        「重賞（G1〜G3）」または「得意条件」なら進む。それ以外は見送り。
-      </div>
+      <div class="note">「重賞（G1〜G3）」または「得意条件」なら進む。それ以外は見送り。</div>
 
       <div class="qbox">
         <div class="qtitle">Q：このレースは対象？</div>
@@ -350,40 +319,63 @@
 
     <!-- STEP2 -->
     <div class="card" id="cardStep2" style="display:none;">
-      <h2>STEP2｜候補馬を最大3頭まで出す</h2>
+      <h2>STEP2｜候補馬を最大3頭まで出す（選択式）</h2>
       <div class="note">
-        人気・オッズ・評価はまだ見ない。<br>
-        「この条件で変な負け方しにくそう」な馬だけ拾う。3頭出なければ見送り可。
+        人気・オッズはまだ見ない。<br>
+        「この条件で変な負け方しにくそう」な馬だけ拾う。<br>
+        <b>3頭出なければ、この時点で見送りも正解</b>。
       </div>
 
-      <label>候補（馬番） 例：6,13,15</label>
-      <input id="candidates" placeholder="例：6,13,15（最大3頭）" inputmode="numeric" />
+      <div class="qbox">
+        <div class="qtitle">候補（最大3頭）</div>
 
-      <label>補足（任意）</label>
-      <input id="candMemo" placeholder="例：6=前受けできる、13=安定、15=崩れにくい" />
+        <div class="row">
+          <div class="col">
+            <label>候補①（馬番）</label>
+            <select id="cand1"></select>
+            <label>理由（任意）</label>
+            <input id="candMemo1" placeholder="例：前受けできる" />
+          </div>
+          <div class="col">
+            <label>候補②（馬番）</label>
+            <select id="cand2"></select>
+            <label>理由（任意）</label>
+            <input id="candMemo2" placeholder="例：崩れにくい" />
+          </div>
+          <div class="col">
+            <label>候補③（馬番）</label>
+            <select id="cand3"></select>
+            <label>理由（任意）</label>
+            <input id="candMemo3" placeholder="例：4角いそう" />
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <div id="step2Hint" class="note"></div>
+      </div>
 
       <div class="btnRow">
         <button class="primary" id="btnGoStep3">次へ（STEP3へ）</button>
-        <button class="danger" id="btnSkipFrom2">候補が出ない → 見送り（ログ保存）</button>
+        <button class="danger" id="btnSkipFrom2">候補不足 → 見送り（ログ保存）</button>
         <button class="secondary" id="btnBackTo1">戻る</button>
       </div>
     </div>
 
     <!-- STEP3 -->
     <div class="card" id="cardStep3" style="display:none;">
-      <h2>STEP3｜三本柱チェック（Yes / No を“選択肢”で）</h2>
+      <h2>STEP3｜三本柱チェック（状態選択式）</h2>
       <div class="note">
-        ①コース×距離（最優先）／②流れ×脚質（負け筋1つ）／③騎手（減点専用）。<br>
-        各馬ごとに入力していく。
+        Yes/Noは使わない。<br>
+        ①②は「強さ（2/1/0）」、③は「減点（0/-0.5/-1）」で機械的に点数化する。
       </div>
 
       <div class="qbox">
-        <div class="qtitle">対象馬</div>
-        <div id="horseTabs" class="note"></div>
-        <div class="small">タブで馬を切り替えて入力。全部埋めないと次へ進めない。</div>
+        <div class="qtitle">候補馬</div>
+        <div id="horseTags" class="note"></div>
+        <div class="small">全馬の①②③を選択し終えるまで次へ進めない。</div>
       </div>
 
-      <div id="horseForms"></div>
+      <div id="step3Forms"></div>
 
       <div class="btnRow">
         <button class="primary" id="btnGoStep4">次へ（STEP4 点数化へ）</button>
@@ -393,16 +385,22 @@
 
     <!-- STEP4 -->
     <div class="card" id="cardStep4" style="display:none;">
-      <h2>STEP4｜点数化（機械的に本命を決める）</h2>
+      <h2>STEP4｜点数化（詳細カード型）</h2>
       <div class="note">
-        合計点 = ① + ② + ③（③は減点/消し）。トップが本命。<br>
-        同点なら ① → ② → ③ → それでも同点なら見送り。さらにトップが1点未満なら見送り推奨。
+        合計点がトップ＝本命。<br>
+        同点は ①→②→③ の順で決める。それでも同点なら見送り。<br>
+        トップが <b>1.0点未満</b> は見送り推奨。
       </div>
 
       <div class="qbox">
-        <div class="qtitle" id="mainPickTitle">結果</div>
-        <div id="scoreTable"></div>
-        <div id="step4Msg" class="note" style="margin-top:10px;"></div>
+        <div class="qtitle">結論</div>
+        <div id="step4Top"></div>
+        <div id="step4TieMsg" class="note" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="qbox">
+        <div class="qtitle">候補（内訳）</div>
+        <div id="step4Cards"></div>
       </div>
 
       <div class="btnRow">
@@ -415,9 +413,7 @@
     <!-- STEP5 -->
     <div class="card" id="cardStep5" style="display:none;">
       <h2>STEP5｜0番チェック（最終ブレーキ）</h2>
-      <div class="note">
-        パドックは“やらない前提”でOK。代わりに「馬体重±12kg」と「直前情報フラグ」だけ必須にする。
-      </div>
+      <div class="note">パドックは“やらない前提”でOK。代わりに2問だけ必須。</div>
 
       <div class="qbox">
         <div class="qtitle">Q1：馬体重 前走比 ±12kg以上 ですか？</div>
@@ -444,9 +440,7 @@
     <!-- STEP6 -->
     <div class="card" id="cardStep6" style="display:none;">
       <h2>STEP6｜結論（固定文）</h2>
-      <div class="note">
-        「狙い」「リスク（負け筋1つ）」は、最後に1行で言語化。書けないなら見送りでOK。
-      </div>
+      <div class="note">「リスク（負け筋）」は1つだけ。書けないなら見送りでOK。</div>
 
       <div class="qbox">
         <div class="qtitle">結論</div>
@@ -454,7 +448,7 @@
       </div>
 
       <label>リスク（負け筋）※1つだけ</label>
-      <input id="riskOne" placeholder="例：外々を回って差される／前が止まらない など" />
+      <input id="riskOne" placeholder="例：前が止まらない／外々を回って差される など" />
 
       <label>見送り条件（確認用）</label>
       <textarea id="skipCond" readonly></textarea>
@@ -482,22 +476,20 @@
       <div class="small mono" id="logPreview"></div>
     </div>
 
-    <div class="footer">
-      迷ったら見送り（No bet is a bet）。途中で戻らない。感情を挟まない。
-    </div>
+    <div class="footer">迷ったら見送り（No bet is a bet）。途中で戻らない。感情を挟まない。</div>
   </div>
 
 <script>
 (() => {
-  // ====== storage ======
-  const KEY = "oji_keiba_logs_v2";
+  // ====== Storage ======
+  const KEY = "oji_keiba_logs_v3";
   const loadLogs = () => {
     try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
     catch { return []; }
   };
   const saveLogs = (logs) => localStorage.setItem(KEY, JSON.stringify(logs));
 
-  // ====== utils ======
+  // ====== Utils ======
   const todayISO = () => {
     const d = new Date();
     const y = d.getFullYear();
@@ -514,27 +506,19 @@
     const mm = String(d.getMinutes()).padStart(2,"0");
     return `${y}-${m}-${dd} ${hh}:${mm}`;
   };
-  const clamp3 = (arr) => arr.slice(0,3);
-
-  const normalizeCandidates = (s) => {
-    const nums = (s || "")
-      .split(/[,\s、]+/)
-      .map(x => x.trim())
-      .filter(Boolean)
-      .map(x => x.replace(/[^\d]/g,""))
-      .filter(Boolean)
-      .map(x => String(parseInt(x,10)))
-      .filter(x => x !== "NaN");
-    const uniq = [...new Set(nums)];
-    return clamp3(uniq);
-  };
 
   const el = (id) => document.getElementById(id);
   const show = (id) => el(id).style.display = "";
   const hide = (id) => el(id).style.display = "none";
 
-  // ====== rules ======
-  // course value => allowed? based on step1 logic
+  const go = (cardId) => {
+    ["cardRace","cardStep0","cardStep1","cardStep2","cardStep3","cardStep4","cardStep5","cardStep6"].forEach(hide);
+    show(cardId);
+    window.scrollTo({top:0, behavior:"smooth"});
+    refreshLogUI();
+  };
+
+  // ====== Rules ======
   const isG = (cls) => ["G1","G2","G3"].includes(cls);
   const isTokyo1400Paused = (course) => course.startsWith("東京芝1400");
 
@@ -542,12 +526,12 @@
     if (isG(raceClass)) return true;
     if (course === "中山ダ1800") return true;
     if (course === "東京ダ1600") return true;
-    if (course.startsWith("東京芝1400")) return false; // 停止中
-    if (course === "重賞") return true; // ただしクラスはG1-3想定
+    if (isTokyo1400Paused(course)) return false; // 停止中
+    if (course === "重賞") return true; // 実質G1-3想定
     return false;
   };
 
-  // ====== state ======
+  // ====== State ======
   const state = {
     race: {
       date: todayISO(),
@@ -557,15 +541,20 @@
       course: "中山ダ1800",
     },
     step0: { q1:null, q2:null },
-    candidates: [],
-    candMemo: "",
-    perHorse: {},  // horseNo -> answers
+    // step2
+    candidates: [], // ["6","13","15"]
+    candMemos: {},  // horse -> memo
+    // step3 per horse
+    perHorse: {},   // horse -> {p1,p2,p3}
+    // step4
+    pick: { main:null, rows:[], tieMsg:"", recommendSkip:false, reason:"" },
+    // step5
     step5: { weight:null, info:null },
-    pick: { main:null, scores:[], msg:"" },
+    // step6
     final: { risk:"" }
   };
 
-  // ====== init inputs ======
+  // ====== Init inputs ======
   el("date").value = state.race.date;
   el("track").value = state.race.track;
   el("raceNo").value = state.race.raceNo;
@@ -583,17 +572,13 @@
       `<div class="hr"></div>` +
       `<div class="mono">${r.date} ${r.track}${r.raceNo}（${r.raceClass} / ${r.course}）</div>`;
 
-    // daily counter
     const logs = loadLogs();
     const todays = logs.filter(x => x.date === r.date);
     const left = Math.max(0, 3 - todays.length);
     el("todayCounter").innerHTML =
       `本日の記録：<b>${todays.length}</b>件（残り<b>${left}</b>件）<br>` +
       `<span class="small">※3件に達したら、今日は“進めない”のが正解（暴走防止）。</span>`;
-
-    // enable/disable go
     el("btnGoStep0").disabled = (left <= 0);
-    el("btnSkipToday").disabled = false;
   };
 
   ["date","track","raceNo","raceClass","course"].forEach(id => {
@@ -608,22 +593,15 @@
   });
   updateRaceSummary();
 
-  // ====== navigation helpers ======
-  const go = (cardId) => {
-    ["cardRace","cardStep0","cardStep1","cardStep2","cardStep3","cardStep4","cardStep5","cardStep6"].forEach(hide);
-    show(cardId);
-    window.scrollTo({top:0, behavior:"smooth"});
-    refreshLogUI();
-  };
-
-  // ====== choice buttons ======
+  // ====== STEP0 / STEP5 Choice buttons ======
   const setChoice = (q, v) => {
     document.querySelectorAll(`.choice[data-q="${q}"]`).forEach(x => x.classList.remove("on"));
     const target = document.querySelector(`.choice[data-q="${q}"][data-v="${v}"]`);
     if (target) target.classList.add("on");
   };
+
   document.addEventListener("click", (e) => {
-    const t = e.target.closest(".choice");
+    const t = e.target.closest(".choice[data-q]");
     if (!t) return;
     const q = t.dataset.q;
     const v = t.dataset.v;
@@ -634,14 +612,9 @@
     if (q === "s5info") state.step5.info = v;
 
     setChoice(q, v);
-
-    // auto-stop on STEP0 No
-    if ((q === "s0q1" || q === "s0q2") && v === "no") {
-      // nothing forced, but user can choose skip button
-    }
   });
 
-  // ====== step1 auto message ======
+  // ====== STEP1 Auto ======
   const refreshStep1 = () => {
     const ok = isTargetRace(state.race);
     const r = state.race;
@@ -659,295 +632,294 @@
     }
     el("step1Auto").innerHTML = msg + `<div class="hr"></div><div class="small">※対象外なら「見送り」でログ保存が正解ルート。</div>`;
     el("btnGoStep2").disabled = !ok;
-    el("btnSkipFrom1").disabled = ok; // 対象なら誤クリック防止
+    el("btnSkipFrom1").disabled = ok; // 誤クリック防止
   };
 
-  // ====== step3 forms ======
-  const scorePillar = (yesCount) => {
-    // 3問中 yesCount
-    // 2以上→2点、1→1点、0→0点
-    if (yesCount >= 2) return 2;
-    if (yesCount === 1) return 1;
-    return 0;
+  // ====== STEP2 Dropdown candidates ======
+  const buildHorseSelectOptions = () => {
+    const opts = ['<option value="">未選択</option>'];
+    for (let i=1; i<=18; i++){
+      opts.push(`<option value="${i}">${i}</option>`);
+    }
+    return opts.join("");
   };
 
-  const buildHorseForms = () => {
+  const initStep2 = () => {
+    const html = buildHorseSelectOptions();
+    el("cand1").innerHTML = html;
+    el("cand2").innerHTML = html;
+    el("cand3").innerHTML = html;
+
+    // clear
+    el("cand1").value = "";
+    el("cand2").value = "";
+    el("cand3").value = "";
+    el("candMemo1").value = "";
+    el("candMemo2").value = "";
+    el("candMemo3").value = "";
+
+    updateStep2Hint();
+    el("btnGoStep3").disabled = true;
+
+    const onChange = () => {
+      enforceUniqueCandidates();
+      updateStep2Hint();
+      el("btnGoStep3").disabled = (getCandidates().length === 0);
+    };
+
+    el("cand1").addEventListener("change", onChange);
+    el("cand2").addEventListener("change", onChange);
+    el("cand3").addEventListener("change", onChange);
+    el("candMemo1").addEventListener("input", updateStep2Hint);
+    el("candMemo2").addEventListener("input", updateStep2Hint);
+    el("candMemo3").addEventListener("input", updateStep2Hint);
+  };
+
+  const getCandidates = () => {
+    const a = [el("cand1").value, el("cand2").value, el("cand3").value].filter(Boolean);
+    // unique (just in case)
+    return [...new Set(a)];
+  };
+
+  const enforceUniqueCandidates = () => {
+    // 既に選ばれた馬番を、他のselectから選びにくくする（選択済みは保持）
+    const chosen = new Set(getCandidates());
+
+    ["cand1","cand2","cand3"].forEach(id => {
+      const s = el(id);
+      const cur = s.value;
+      [...s.options].forEach(opt => {
+        if (!opt.value) return;
+        if (opt.value === cur) { opt.disabled = false; return; }
+        opt.disabled = chosen.has(opt.value);
+      });
+    });
+  };
+
+  const updateStep2Hint = () => {
+    const c = getCandidates();
+    const count = c.length;
+
+    let msg = "";
+    if (count === 0) msg = "候補を1頭以上選んでください。";
+    else if (count === 1) msg = "⚠️ 候補が1頭だけ。無理に進まず「見送り」も正解。";
+    else if (count === 2) msg = "⚠️ 候補が2頭。3頭出ないレースは見送りも正解。";
+    else msg = "OK。候補が3頭そろった。STEP3へ。";
+
+    el("step2Hint").innerHTML = `<b>${msg}</b>`;
+  };
+
+  // ====== STEP3 (3-choice) ======
+  const buildStep3 = () => {
     const horses = state.candidates;
-    state.perHorse = state.perHorse || {};
+    state.perHorse = {};
+    el("horseTags").innerHTML = horses.map(h => `<span class="tag">🐎 馬${h}</span>`).join("");
 
-    // tabs
-    el("horseTabs").innerHTML = horses.map((h,i)=>`<span class="tag">🐎 馬${h}</span>`).join("");
-
-    // forms
     const wrap = document.createElement("div");
-    horses.forEach((h) => {
-      if (!state.perHorse[h]) {
-        state.perHorse[h] = {
-          p1a:null, p1b:null, p1c:null,
-          p2a:null, p2b:null, p2c:null,
-          j:null, j2:null,
-          pace:"普",
-          style:"先行",
-          jockeyMemo:""
-        };
-      }
+
+    horses.forEach(h => {
+      state.perHorse[h] = { p1:null, p2:null, p3:null };
+
+      const memo = state.candMemos[h] || "";
 
       const box = document.createElement("div");
       box.className = "qbox";
       box.style.marginTop = "14px";
       box.innerHTML = `
-        <div class="qtitle">馬${h}｜①コース×距離（最優先）</div>
-        ${qYN(`p1a_${h}`, `類似条件で好走 or 崩れていない？`)}
-        ${qYN(`p1b_${h}`, `枠が脚質的に致命的でない？`)}
-        ${qYN(`p1c_${h}`, `4角で勝負圏にいられるイメージが即出る？`)}
+        <div class="qtitle">馬${h}｜入力</div>
+
+        <label>① コース×距離</label>
+        <select id="p1_${h}">
+          <option value="">未選択</option>
+          <option value="2">🟢 問題なし（2）</option>
+          <option value="1">🟡 やや不安（1）</option>
+          <option value="0">🔴 不安大（0）</option>
+        </select>
+
+        <label>② 流れ×脚質（負け筋の数）</label>
+        <select id="p2_${h}">
+          <option value="">未選択</option>
+          <option value="2">🟢 負け筋が1つ（2）</option>
+          <option value="1">🟡 負け筋が2つ（1）</option>
+          <option value="0">🔴 読めない（0）</option>
+        </select>
+
+        <label>③ 騎手（減点専用）</label>
+        <select id="p3_${h}">
+          <option value="">未選択</option>
+          <option value="0">🟢 壊さない（0）</option>
+          <option value="-0.5">🟡 少し不安（-0.5）</option>
+          <option value="-1">🔴 壊しそう（-1.0）</option>
+        </select>
 
         <div class="hr"></div>
-        <div class="qtitle">馬${h}｜②流れ×脚質（負けにくさ）</div>
-        <label>想定ペース（1つに決める）</label>
-        <select id="pace_${h}">
-          <option value="遅">遅</option>
-          <option value="普">普</option>
-          <option value="速">速</option>
-        </select>
-        <label>脚質（ざっくり）</label>
-        <select id="style_${h}">
-          <option value="逃げ">逃げ</option>
-          <option value="先行">先行</option>
-          <option value="差し">差し</option>
-          <option value="追込">追込</option>
-        </select>
-
-        ${qYN(`p2a_${h}`, `想定ペース（遅/普/速）を1つに決められる？`)}
-        ${qYN(`p2b_${h}`, `4角位置を1パターンで言える？`)}
-        ${qYN(`p2c_${h}`, `負け筋が1つに限定できる？（2つ以上なら危険）`)}
-
-        <div class="hr"></div>
-        <div class="qtitle">馬${h}｜③騎手（減点専用）</div>
-        <label>騎手が②の形を壊しにくい？</label>
-        <select id="j_${h}">
-          <option value="OK">OK（減点なし）</option>
-          <option value="不安">不安（-0.5）</option>
-          <option value="消し">消し（除外）</option>
-        </select>
-        <label>位置取りのブレ（任意メモ）</label>
-        <input id="jm_${h}" placeholder="例：位置取りブレ小／出遅れ多い など" />
+        <div class="small">（STEP2メモ）${escapeHTML(memo) || "—"}</div>
       `;
       wrap.appendChild(box);
     });
 
-    el("horseForms").innerHTML = "";
-    el("horseForms").appendChild(wrap);
+    el("step3Forms").innerHTML = "";
+    el("step3Forms").appendChild(wrap);
 
-    // wire up values + restore
-    horses.forEach(h => {
-      const s = state.perHorse[h];
-
-      // restore selects
-      el(`pace_${h}`).value = s.pace || "普";
-      el(`style_${h}`).value = s.style || "先行";
-      el(`j_${h}`).value = s.j || "OK";
-      el(`jm_${h}`).value = s.jockeyMemo || "";
-
-      // restore yn
-      ["p1a","p1b","p1c","p2a","p2b","p2c"].forEach(k=>{
-        if (s[k] === "yes") ynSet(`${k}_${h}`, true);
-        if (s[k] === "no") ynSet(`${k}_${h}`, false);
+    const validate = () => {
+      const ok = horses.every(h => {
+        const a = el(`p1_${h}`).value;
+        const b = el(`p2_${h}`).value;
+        const c = el(`p3_${h}`).value;
+        state.perHorse[h].p1 = (a === "" ? null : parseFloat(a));
+        state.perHorse[h].p2 = (b === "" ? null : parseFloat(b));
+        state.perHorse[h].p3 = (c === "" ? null : parseFloat(c));
+        return a !== "" && b !== "" && c !== "";
       });
+      el("btnGoStep4").disabled = !ok;
+    };
 
-      // listeners
-      el(`pace_${h}`).addEventListener("change", ()=> s.pace = el(`pace_${h}`).value);
-      el(`style_${h}`).addEventListener("change", ()=> s.style = el(`style_${h}`).value);
-      el(`j_${h}`).addEventListener("change", ()=> s.j = el(`j_${h}`).value);
-      el(`jm_${h}`).addEventListener("input", ()=> s.jockeyMemo = el(`jm_${h}`).value);
+    horses.forEach(h => {
+      el(`p1_${h}`).addEventListener("change", validate);
+      el(`p2_${h}`).addEventListener("change", validate);
+      el(`p3_${h}`).addEventListener("change", validate);
     });
 
-    // validate button
-    el("btnGoStep4").disabled = !canGoStep4();
+    el("btnGoStep4").disabled = true;
   };
 
-  function qYN(id, text){
-    return `
-      <div style="margin-top:10px;">
-        <div class="note"><b>${text}</b></div>
-        <div class="choices" style="margin-top:8px;">
-          <div class="choice" data-yn="${id}" data-v="yes">はい</div>
-          <div class="choice bad" data-yn="${id}" data-v="no">いいえ</div>
-        </div>
-      </div>
-    `;
-  }
+  const escapeHTML = (s) => String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
-  function ynSet(id, yes){
-    document.querySelectorAll(`.choice[data-yn="${id}"]`).forEach(x=>x.classList.remove("on"));
-    const v = yes ? "yes" : "no";
-    const t = document.querySelector(`.choice[data-yn="${id}"][data-v="${v}"]`);
-    if (t) t.classList.add("on");
-  }
-
-  document.addEventListener("click", (e) => {
-    const t = e.target.closest(".choice[data-yn]");
-    if (!t) return;
-    const id = t.dataset.yn;
-    const v = t.dataset.v; // yes/no
-    const [key, horse] = id.split("_");
-    if (!state.perHorse[horse]) return;
-    state.perHorse[horse][key] = v;
-    ynSet(id, v === "yes");
-    el("btnGoStep4").disabled = !canGoStep4();
-  });
-
-  const canGoStep4 = () => {
+  // ====== STEP4 Scoring + Cards ======
+  const computePick = () => {
     const horses = state.candidates;
-    if (!horses.length) return false;
-    for (const h of horses) {
+
+    // build rows
+    const rows = horses.map(h => {
       const s = state.perHorse[h];
-      if (!s) return false;
-      // required: p1a/b/c p2a/b/c and jockey select exists (always)
-      const req = ["p1a","p1b","p1c","p2a","p2b","p2c"];
-      if (req.some(k => !s[k])) return false;
-      if (!s.j) return false;
-    }
-    return true;
-  };
+      const total = (s.p1 ?? 0) + (s.p2 ?? 0) + (s.p3 ?? 0);
+      return { horse:h, p1:s.p1, p2:s.p2, p3:s.p3, total };
+    });
 
-  // ====== scoring ======
-  const computeScores = () => {
-    const horses = state.candidates;
-    const rows = [];
-    for (const h of horses) {
-      const s = state.perHorse[h];
+    // sort by total desc, then p1 desc, p2 desc, p3 desc (since p3 is negative, higher is better)
+    const sorted = [...rows].sort((a,b) => {
+      if (b.total !== a.total) return b.total - a.total;
+      if (b.p1 !== a.p1) return b.p1 - a.p1;
+      if (b.p2 !== a.p2) return b.p2 - a.p2;
+      return b.p3 - a.p3;
+    });
 
-      // pillar1
-      const p1Yes = ["p1a","p1b","p1c"].filter(k => s[k] === "yes").length;
-      const p1 = scorePillar(p1Yes);
+    const top = sorted[0];
+    const topTotal = top.total;
 
-      // pillar2
-      // p2c is "負け筋1つに限定できる？" yes=>good, no=>danger
-      const p2Yes = ["p2a","p2b","p2c"].filter(k => s[k] === "yes").length;
-      const p2 = scorePillar(p2Yes);
+    // check true tie after tie-break keys
+    const tied = sorted.filter(r =>
+      r.total === top.total && r.p1 === top.p1 && r.p2 === top.p2 && r.p3 === top.p3
+    );
 
-      // jockey
-      let jAdj = 0;
-      let jLabel = "OK";
-      if (s.j === "不安") { jAdj = -0.5; jLabel = "不安"; }
-      if (s.j === "消し") { jAdj = -999; jLabel = "消し"; }
+    let main = top.horse;
+    let tieMsg = "";
+    let recommendSkip = false;
+    let reason = "";
 
-      const total = (jAdj <= -900) ? -999 : (p1 + p2 + jAdj);
-
-      rows.push({
-        horse:h,
-        p1, p2,
-        j: jLabel,
-        total
-      });
-    }
-
-    // pick main: highest total (ignoring -999)
-    const valid = rows.filter(r => r.total > -900);
-    let msg = "";
-    let main = null;
-
-    if (!valid.length) {
-      msg = `<b class="ng">全頭が「消し」扱い。見送り推奨。</b>`;
-      state.pick = { main:null, scores:rows, msg };
-      return;
-    }
-
-    // sort by total desc
-    valid.sort((a,b)=> b.total - a.total);
-
-    // tie-break: if total same
-    const topTotal = valid[0].total;
-    const tied = valid.filter(x => x.total === topTotal);
-
-    if (tied.length === 1) {
-      main = tied[0].horse;
+    if (tied.length >= 2) {
+      // cannot break tie -> skip
+      main = null;
+      recommendSkip = true;
+      reason = "同点が解けない";
+      tieMsg = "⚠️ 同点 → ①→②→③でも同点 → ルール通り「見送り」推奨。";
     } else {
-      // tie-break by p1 desc then p2 desc then jockey OK over 不安
-      tied.sort((a,b)=>{
-        if (b.p1 !== a.p1) return b.p1 - a.p1;
-        if (b.p2 !== a.p2) return b.p2 - a.p2;
-        // OK better than 不安
-        const rank = (x)=> x.j==="OK"?2 : x.j==="不安"?1 : 0;
-        return rank(b) - rank(a);
-      });
-      // if still tie fully, recommend skip
-      const best = tied[0];
-      const isStillTie = tied.slice(1).some(x => x.p1===best.p1 && x.p2===best.p2 && x.j===best.j);
-      if (isStillTie) {
-        msg = `<b class="warn">同点が解けない（①②③まで同じ）→ ルール通り <b>見送り</b> 推奨。</b>`;
-        main = best.horse; // show, but recommend skip
-      } else {
-        main = best.horse;
+      // still could have same total but resolved by tie-break
+      const sameTotal = sorted.filter(r => r.total === topTotal);
+      if (sameTotal.length >= 2) {
+        tieMsg = "同点 → ①優先 → ② → ③ で決定。";
+      }
+      if (topTotal < 1.0) {
+        recommendSkip = true;
+        reason = "トップが弱い（1.0点未満）";
+        tieMsg = (tieMsg ? tieMsg + "<br>" : "") + "⚠️ トップが1.0点未満 → 見送り推奨。";
       }
     }
 
-    // top < 1 => recommend skip
-    if (topTotal < 1) {
-      msg += `<div class="hr"></div><b class="warn">トップが1点未満 → 見送り推奨。</b>`;
-    }
-
-    state.pick = { main, scores:rows, msg };
+    state.pick = { main, rows:sorted, tieMsg, recommendSkip, reason };
   };
 
-  const renderScoreTable = () => {
-    const rows = state.pick.scores;
-    const main = state.pick.main;
-    const val = (x)=> (x <= -900 ? "×" : x.toFixed(1));
-    const html = `
-      <table>
-        <thead>
-          <tr>
-            <th>馬番</th><th>①</th><th>②</th><th>③</th><th>合計</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r => `
-            <tr>
-              <td><b>${r.horse}${(main===r.horse) ? ' <span class="ok">✅</span>' : ''}</b></td>
-              <td>${r.p1}</td>
-              <td>${r.p2}</td>
-              <td>${r.j}</td>
-              <td><b>${val(r.total)}</b></td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-      <div class="small" style="margin-top:10px;">
-        内訳：①=コース距離（2以上で2点）／②=流れ脚質（2以上で2点）／③=騎手（不安-0.5、消し=除外）
-      </div>
-    `;
-    el("scoreTable").innerHTML = html;
+  const labelP1 = (v) => v===2 ? "🟢 問題なし（2）" : v===1 ? "🟡 やや不安（1）" : "🔴 不安大（0）";
+  const labelP2 = (v) => v===2 ? "🟢 負け筋が1つ（2）" : v===1 ? "🟡 負け筋が2つ（1）" : "🔴 読めない（0）";
+  const labelP3 = (v) => v===0 ? "🟢 壊さない（0）" : v===-0.5 ? "🟡 少し不安（-0.5）" : "🔴 壊しそう（-1.0）";
 
-    const topRow = rows.filter(x=>x.total>-900).sort((a,b)=>b.total-a.total)[0];
-    if (!topRow) {
-      el("mainPickTitle").innerHTML = `結果`;
-    } else {
-      el("mainPickTitle").innerHTML = `✅ 本命：馬${state.pick.main || "—"}（合計 ${topRow.total.toFixed(1)} 点）`;
-    }
-
-    el("step4Msg").innerHTML = state.pick.msg || "";
-  };
-
-  const autoAim = () => {
-    // aim: which pillars are strong for the main horse
-    const main = state.pick.main;
-    if (!main) return "なし";
-    const r = state.pick.scores.find(x=>x.horse===main);
-    if (!r) return "なし";
+  const computeAim = (row) => {
     const a = [];
-    if (r.p1 >= 2) a.push("①");
-    if (r.p2 >= 2) a.push("②");
-    if (r.j === "OK") a.push("③");
-    if (!a.length) return "なし";
+    if (row.p1 === 2) a.push("①");
+    if (row.p2 === 2) a.push("②");
+    // ③は減点しない場合だけ表示
+    if (row.p3 === 0) a.push("③");
     return a.join("");
   };
 
-  // ====== final summary ======
+  const renderStep4 = () => {
+    const { main, rows, tieMsg, recommendSkip } = state.pick;
+
+    // top card
+    if (!main) {
+      el("step4Top").innerHTML = `
+        <div class="resultCard bad">
+          <div class="big ng">⚠️ 見送り（同点が解けない）</div>
+          <div class="small">ルール：①→②→③でも同点 → 見送り</div>
+        </div>
+      `;
+      el("btnGoStep5").disabled = true;
+    } else {
+      const top = rows.find(r => r.horse === main);
+      const aim = computeAim(top) || "—";
+      const cls = recommendSkip ? "warn" : "good";
+      const title = recommendSkip ? `⚠️ 本命：馬${main}（合計 ${top.total.toFixed(1)}点）` : `✅ 本命：馬${main}（合計 ${top.total.toFixed(1)}点）`;
+      const subtitle = recommendSkip ? "見送り推奨（弱い/危険）" : "買う候補";
+
+      el("step4Top").innerHTML = `
+        <div class="resultCard ${cls}">
+          <div class="big">${title}</div>
+          <div class="pillRow">
+            <div class="pill">狙い：<b>${aim}</b></div>
+            <div class="pill">判定：<b>${subtitle}</b></div>
+          </div>
+          <div class="hr"></div>
+          <div class="small">次はSTEP5で最終ブレーキ（馬体重±12／直前フラグ）</div>
+        </div>
+      `;
+      el("btnGoStep5").disabled = false;
+    }
+
+    // tie msg
+    el("step4TieMsg").innerHTML = tieMsg || "";
+
+    // detail cards
+    const cards = rows.map(r => {
+      const isMain = (r.horse === main);
+      const borderCls = isMain ? "good" : "";
+      const mark = isMain ? " ✅" : "";
+      return `
+        <div class="resultCard ${borderCls}" style="margin-top:12px;">
+          <div class="big">馬${r.horse}${mark}｜合計 ${r.total.toFixed(1)}点</div>
+          <div class="hr"></div>
+          <div>① コース×距離：<b>${labelP1(r.p1)}</b></div>
+          <div>② 流れ×脚質：<b>${labelP2(r.p2)}</b></div>
+          <div>③ 騎手：<b>${labelP3(r.p3)}</b></div>
+        </div>
+      `;
+    }).join("");
+
+    el("step4Cards").innerHTML = cards;
+
+    // enable/disable skip button always OK; step5 button depends on main
+  };
+
+  // ====== STEP6 Summary ======
   const updateFinalSummary = () => {
     const r = state.race;
-    const main = state.pick.main;
-    const aim = autoAim();
+    const { main, rows } = state.pick;
+    const top = main ? rows.find(x => x.horse === main) : null;
+    const aim = top ? (computeAim(top) || "—") : "—";
     const w = state.step5.weight;
     const info = state.step5.info;
 
@@ -956,8 +928,9 @@
     if (w === "yes") skipReasons.push("馬体重±12kg以上");
     if (info === "yes") skipReasons.push("直前情報フラグON");
 
-    const rec = (skipReasons.length ? "見送り推奨" : "買う候補");
-    const recClass = (skipReasons.length ? "warn" : "ok");
+    const willSkip = skipReasons.length > 0;
+    const rec = willSkip ? "見送り" : "買う";
+    const cls = willSkip ? "warnTxt" : "ok";
 
     el("finalSummary").innerHTML = `
       <div class="tag">📅 ${r.date}</div>
@@ -966,55 +939,48 @@
       <div class="tag">🏷️ ${r.raceClass}</div>
       <div class="tag">⭐ ${r.course}</div>
       <div class="hr"></div>
-      <div class="big ${recClass}">${rec}</div>
+      <div class="big ${cls}">結論：${rec}</div>
       <div class="hr"></div>
-      <div><b>結論：</b>${skipReasons.length ? "<b class='warn'>見送り</b>" : "<b class='ok'>買う</b>"}</div>
       <div><b>本命：</b>${main ? `馬${main}` : "—"}</div>
-      <div><b>狙い：</b>${aim} が揃っていて崩れにくい</div>
+      <div><b>狙い：</b>${aim}</div>
       <div><b>買い目：</b>${main ? `馬${main} 複勝1点 500円` : "—"}</div>
+      ${willSkip ? `<div class="hr"></div><div class="small">見送り理由：${skipReasons.join(" / ")}</div>` : ""}
     `;
 
     el("skipCond").value =
       `馬体重±12kg以上 → 見送り\n` +
       `直前情報フラグON → 見送り\n` +
       `同点が解けない／本命が決まらない → 見送り\n`;
-
-    // if recommended skip, default to disable BUY?（ただし重賞は買いたくなるので“完全禁止”にはしない）
-    // ここは「BUY保存」も可能にする（自己責任でログが残る方が大事）
   };
 
-  // ====== log & csv ======
+  // ====== Logs & CSV ======
   const toCSV = (logs) => {
     const headers = [
       "ts","date","track","raceNo","class","course",
-      "candidates","main","score","aim","risk","weight12","lateInfo","decision","memo"
+      "cand1","cand2","cand3",
+      "main","score","aim",
+      "risk","weight12","lateInfo",
+      "decision","memo"
     ];
-    const esc = (s) => {
-      const x = String(s ?? "");
-      return `"${x.replace(/"/g,'""')}"`;
-    };
+    const esc = (s) => `"${String(s ?? "").replace(/"/g,'""')}"`;
     const lines = [headers.join(",")];
+
     logs.forEach(l => {
       lines.push([
         l.ts, l.date, l.track, l.raceNo, l.raceClass, l.course,
-        (l.candidates || []).join("-"),
-        l.main || "",
-        (l.score ?? ""),
-        l.aim || "",
-        l.risk || "",
-        l.weight12 || "",
-        l.lateInfo || "",
-        l.decision || "",
-        l.memo || ""
+        l.cand1||"", l.cand2||"", l.cand3||"",
+        l.main||"", l.score||"", l.aim||"",
+        l.risk||"", l.weight12||"", l.lateInfo||"",
+        l.decision||"", l.memo||""
       ].map(esc).join(","));
     });
+
     return lines.join("\n");
   };
 
   const refreshLogUI = () => {
     const logs = loadLogs();
     const csv = toCSV(logs);
-    // preview last 10 lines
     const lines = csv.split("\n");
     const preview = lines.slice(0,1).concat(lines.slice(Math.max(1, lines.length-11))).join("\n");
     el("logPreview").textContent = preview;
@@ -1024,10 +990,23 @@
   const saveDecision = (decision) => {
     const logs = loadLogs();
     const r = state.race;
-    const aim = autoAim();
-    const mainRow = state.pick.scores.find(x => x.horse === state.pick.main);
-    const score = mainRow ? (mainRow.total <= -900 ? "" : mainRow.total.toFixed(1)) : "";
-    const memo = state.candMemo || "";
+
+    const cand = state.candidates || [];
+    const cand1 = cand[0] || "";
+    const cand2 = cand[1] || "";
+    const cand3 = cand[2] || "";
+
+    const main = state.pick.main;
+    const mainRow = main ? state.pick.rows.find(x => x.horse === main) : null;
+    const score = mainRow ? mainRow.total.toFixed(1) : "";
+    const aim = mainRow ? (computeAim(mainRow) || "") : "";
+
+    // memo: step2 memos combined
+    const memoParts = [];
+    cand.forEach(h => {
+      const m = (state.candMemos[h] || "").trim();
+      if (m) memoParts.push(`${h}:${m}`);
+    });
 
     logs.push({
       ts: nowStr(),
@@ -1036,37 +1015,37 @@
       raceNo: r.raceNo,
       raceClass: r.raceClass,
       course: r.course,
-      candidates: state.candidates,
-      main: state.pick.main,
+      cand1, cand2, cand3,
+      main,
       score,
       aim,
       risk: (state.final.risk || "").trim(),
       weight12: state.step5.weight || "",
       lateInfo: state.step5.info || "",
       decision,
-      memo,
+      memo: memoParts.join(" / ")
     });
 
     saveLogs(logs);
     refreshLogUI();
   };
 
-  // ====== buttons ======
+  // ====== Buttons wiring ======
   el("btnGoStep0").addEventListener("click", () => {
-    // daily limit
     const logs = loadLogs();
     const todays = logs.filter(x => x.date === state.race.date);
-    if (todays.length >= 3) return; // should be disabled already
+    if (todays.length >= 3) return;
     go("cardStep0");
   });
 
   el("btnSkipToday").addEventListener("click", () => {
-    // Save a SKIP log immediately (入口スキップ)
-    state.final.risk = "";
+    // quick skip
     state.candidates = [];
-    state.pick.main = null;
+    state.candMemos = {};
+    state.pick = { main:null, rows:[], tieMsg:"", recommendSkip:false, reason:"" };
     state.step5.weight = "";
     state.step5.info = "";
+    state.final.risk = "";
     saveDecision("SKIP");
     alert("見送りで保存しました（ログ）。");
   });
@@ -1086,13 +1065,11 @@
   });
 
   el("btnGoStep1").addEventListener("click", () => {
-    // Must answer both
     if (!state.step0.q1 || !state.step0.q2) {
       alert("STEP0のQ1/Q2を選択してください。");
       return;
     }
     if (state.step0.q1 === "no" || state.step0.q2 === "no") {
-      // stop early
       alert("No が出ました。今回は見送りが正解です（ログ保存してください）。");
       return;
     }
@@ -1112,35 +1089,43 @@
       alert("対象外です。見送りが正解です。");
       return;
     }
+    initStep2();
     go("cardStep2");
-  });
-
-  el("btnGoStep3").addEventListener("click", () => {
-    const c = normalizeCandidates(el("candidates").value);
-    const memo = el("candMemo").value || "";
-    if (c.length === 0) {
-      alert("候補馬（馬番）を1〜3頭入れてください。");
-      return;
-    }
-    state.candidates = c;
-    state.candMemo = memo;
-    buildHorseForms();
-    go("cardStep3");
   });
 
   el("btnSkipFrom2").addEventListener("click", () => {
     saveDecision("SKIP");
-    alert("候補が出ないため見送り保存しました（ログ）。");
+    alert("見送りで保存しました（ログ）。");
     go("cardRace");
   });
 
-  el("btnGoStep4").addEventListener("click", () => {
-    if (!canGoStep4()) {
-      alert("各馬の入力が未完です（①②のYes/Noを全部埋めてください）。");
+  el("btnGoStep3").addEventListener("click", () => {
+    const cand = getCandidates();
+    if (cand.length === 0) {
+      alert("候補を1頭以上選んでください。");
       return;
     }
-    computeScores();
-    renderScoreTable();
+
+    // save candidates + memos
+    state.candidates = cand;
+    state.candMemos = {};
+    const m1 = (el("candMemo1").value || "").trim();
+    const m2 = (el("candMemo2").value || "").trim();
+    const m3 = (el("candMemo3").value || "").trim();
+    const map = [
+      {h: el("cand1").value, m: m1},
+      {h: el("cand2").value, m: m2},
+      {h: el("cand3").value, m: m3},
+    ];
+    map.forEach(x => { if (x.h) state.candMemos[x.h] = x.m; });
+
+    buildStep3();
+    go("cardStep3");
+  });
+
+  el("btnGoStep4").addEventListener("click", () => {
+    computePick();
+    renderStep4();
     go("cardStep4");
   });
 
@@ -1151,7 +1136,10 @@
   });
 
   el("btnGoStep5").addEventListener("click", () => {
-    // allow, even if recommended skip
+    if (!state.pick.main) {
+      alert("本命が決まっていません。同点が解けない場合は見送りです。");
+      return;
+    }
     go("cardStep5");
   });
 
@@ -1178,7 +1166,7 @@
     go("cardRace");
   });
 
-  // ====== log buttons ======
+  // ====== LOG buttons ======
   el("btnCopyCSV").addEventListener("click", async () => {
     const logs = loadLogs();
     const csv = toCSV(logs);
@@ -1211,17 +1199,9 @@
     alert("ログを全消ししました。");
   });
 
-  // ====== daily reset note ======
-  // This app counts "today" by filtering logs by selected date.
-  // So when date changes to tomorrow, remaining count becomes 3 again.
-  // (No extra reset needed)
-
-  // initial log view
+  // ====== start ======
   refreshLogUI();
-
-  // start card
   go("cardRace");
-
 })();
 </script>
 </body>
