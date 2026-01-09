@@ -2,611 +2,337 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="color-scheme" content="light dark" />
-  <title>おじ.exe（中山ダ1800）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>おじ.exe（競馬プロジェクト）</title>
   <style>
-    :root{
-      --bg:#f6f7f9; --card:#fff; --text:#111; --sub:#555; --line:#e6e8ee;
-      --pri:#111; --priText:#fff; --soft:#f2f3f6; --warn:#ffefef; --warnLine:#ffb8b8;
-      --radius:14px; --pad:16px;
-    }
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg:#0f1115; --card:#151922; --text:#eef1f6; --sub:#aab3c2; --line:#2a3140;
-        --pri:#eef1f6; --priText:#0f1115; --soft:#1b2130; --warn:#2a1616; --warnLine:#7a3333;
-      }
-    }
-    *{box-sizing:border-box}
+    :root { --pad: 16px; --line: rgba(255,255,255,.10); }
+    *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",system-ui,Segoe UI,Roboto,sans-serif;
-      background:var(--bg);
-      color:var(--text);
+      font-family:-apple-system, system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background:#0b1220; color:#e9eefc;
     }
-    .wrap{max-width:780px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) var(--pad) calc(env(safe-area-inset-bottom) + 18px);}
+    .wrap{ max-width:820px; margin:0 auto; padding:var(--pad); }
     .card{
-      background:var(--card);
+      background:rgba(255,255,255,.06);
       border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:var(--pad);
-      box-shadow:0 10px 26px rgba(0,0,0,.06);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+      backdrop-filter: blur(8px);
+      margin-bottom:14px;
+    }
+    h1{ font-size:22px; margin:0 0 6px; }
+    h2{ font-size:16px; margin:0 0 10px; color:#cfe0ff; }
+    .sub{ font-size:13px; color:rgba(233,238,252,.75); line-height:1.5; margin:0 0 14px; }
+    .pill{
+      display:inline-block; font-size:12px; padding:6px 10px;
+      border-radius:999px; border:1px solid var(--line);
+      background:rgba(0,0,0,.18); color:rgba(233,238,252,.85);
+      margin-right:6px; margin-bottom:6px;
+    }
+    .hr{ height:1px; background:var(--line); margin:14px 0; }
+    .q{
+      background:rgba(0,0,0,.18);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
       margin:12px 0;
     }
-    h1{font-size:20px;margin:0 0 6px;}
-    .sub{font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 10px;}
-    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 2px;}
-    .chip{background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--sub);}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    @media (max-width:520px){.grid{grid-template-columns:1fr}}
-    label{display:block;font-size:13px;color:var(--sub);margin:10px 0 6px;}
-    input,select,textarea{
-      width:100%;
-      padding:12px 12px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:transparent;
-      color:var(--text);
-      font-size:16px;
-      outline:none;
-    }
-    textarea{min-height:78px;resize:vertical}
-    .q{
-      font-size:18px;
-      margin:12px 0 10px;
-      font-weight:700;
-    }
-    .row{display:flex;gap:10px;flex-wrap:wrap;}
+    .qTitle{ font-weight:800; margin:0 0 10px; }
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; }
     button{
-      flex:1;
-      min-width:140px;
-      padding:14px 12px;
-      border-radius:14px;
       border:1px solid var(--line);
-      background:transparent;
-      color:var(--text);
+      background:rgba(0,0,0,.18);
+      color:#e9eefc;
+      border-radius:16px;
+      padding:14px 14px;
       font-size:16px;
-      font-weight:700;
+      font-weight:800;
       cursor:pointer;
+      flex:1;
+      min-width:160px;
     }
-    button.primary{background:var(--pri);color:var(--priText);border-color:transparent;}
-    button.soft{background:var(--soft);}
-    button.danger{background:var(--warn);border-color:var(--warnLine);}
-    .result{
+    button.primary{ background:#e9eefc; color:#0b1220; border-color:transparent; }
+    button.danger{ background:rgba(255,80,80,.12); border-color:rgba(255,80,80,.22); color:#ffd7d7; }
+    .note{ font-size:12px; color:rgba(233,238,252,.65); line-height:1.5; margin-top:10px; }
+    .hide{ display:none; }
+    .bigMsg{
+      font-size:16px; line-height:1.6;
+      background:rgba(0,0,0,.18);
       border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      background:linear-gradient(180deg, rgba(0,0,0,.02), transparent);
-      margin-top:10px;
+      border-radius:16px;
+      padding:14px;
+      margin-top:12px;
     }
-    .big{font-size:18px;font-weight:900;margin:0 0 6px;}
-    .small{font-size:13px;color:var(--sub);margin:0;line-height:1.5;}
-    .sep{height:1px;background:var(--line);margin:14px 0;}
-    .logHead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
-    .logList{margin:10px 0 0;padding:0;list-style:none;}
-    .logItem{border-top:1px solid var(--line);padding:10px 0;}
-    .logItem:first-child{border-top:none;padding-top:0;}
-    .tag{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--soft);color:var(--sub);margin-right:6px;}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}
-    .hint{font-size:12px;color:var(--sub);margin-top:8px}
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:12px; color:rgba(233,238,252,.8);
+      white-space:pre-wrap;
+    }
     .toast{
-      position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
-      background:rgba(0,0,0,.82);color:#fff;
-      padding:10px 12px;border-radius:12px;font-size:13px;
-      opacity:0;pointer-events:none;transition:.2s;
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background:rgba(0,0,0,.75); border:1px solid var(--line);
+      color:#fff; padding:10px 12px; border-radius:14px;
+      font-size:13px; opacity:0; pointer-events:none;
+      transition:opacity .18s ease;
+      max-width:92vw;
     }
-    .toast.show{opacity:1}
+    .toast.show{ opacity:1; }
   </style>
 </head>
 <body>
   <div class="wrap">
 
+    <!-- Header -->
     <div class="card">
-      <h1>おじ.exe（中山ダ1800）</h1>
+      <h1>おじ.exe（競馬プロジェクト）</h1>
       <p class="sub">
         目的：迷わない／感情で買わない／決めた手順通りに動く<br>
-        ※ログは端末内（このブラウザ）だけに保存。外に送らない。
+        入口（STEP0〜STEP1）実装済み。次でSTEP2以降を入れる。
       </p>
-      <div class="chips">
-        <span class="chip">固定：複勝1点</span>
-        <span class="chip">1R 500円</span>
-        <span class="chip">候補 最大3頭</span>
-        <span class="chip">迷ったら 見送り</span>
-      </div>
-
-      <div class="sep"></div>
-
-      <label>レース名（ログ用）</label>
-      <input id="raceName" placeholder="例：1/18 中山10R など" />
-
-      <div class="grid">
-        <div>
-          <label>馬場</label>
-          <select id="cond">
-            <option value="良">良</option>
-            <option value="稍重">稍重</option>
-            <option value="重">重</option>
-            <option value="不良">不良</option>
-          </select>
-        </div>
-        <div>
-          <label>頭数</label>
-          <input id="heads" type="number" inputmode="numeric" min="1" max="18" placeholder="例：16" />
-        </div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div id="flow"></div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <button class="soft" id="btnBack" type="button">ひとつ戻る</button>
-        <button class="soft" id="btnReset" type="button">リセット</button>
-      </div>
-
-      <p class="hint">※「ひとつ戻る」はこのアプリ内の戻る（ブラウザの戻るじゃない）</p>
+      <span class="pill">複勝1点</span>
+      <span class="pill">1R 500円</span>
+      <span class="pill">最大3レース/日</span>
+      <span class="pill">得意条件：中山ダ1800 / 東京ダ1600</span>
     </div>
 
-    <div class="card">
-      <div class="logHead">
-        <div>
-          <div style="font-weight:900;">🗒️ ログ（端末内に保存）</div>
-          <div class="sub" style="margin:4px 0 0;">買う／見送り と「止まった理由・負け筋」だけ残す</div>
+    <!-- STEP0 -->
+    <section id="step0" class="card">
+      <h2>STEP0｜前提確認（10秒）</h2>
+
+      <div class="q">
+        <p class="qTitle">Q1：今日は最大3レースまで、というルールを守れる？</p>
+        <div class="btnRow">
+          <button class="primary" data-next="step0_q2" data-set="step0_q1:yes">はい</button>
+          <button class="danger" data-skip="today_limit" data-set="step0_q1:no">いいえ</button>
         </div>
-        <div class="row" style="flex:0 0 auto;">
-          <button class="soft" id="btnCopyCsv" type="button">CSVコピー</button>
-          <button class="danger" id="btnClearLog" type="button">ログ全消し</button>
+        <p class="note">No が出たら、その時点で終了（今日は見送り）。</p>
+      </div>
+
+      <div id="step0_q2" class="q hide">
+        <p class="qTitle">Q2：このレースは500円だけで買う？</p>
+        <div class="btnRow">
+          <button class="primary" id="goStep1" data-set="step0_q2:yes">はい</button>
+          <button class="danger" data-skip="money_rule" data-set="step0_q2:no">いいえ</button>
+        </div>
+        <p class="note">「500円だけ」が守れないなら、このレースは見送り。</p>
+      </div>
+    </section>
+
+    <!-- STEP1 -->
+    <section id="step1" class="card hide">
+      <h2>STEP1｜対象レース判定（即断）</h2>
+
+      <div class="q">
+        <p class="qTitle">Q3：このレースは重賞（G1〜G3）？</p>
+        <div class="btnRow">
+          <button class="primary" id="isGradedYes" data-set="step1_q3:yes">はい</button>
+          <button id="isGradedNo" data-set="step1_q3:no">いいえ</button>
+        </div>
+        <p class="note">重賞は買う対象に含める（ただしSTEP0の資金ルールは絶対）。</p>
+      </div>
+
+      <div id="step1_q4" class="q hide">
+        <p class="qTitle">Q4：得意条件に当てはまる？</p>
+        <div class="btnRow">
+          <button class="primary" data-pick="nakayama_d1800">中山ダ1800</button>
+          <button class="primary" data-pick="tokyo_d1600">東京ダ1600</button>
+          <button class="danger" data-pick="none">どれでもない</button>
+        </div>
+        <p class="note">東京芝1400は一時停止（選択肢に存在しない）。</p>
+      </div>
+
+      <div id="step1_pass" class="bigMsg hide">
+        <div style="font-weight:900; margin-bottom:6px;">✅ 対象レース：OK</div>
+        <div class="mono" id="passSummary"></div>
+        <div class="btnRow" style="margin-top:12px;">
+          <button class="primary" id="goStep2">STEP2へ進む</button>
+          <button class="danger" id="skipHere">今回は見送る</button>
+        </div>
+        <p class="note">※STEP2以降は次の実装で本体化します（いまは遷移確認）。</p>
+      </div>
+    </section>
+
+    <!-- STEP2 (placeholder) -->
+    <section id="step2" class="card hide">
+      <h2>STEP2｜候補抽出（※準備中）</h2>
+      <p class="sub">
+        次の実装でここに「候補抽出の質問＋見送りボタン」を入れ込みます。<br>
+        いまは入口が正しく動くかの確認用。
+      </p>
+      <div class="btnRow">
+        <button class="danger" id="skipFromStep2">今回は見送る</button>
+        <button class="primary" id="restart">最初から</button>
+      </div>
+    </section>
+
+    <!-- SKIP -->
+    <section id="skip" class="card hide">
+      <h2>見送り</h2>
+      <p class="sub">見送りは正解ルート。型に従った判断です。</p>
+      <div class="bigMsg">
+        <div style="font-weight:900; margin-bottom:6px;">✅ 見送りを選択しました</div>
+        <div class="mono" id="skipReason"></div>
+        <div style="margin-top:10px; font-size:12px; color:rgba(233,238,252,.7);">
+          No bet is a bet. 見送れる日は、型が守れている日。
         </div>
       </div>
-      <ul id="logList" class="logList"></ul>
-      <div id="logEmpty" class="sub" style="margin-top:10px;">まだログはありません。</div>
-    </div>
+      <div class="btnRow" style="margin-top:12px;">
+        <button class="primary" id="restart2">最初から</button>
+      </div>
+    </section>
 
   </div>
 
-  <div id="toast" class="toast">コピーしました</div>
+  <div class="toast" id="toast"></div>
 
-  <script>
-    "use strict";
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const toast = $("toast");
 
-    // ====== State ======
-    const state = {
-      step: "q_course",
-      history: [],
-      // input snapshot
-      raceName: "",
-      cond: "良",
-      heads: null,
-      // computed
-      extremeHint: null,
-      // result
-      decision: null,   // "BUY" | "SKIP"
-      reason: ""
+  const state = {
+    step0_q1: null,
+    step0_q2: null,
+    step1_q3: null,       // graded?
+    step1_q4: null,       // course pick
+  };
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1100);
+  }
+
+  function showSection(id){
+    ["step0","step1","step2","skip"].forEach(s => $(s).classList.add("hide"));
+    $(id).classList.remove("hide");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function showEl(id){
+    $(id).classList.remove("hide");
+  }
+
+  function setFromData(setStr){
+    // "key:value"
+    if(!setStr) return;
+    const [k,v] = setStr.split(":");
+    state[k] = v;
+  }
+
+  function goSkip(reasonKey){
+    const map = {
+      today_limit: "STEP0で終了：最大3レース/日が守れない → 今日は見送り。",
+      money_rule:  "STEP0で終了：500円固定が守れない → このレースは見送り。",
+      not_target:  "STEP1で終了：重賞でも得意条件でもない → 見送り。",
+      user_skip:   "おじ判断：今回は見送る（正解ルート）。"
     };
+    $("skipReason").textContent =
+      (map[reasonKey] || "見送りを選択しました。") +
+      "\n\n-- 状態 --\n" + JSON.stringify(state, null, 2);
 
-    const $ = (id)=>document.getElementById(id);
+    showSection("skip");
+  }
 
-    const elFlow = $("flow");
-    const elRace = $("raceName");
-    const elCond = $("cond");
-    const elHeads = $("heads");
-    const btnBack = $("btnBack");
-    const btnReset = $("btnReset");
-    const btnCopyCsv = $("btnCopyCsv");
-    const btnClearLog = $("btnClearLog");
-    const elLogList = $("logList");
-    const elLogEmpty = $("logEmpty");
-    const elToast = $("toast");
+  // Global click handlers for data attributes
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if(!btn) return;
 
-    // ====== Log ======
-    const LOG_KEY = "oji_keiba_log_v1";
+    // set state
+    setFromData(btn.dataset.set);
 
-    function loadLog(){
-      try{
-        const raw = localStorage.getItem(LOG_KEY);
-        return raw ? JSON.parse(raw) : [];
-      }catch(e){
-        return [];
-      }
-    }
-    function saveLog(items){
-      localStorage.setItem(LOG_KEY, JSON.stringify(items));
+    // show next element
+    if(btn.dataset.next){
+      showEl(btn.dataset.next);
+      showToast("次へ");
     }
 
-    function nowIso(){
-      const d = new Date();
-      const pad = (n)=>String(n).padStart(2,"0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    // skip
+    if(btn.dataset.skip){
+      goSkip(btn.dataset.skip);
+    }
+  });
+
+  // STEP0 -> STEP1
+  $("goStep1").addEventListener("click", () => {
+    if(state.step0_q1 !== "yes"){ return; }
+    state.step0_q2 = "yes";
+    showSection("step1");
+  });
+
+  // STEP1: graded yes -> pass
+  function passTarget(summaryLines){
+    $("passSummary").textContent = summaryLines.join("\n");
+    showEl("step1_pass");
+    showToast("対象OK");
+  }
+
+  $("isGradedYes").addEventListener("click", () => {
+    state.step1_q3 = "yes";
+    state.step1_q4 = "graded";
+    passTarget([
+      "対象：重賞（G1〜G3）",
+      "注意：500円固定／最大3レース/日は絶対",
+      "次：STEP2（候補抽出）へ"
+    ]);
+  });
+
+  // STEP1: graded no -> show Q4
+  $("isGradedNo").addEventListener("click", () => {
+    state.step1_q3 = "no";
+    showEl("step1_q4");
+    showToast("得意条件を選ぶ");
+  });
+
+  // Q4 pick
+  $("step1_q4").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if(!btn || !btn.dataset.pick) return;
+
+    const pick = btn.dataset.pick;
+    state.step1_q4 = pick;
+
+    if(pick === "none"){
+      goSkip("not_target");
+      return;
     }
 
-    function addLogEntry(entry){
-      const items = loadLog();
-      items.unshift(entry);
-      saveLog(items);
-      renderLog();
-    }
+    const label = (pick === "nakayama_d1800") ? "中山ダ1800" : "東京ダ1600";
+    passTarget([
+      `対象：得意条件（${label}）`,
+      "注意：500円固定／最大3レース/日は絶対",
+      "次：STEP2（候補抽出）へ"
+    ]);
+  });
 
-    function renderLog(){
-      const items = loadLog();
-      elLogList.innerHTML = "";
-      elLogEmpty.style.display = items.length ? "none" : "block";
+  // Pass -> Step2 (placeholder)
+  $("goStep2").addEventListener("click", () => showSection("step2"));
+  $("skipHere").addEventListener("click", () => goSkip("user_skip"));
+  $("skipFromStep2").addEventListener("click", () => goSkip("user_skip"));
 
-      for(const it of items){
-        const li = document.createElement("li");
-        li.className = "logItem";
-        const tags = [
-          `<span class="tag">${it.decision === "BUY" ? "買う" : "見送り"}</span>`,
-          it.cond ? `<span class="tag">${escapeHtml(it.cond)}</span>` : "",
-          (it.heads != null && it.heads !== "") ? `<span class="tag">${escapeHtml(String(it.heads))}頭</span>` : ""
-        ].join("");
-        li.innerHTML = `
-          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-            <div style="font-weight:800;">${escapeHtml(it.raceName || "(レース名なし)")}</div>
-            <div class="sub mono">${escapeHtml(it.ts)}</div>
-          </div>
-          <div style="margin-top:6px;">${tags}</div>
-          <div class="sub" style="margin-top:6px;white-space:pre-wrap;">${escapeHtml(it.reason || "")}</div>
-        `;
-        elLogList.appendChild(li);
-      }
-    }
+  // Restart
+  function resetAll(){
+    state.step0_q1 = null;
+    state.step0_q2 = null;
+    state.step1_q3 = null;
+    state.step1_q4 = null;
 
-    function toCsv(items){
-      const header = ["ts","raceName","cond","heads","decision","reason"];
-      const rows = [header];
-      for(const it of items){
-        rows.push([
-          it.ts || "",
-          it.raceName || "",
-          it.cond || "",
-          (it.heads==null ? "" : String(it.heads)),
-          it.decision || "",
-          (it.reason || "").replace(/\r?\n/g, " ")
-        ]);
-      }
-      return rows.map(r => r.map(csvCell).join(",")).join("\n");
-    }
-    function csvCell(s){
-      const v = String(s ?? "");
-      if(/[",\n]/.test(v)) return `"${v.replace(/"/g,'""')}"`;
-      return v;
-    }
+    $("step0_q2").classList.add("hide");
+    $("step1_q4").classList.add("hide");
+    $("step1_pass").classList.add("hide");
 
-    async function copyText(text){
-      try{
-        await navigator.clipboard.writeText(text);
-        toast("CSVをコピーしました");
-      }catch(e){
-        // fallback
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        ta.remove();
-        toast("CSVをコピーしました");
-      }
-    }
+    showSection("step0");
+    showToast("リセット");
+  }
+  $("restart").addEventListener("click", resetAll);
+  $("restart2").addEventListener("click", resetAll);
 
-    function toast(msg){
-      elToast.textContent = msg;
-      elToast.classList.add("show");
-      setTimeout(()=>elToast.classList.remove("show"), 1400);
-    }
-
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#39;");
-    }
-
-    // ====== Flow helpers ======
-    function snapshot(){
-      return JSON.parse(JSON.stringify(state));
-    }
-    function restore(snap){
-      // keep functions out; snap is plain
-      for(const k of Object.keys(state)){
-        delete state[k];
-      }
-      Object.assign(state, snap);
-      render();
-    }
-    function pushHistory(){
-      state.history.push(snapshot());
-      if(state.history.length > 50) state.history.shift();
-    }
-
-    function readInputs(){
-      state.raceName = (elRace.value || "").trim();
-      state.cond = elCond.value;
-      const h = elHeads.value === "" ? null : Number(elHeads.value);
-      state.heads = Number.isFinite(h) ? h : null;
-
-      // hint: extreme if many heads or heavy track
-      const heads = state.heads;
-      const cond = state.cond;
-      const many = (heads != null && heads >= 15);
-      const few  = (heads != null && heads <= 10);
-      const heavy = (cond === "重" || cond === "不良");
-      state.extremeHint = (many || few || heavy) ? "極端" : "普通";
-    }
-
-    // ====== Render ======
-    function render(){
-      readInputs();
-
-      btnBack.disabled = state.history.length === 0;
-      btnBack.style.opacity = btnBack.disabled ? "0.5" : "1";
-
-      elFlow.innerHTML = "";
-      if(state.step === "q_course"){
-        renderQCourse();
-      }else if(state.step === "q_extreme"){
-        renderQExtreme();
-      }else if(state.step === "q_pattern"){
-        renderQPattern();
-      }else if(state.step === "result"){
-        renderResult();
-      }
-    }
-
-    function renderQCourse(){
-      elFlow.appendChild(qBlock(
-        "【買う資格】 このレースは中山ダ1800？",
-        [
-          btn("はい", "primary", ()=>goYesCourse()),
-          btn("いいえ", "soft", ()=>goNoCourse())
-        ],
-        hintBlock("※ 対象外なら即「見送り」")
-      ));
-    }
-
-    function goYesCourse(){
-      pushHistory();
-      state.step = "q_extreme";
-      state.decision = null;
-      state.reason = "";
-      render();
-    }
-
-    function goNoCourse(){
-      pushHistory();
-      state.step = "result";
-      state.decision = "SKIP";
-      state.reason = "対象外（中山ダ1800ではない）";
-      render();
-    }
-
-    function renderQExtreme(){
-      const hint = state.extremeHint;
-      const msg = `入力値からの判定：${hint || "不明"}（頭数と馬場）`;
-      elFlow.appendChild(qBlock(
-        "【状況】 頭数・馬場は“極端”？",
-        [
-          btn("はい（極端）", "primary", ()=>goExtreme(true)),
-          btn("いいえ（普通）", "soft", ()=>goExtreme(false))
-        ],
-        hintBlock(`ヒント：${msg}\n・極端＝「多い(15+) / 少ない(〜10) / 重・不良」など`)
-      ));
-    }
-
-    function goExtreme(isExtreme){
-      pushHistory();
-      // ここは型の入口。極端なら「買うゾーン」寄り、普通なら慎重。
-      state.step = "q_pattern";
-      state.decision = null;
-      state.reason = isExtreme
-        ? "極端条件（多頭 or 道悪 など）→ パターンへ"
-        : "普通条件 → 迷ったら見送り前提でパターンへ";
-      state._isExtreme = isExtreme;
-      render();
-    }
-
-    function renderQPattern(){
-      const isExtreme = !!state._isExtreme;
-      const head = isExtreme
-        ? "【パターン】 どの勝ち筋で買う？（極端条件）"
-        : "【パターン】 どの勝ち筋で買う？（普通条件）";
-
-      const sub = isExtreme
-        ? "極端＝展開ブレが大きい。勝ち筋を1つに固定して迷いを減らす。"
-        : "普通＝優位が薄いことが多い。自信がなければ見送り。";
-
-      const box = document.createElement("div");
-      box.className = "card";
-      box.innerHTML = `
-        <div class="q">${escapeHtml(head)}</div>
-        <div class="sub">${escapeHtml(sub)}</div>
-        <div class="row" style="margin-top:10px;">
-          <button class="primary" id="pA">A：前目で押し切り</button>
-          <button class="soft" id="pB">B：差し届く想定</button>
-          <button class="soft" id="pC">C：混戦→安全に見送り</button>
-        </div>
-        <label style="margin-top:12px;">止まった理由・負け筋（1つだけ）</label>
-        <textarea id="reasonBox" placeholder="例：同型が多くて先行争い→潰れる"></textarea>
-        <div class="row" style="margin-top:10px;">
-          <button class="soft" id="btnBuy">この内容で『買う』</button>
-          <button class="danger" id="btnSkip">『見送り』にする</button>
-        </div>
-        <p class="hint">※『買う』でも券種・金額は固定（複勝1点／500円）</p>
-      `;
-      elFlow.appendChild(box);
-
-      const pA = $("pA");
-      const pB = $("pB");
-      const pC = $("pC");
-      const reasonBox = $("reasonBox");
-      const btnBuy = $("btnBuy");
-      const btnSkip = $("btnSkip");
-
-      let picked = null;
-
-      function pick(x){
-        picked = x;
-        // UI
-        pA.className = (x==="A") ? "primary" : "soft";
-        pB.className = (x==="B") ? "primary" : "soft";
-        pC.className = (x==="C") ? "primary" : "soft";
-
-        if(x==="C"){
-          btnBuy.textContent = "（見送り推奨）でも買うなら買う";
-        }else{
-          btnBuy.textContent = "この内容で『買う』";
-        }
-      }
-
-      pA.onclick = ()=>pick("A");
-      pB.onclick = ()=>pick("B");
-      pC.onclick = ()=>pick("C");
-
-      // default
-      pick(isExtreme ? "A" : "C");
-
-      btnBuy.onclick = ()=>{
-        pushHistory();
-        state.step = "result";
-        state.decision = "BUY";
-        const extra = reasonBox.value.trim();
-        state.reason = `パターン${picked}で買う。` + (extra ? ` 負け筋：${extra}` : "");
-        render();
-      };
-
-      btnSkip.onclick = ()=>{
-        pushHistory();
-        state.step = "result";
-        state.decision = "SKIP";
-        const extra = reasonBox.value.trim();
-        state.reason = `見送り。` + (extra ? ` 理由：${extra}` : "");
-        render();
-      };
-    }
-
-    function renderResult(){
-      const decision = state.decision || "SKIP";
-      const isBuy = decision === "BUY";
-
-      const box = document.createElement("div");
-      box.className = "card";
-      box.innerHTML = `
-        <div class="result">
-          <p class="big">${isBuy ? "結論：買う（複勝1点／500円）" : "結論：見送り"}</p>
-          <p class="small">${escapeHtml(summaryLine())}</p>
-          <div class="sep"></div>
-          <div class="sub" style="white-space:pre-wrap;">${escapeHtml(state.reason || "")}</div>
-          <div class="sep"></div>
-          <div class="row">
-            <button class="primary" id="btnSave">ログに保存</button>
-            <button class="soft" id="btnAgain">もう一度（最初へ）</button>
-          </div>
-        </div>
-      `;
-      elFlow.appendChild(box);
-
-      $("btnSave").onclick = ()=>{
-        addLogEntry({
-          ts: nowIso(),
-          raceName: state.raceName,
-          cond: state.cond,
-          heads: state.heads,
-          decision: state.decision || "SKIP",
-          reason: state.reason || ""
-        });
-        toast("ログに保存しました");
-      };
-
-      $("btnAgain").onclick = ()=>{
-        resetAll();
-      };
-    }
-
-    function summaryLine(){
-      const parts = [];
-      if(state.raceName) parts.push(state.raceName);
-      if(state.cond) parts.push(`馬場:${state.cond}`);
-      if(state.heads != null) parts.push(`${state.heads}頭`);
-      return parts.join(" / ");
-    }
-
-    // ====== UI helpers ======
-    function qBlock(title, buttons, hintEl){
-      const box = document.createElement("div");
-      box.className = "card";
-      const q = document.createElement("div");
-      q.className = "q";
-      q.textContent = title;
-      box.appendChild(q);
-
-      const row = document.createElement("div");
-      row.className = "row";
-      for(const b of buttons) row.appendChild(b);
-      box.appendChild(row);
-
-      if(hintEl) box.appendChild(hintEl);
-      return box;
-    }
-
-    function hintBlock(text){
-      const p = document.createElement("div");
-      p.className = "hint";
-      p.style.whiteSpace = "pre-wrap";
-      p.textContent = text;
-      return p;
-    }
-
-    function btn(text, cls, onClick){
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = cls || "soft";
-      b.textContent = text;
-      b.onclick = onClick;
-      return b;
-    }
-
-    // ====== Controls ======
-    function resetAll(){
-      state.step = "q_course";
-      state.history = [];
-      state.decision = null;
-      state.reason = "";
-      state._isExtreme = false;
-      render();
-    }
-
-    btnBack.onclick = ()=>{
-      if(!state.history.length) return;
-      const snap = state.history.pop();
-      restore(snap);
-    };
-
-    btnReset.onclick = ()=>resetAll();
-
-    btnCopyCsv.onclick = async ()=>{
-      const items = loadLog();
-      const csv = toCsv(items);
-      await copyText(csv);
-    };
-
-    btnClearLog.onclick = ()=>{
-      if(!confirm("ログを全部消します。よろしいですか？")) return;
-      saveLog([]);
-      renderLog();
-      toast("ログを消しました");
-    };
-
-    // Re-render when inputs change (lightweight)
-    elRace.addEventListener("input", ()=>{ /* no-op */ });
-    elCond.addEventListener("change", ()=>render());
-    elHeads.addEventListener("input", ()=>render());
-
-    // init
-    renderLog();
-    render();
-  </script>
+  // Init
+  showSection("step0");
+})();
+</script>
 </body>
 </html>
