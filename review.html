@@ -13,21 +13,14 @@
       padding: 16px;
       line-height: 1.4;
     }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 12px;
-    }
+    h1 { font-size: 20px; margin-bottom: 12px; }
     section {
       background: #fff;
       padding: 12px;
       margin-bottom: 12px;
       border-radius: 8px;
     }
-    label {
-      display: block;
-      font-size: 14px;
-      margin-top: 8px;
-    }
+    label { display: block; font-size: 14px; margin-top: 8px; }
     select, input, textarea {
       width: 100%;
       margin-top: 4px;
@@ -39,7 +32,6 @@
     .radio-group label { display: block; font-size: 14px; }
     .note { font-size: 12px; color: #666; margin-top: 4px; }
 
-    /* ▼ 追加：戻るリンクを最低限それっぽく見せる */
     .header { margin-bottom: 12px; }
     .title { font-weight: 800; font-size: 18px; margin-bottom: 4px; }
     .sub { color: #666; font-size: 12px; margin-bottom: 8px; }
@@ -52,20 +44,43 @@
       background: #fff;
       color: #111;
       font-size: 13px;
+      text-decoration: none;
+    }
+
+    .btnRow { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button {
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      flex: 1;
+      min-width: 160px;
+    }
+    button.primary { background:#111; color:#fff; border-color:#111; }
+    button.danger { background:#ffe9ec; border-color:#ffb7c0; color:#7a0010; }
+    .logbox {
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: #111;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      overflow:auto;
+      max-height: 260px;
     }
   </style>
 </head>
 
 <body>
-  <!-- ✅ header は body の先頭へ -->
   <div class="header">
     <div class="title">今日の馬券振り返り</div>
     <div class="sub">結果と判断を切り離して記録する</div>
-
     <div class="chips">
-      <a href="index.html" class="chip" style="text-decoration:none;">
-        ← 予想に戻る
-      </a>
+      <a href="index.html" class="chip">← 予想に戻る</a>
     </div>
   </div>
 
@@ -73,22 +88,29 @@
 
   <section>
     <strong>STEP 1｜レース</strong>
+
     <label>日付
-      <input type="date" />
+      <input id="date" type="date" />
     </label>
 
     <label>競馬場
-      <select>
+      <select id="track">
         <option>中山</option>
         <option>東京</option>
         <option>阪神</option>
         <option>京都</option>
+        <option>中京</option>
+        <option>札幌</option>
+        <option>函館</option>
+        <option>福島</option>
+        <option>新潟</option>
+        <option>小倉</option>
         <option>その他</option>
       </select>
     </label>
 
     <label>レース番号
-      <select>
+      <select id="raceNo">
         <option>1R</option><option>2R</option><option>3R</option>
         <option>4R</option><option>5R</option><option>6R</option>
         <option>7R</option><option>8R</option><option>9R</option>
@@ -100,49 +122,194 @@
   <section>
     <strong>STEP 2｜判断の置き場所</strong>
     <div class="radio-group">
-      <label><input type="radio" name="zone" /> 🏠 A：主戦場（中山ダ1800・自分）</label>
-      <label><input type="radio" name="zone" /> 📰 B：委任（記者）</label>
-      <label><input type="radio" name="zone" /> 🌊 C：流れ買い</label>
-      <label><input type="radio" name="zone" /> 🛑 D：やり過ごし</label>
+      <label><input type="radio" name="zone" value="A" /> 🏠 A：主戦場（中山ダ1800・自分）</label>
+      <label><input type="radio" name="zone" value="B" /> 📰 B：委任（記者）</label>
+      <label><input type="radio" name="zone" value="C" /> 🌊 C：流れ買い</label>
+      <label><input type="radio" name="zone" value="D" /> 🛑 D：やり過ごし</label>
     </div>
+    <div class="note">※1つだけ選ぶ</div>
   </section>
 
   <section>
     <strong>STEP 3｜誰の判断か</strong>
+
     <label>判断主体
-      <select>
+      <select id="actor">
         <option>自分</option>
-        <option>記者（名前を書く）</option>
+        <option>記者</option>
         <option>その他</option>
       </select>
     </label>
 
-    <label>理由（1行）
-      <textarea rows="2" placeholder="調教と前走が良い / オッズが安い など"></textarea>
+    <label>記者名（任意：actorが記者のとき）
+      <input id="writerName" placeholder="例：競馬ラボ / 〇〇記者" />
     </label>
-    <div class="note">※ 書かなくてもOK</div>
+
+    <label>理由（1行・任意）
+      <textarea id="reason" rows="2" placeholder="調教と前走が良い / オッズが安い など"></textarea>
+    </label>
   </section>
 
   <section>
     <strong>STEP 4｜結果</strong>
+
     <label>買った？
-      <select>
+      <select id="bought">
         <option>買った</option>
         <option>買わなかった</option>
       </select>
     </label>
 
     <label>結果
-      <select>
+      <select id="result">
         <option>的中</option>
         <option>不的中</option>
         <option>買わずに的中</option>
+        <option>買わずに不的中</option>
       </select>
     </label>
 
-    <label>一言メモ
-      <textarea rows="2" placeholder="差分は騎手 / 安くてスルーで正解"></textarea>
+    <label>一言メモ（任意）
+      <textarea id="memo" rows="2" placeholder="差分は騎手 / 安くてスルーで正解"></textarea>
     </label>
+
+    <div class="btnRow">
+      <button class="primary" id="btnSave">保存</button️</button>
+      <button id="btnCopyCSV">CSVコピー</button>
+      <button id="btnDownloadCSV">CSVダウンロード</button>
+      <button class="danger" id="btnClear">ログ全消し</button>
+    </div>
+
+    <div class="note">保存先：この端末のブラウザ（localStorage）。機種変更/ブラウザ変更で消える可能性あり。</div>
   </section>
+
+  <section>
+    <strong>ログ（プレビュー）</strong>
+    <div id="logPreview" class="logbox"></div>
+  </section>
+
+<script>
+(() => {
+  // ===== Storage =====
+  const KEY = "oji_keiba_review_v1";
+
+  const loadLogs = () => {
+    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+    catch { return []; }
+  };
+  const saveLogs = (logs) => localStorage.setItem(KEY, JSON.stringify(logs));
+
+  // ===== Utils =====
+  const el = (id) => document.getElementById(id);
+  const todayISO = () => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${dd}`;
+  };
+  const nowStr = () => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    return `${y}-${m}-${dd} ${hh}:${mm}`;
+  };
+  const getZone = () => {
+    const x = document.querySelector('input[name="zone"]:checked');
+    return x ? x.value : "";
+  };
+
+  // ===== CSV =====
+  const toCSV = (logs) => {
+    const headers = ["ts","date","track","raceNo","zone","actor","writerName","reason","bought","result","memo"];
+    const esc = (s) => `"${String(s ?? "").replace(/"/g,'""')}"`;
+    const lines = [headers.join(",")];
+    logs.forEach(l => {
+      lines.push([
+        l.ts, l.date, l.track, l.raceNo, l.zone, l.actor, l.writerName,
+        l.reason, l.bought, l.result, l.memo
+      ].map(esc).join(","));
+    });
+    return lines.join("\n");
+  };
+
+  const refreshPreview = () => {
+    const logs = loadLogs();
+    const csv = toCSV(logs);
+    const lines = csv.split("\n");
+    const preview = lines.slice(0,1).concat(lines.slice(Math.max(1, lines.length-12))).join("\n");
+    el("logPreview").textContent = preview || "まだログがありません";
+  };
+
+  // ===== Init =====
+  el("date").value = todayISO();
+  refreshPreview();
+
+  // ===== Save =====
+  el("btnSave").addEventListener("click", () => {
+    const date = el("date").value || todayISO();
+    const track = el("track").value;
+    const raceNo = el("raceNo").value;
+
+    const zone = getZone();
+    if (!zone) { alert("STEP2：判断の置き場所（A〜D）を選んでください。"); return; }
+
+    const actor = el("actor").value;
+    const writerName = (el("writerName").value || "").trim();
+    const reason = (el("reason").value || "").trim();
+    const bought = el("bought").value;
+    const result = el("result").value;
+    const memo = (el("memo").value || "").trim();
+
+    const logs = loadLogs();
+    logs.push({
+      ts: nowStr(),
+      date, track, raceNo,
+      zone, actor,
+      writerName: (actor === "記者" ? writerName : ""),
+      reason, bought, result, memo
+    });
+    saveLogs(logs);
+    refreshPreview();
+    alert("保存しました（reviewログ）。");
+  });
+
+  // ===== Copy CSV =====
+  el("btnCopyCSV").addEventListener("click", async () => {
+    const csv = toCSV(loadLogs());
+    try {
+      await navigator.clipboard.writeText(csv);
+      alert("CSVをコピーしました。");
+    } catch {
+      alert("コピーに失敗しました。iOSの設定/権限の影響があるかも。");
+    }
+  });
+
+  // ===== Download CSV =====
+  el("btnDownloadCSV").addEventListener("click", () => {
+    const csv = toCSV(loadLogs());
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `oji_keiba_review_${todayISO()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // ===== Clear =====
+  el("btnClear").addEventListener("click", () => {
+    if (!confirm("reviewログを全消しします。よろしいですか？")) return;
+    localStorage.removeItem(KEY);
+    refreshPreview();
+    alert("reviewログを全消ししました。");
+  });
+})();
+</script>
 </body>
 </html>
