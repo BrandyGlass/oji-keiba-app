@@ -13,25 +13,34 @@
       padding: 16px;
       line-height: 1.4;
     }
-    h1 { font-size: 20px; margin-bottom: 12px; }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
     section {
       background: #fff;
       padding: 12px;
       margin-bottom: 12px;
       border-radius: 8px;
     }
-    label { display: block; font-size: 14px; margin-top: 8px; }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-top: 8px;
+    }
     select, input, textarea {
       width: 100%;
       margin-top: 4px;
       padding: 8px;
       font-size: 14px;
+      box-sizing: border-box;
     }
     textarea { resize: none; }
     .radio-group { margin-top: 8px; }
     .radio-group label { display: block; font-size: 14px; }
     .note { font-size: 12px; color: #666; margin-top: 4px; }
 
+    /* header */
     .header { margin-bottom: 12px; }
     .title { font-weight: 800; font-size: 18px; margin-bottom: 4px; }
     .sub { color: #666; font-size: 12px; margin-bottom: 8px; }
@@ -44,43 +53,48 @@
       background: #fff;
       color: #111;
       font-size: 13px;
-      text-decoration: none;
     }
 
-    .btnRow { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    /* buttons */
+    .btnRow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
     button {
       border: 1px solid #ddd;
       background: #fff;
       padding: 10px 12px;
       border-radius: 10px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
+    }
+    button.primary {
+      background: #111;
+      color: #fff;
+      border-color: #111;
       flex: 1;
       min-width: 160px;
     }
-    button.primary { background:#111; color:#fff; border-color:#111; }
-    button.danger { background:#ffe9ec; border-color:#ffb7c0; color:#7a0010; }
-    .logbox {
-      white-space: pre;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 12px;
-      color: #111;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 10px;
-      overflow:auto;
-      max-height: 260px;
+    button.secondary {
+      flex: 1;
+      min-width: 160px;
     }
+    button.danger {
+      border-color: #ff5d73;
+      color: #b00020;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .hr { height: 1px; background: #eee; margin: 12px 0; }
   </style>
 </head>
 
 <body>
   <div class="header">
     <div class="title">今日の馬券振り返り</div>
-    <div class="sub">結果と判断を切り離して記録する</div>
+    <div class="sub">結果と判断を切り離して記録する（保存は端末内 / localStorage）</div>
+
     <div class="chips">
-      <a href="index.html" class="chip">← 予想に戻る</a>
+      <a href="index.html" class="chip" style="text-decoration:none;">← 予想に戻る</a>
     </div>
   </div>
 
@@ -88,7 +102,6 @@
 
   <section>
     <strong>STEP 1｜レース</strong>
-
     <label>日付
       <input id="date" type="date" />
     </label>
@@ -120,18 +133,17 @@
   </section>
 
   <section>
-    <strong>STEP 2｜判断の置き場所</strong>
-    <div class="radio-group">
+    <strong>STEP 2｜判断の置き場所（zone）</strong>
+    <div class="radio-group" id="zoneGroup">
       <label><input type="radio" name="zone" value="A" /> 🏠 A：主戦場（中山ダ1800・自分）</label>
       <label><input type="radio" name="zone" value="B" /> 📰 B：委任（記者）</label>
       <label><input type="radio" name="zone" value="C" /> 🌊 C：流れ買い</label>
       <label><input type="radio" name="zone" value="D" /> 🛑 D：やり過ごし</label>
     </div>
-    <div class="note">※1つだけ選ぶ</div>
   </section>
 
   <section>
-    <strong>STEP 3｜誰の判断か</strong>
+    <strong>STEP 3｜誰の判断か（actor）</strong>
 
     <label>判断主体
       <select id="actor">
@@ -141,13 +153,14 @@
       </select>
     </label>
 
-    <label>記者名（任意：actorが記者のとき）
-      <input id="writerName" placeholder="例：競馬ラボ / 〇〇記者" />
+    <label id="writerWrap" style="display:none;">記者名（任意）
+      <input id="writerName" placeholder="例：サンスポ綿越" />
     </label>
 
-    <label>理由（1行・任意）
+    <label>理由（1行）
       <textarea id="reason" rows="2" placeholder="調教と前走が良い / オッズが安い など"></textarea>
     </label>
+    <div class="note">※ 書かなくてもOK</div>
   </section>
 
   <section>
@@ -165,42 +178,51 @@
         <option>的中</option>
         <option>不的中</option>
         <option>買わずに的中</option>
-        <option>買わずに不的中</option>
       </select>
     </label>
 
-    <label>一言メモ（任意）
+    <label>賭け金（円）
+      <input id="stake" type="number" value="500" step="100" />
+    </label>
+
+    <label>払戻（円）
+      <input id="payout" type="number" placeholder="例：1400" />
+    </label>
+    <div class="note">※ 的中時のみ入力。外れ・買わずは空欄でOK</div>
+
+    <label>一言メモ
       <textarea id="memo" rows="2" placeholder="差分は騎手 / 安くてスルーで正解"></textarea>
     </label>
 
     <div class="btnRow">
-      <button class="primary" id="btnSave">保存</button️</button>
-      <button id="btnCopyCSV">CSVコピー</button>
-      <button id="btnDownloadCSV">CSVダウンロード</button>
-      <button class="danger" id="btnClear">ログ全消し</button>
+      <button class="primary" id="btnSave">保存</button>
+      <button class="secondary" id="btnReset">入力リセット</button>
     </div>
-
-    <div class="note">保存先：この端末のブラウザ（localStorage）。機種変更/ブラウザ変更で消える可能性あり。</div>
   </section>
 
   <section>
-    <strong>ログ（プレビュー）</strong>
-    <div id="logPreview" class="logbox"></div>
+    <strong>LOG（CSV）</strong>
+    <div class="note">保存先：この端末のブラウザ（localStorage）。機種変更やブラウザ変更で消える可能性あり。</div>
+    <div class="hr"></div>
+
+    <div class="btnRow">
+      <button class="secondary" id="btnCopyCSV">CSVをコピー</button>
+      <button class="secondary" id="btnDownloadCSV">CSVをダウンロード</button>
+      <button class="danger" id="btnClear">ログ全消し</button>
+    </div>
+
+    <div class="hr"></div>
+    <div class="note">プレビュー（末尾10件）</div>
+    <pre class="mono" id="logPreview" style="white-space:pre-wrap;"></pre>
   </section>
 
 <script>
 (() => {
-  // ===== Storage =====
-  const KEY = "oji_keiba_review_v1";
-
-  const loadLogs = () => {
-    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-    catch { return []; }
-  };
-  const saveLogs = (logs) => localStorage.setItem(KEY, JSON.stringify(logs));
+  const KEY = "oji_review_logs_v1";
 
   // ===== Utils =====
   const el = (id) => document.getElementById(id);
+
   const todayISO = () => {
     const d = new Date();
     const y = d.getFullYear();
@@ -208,6 +230,7 @@
     const dd = String(d.getDate()).padStart(2,"0");
     return `${y}-${m}-${dd}`;
   };
+
   const nowStr = () => {
     const d = new Date();
     const y = d.getFullYear();
@@ -217,22 +240,36 @@
     const mm = String(d.getMinutes()).padStart(2,"0");
     return `${y}-${m}-${dd} ${hh}:${mm}`;
   };
-  const getZone = () => {
-    const x = document.querySelector('input[name="zone"]:checked');
-    return x ? x.value : "";
+
+  const loadLogs = () => {
+    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+    catch { return []; }
   };
 
-  // ===== CSV =====
+  const saveLogs = (logs) => localStorage.setItem(KEY, JSON.stringify(logs));
+
+  const esc = (s) => `"${String(s ?? "").replace(/"/g,'""')}"`;
+
   const toCSV = (logs) => {
-    const headers = ["ts","date","track","raceNo","zone","actor","writerName","reason","bought","result","memo"];
-    const esc = (s) => `"${String(s ?? "").replace(/"/g,'""')}"`;
+    const headers = [
+      "ts","date","track","raceNo",
+      "zone","actor","writerName","reason",
+      "bought","result",
+      "stake","payout","profit","roi",
+      "memo"
+    ];
     const lines = [headers.join(",")];
+
     logs.forEach(l => {
       lines.push([
-        l.ts, l.date, l.track, l.raceNo, l.zone, l.actor, l.writerName,
-        l.reason, l.bought, l.result, l.memo
+        l.ts, l.date, l.track, l.raceNo,
+        l.zone, l.actor, l.writerName, l.reason,
+        l.bought, l.result,
+        l.stake, l.payout, l.profit, l.roi,
+        l.memo
       ].map(esc).join(","));
     });
+
     return lines.join("\n");
   };
 
@@ -240,13 +277,54 @@
     const logs = loadLogs();
     const csv = toCSV(logs);
     const lines = csv.split("\n");
-    const preview = lines.slice(0,1).concat(lines.slice(Math.max(1, lines.length-12))).join("\n");
-    el("logPreview").textContent = preview || "まだログがありません";
+    const preview = lines.slice(0,1).concat(lines.slice(Math.max(1, lines.length-11))).join("\n");
+    el("logPreview").textContent = preview;
   };
 
   // ===== Init =====
   el("date").value = todayISO();
-  refreshPreview();
+  // zone default: D（やり過ごし）にしてもいい。いまは未選択。
+  const setZone = (v) => {
+    const radio = document.querySelector(`input[name="zone"][value="${v}"]`);
+    if (radio) radio.checked = true;
+  };
+
+  const actorChanged = () => {
+    const a = el("actor").value;
+    el("writerWrap").style.display = (a === "記者") ? "" : "none";
+    if (a !== "記者") el("writerName").value = "";
+  };
+  el("actor").addEventListener("change", actorChanged);
+  actorChanged();
+
+  // bought/result と stake/payout の整合
+  const normalizeMoneyByResult = () => {
+    const bought = el("bought").value;
+    const result = el("result").value;
+
+    // 買わなかった場合は stake=0 推奨
+    if (bought === "買わなかった") {
+      el("stake").value = 0;
+    } else {
+      // 買ったのにstakeが0なら500を入れる（軽い保険）
+      if (parseInt(el("stake").value || "0", 10) === 0) el("stake").value = 500;
+    }
+
+    // 「買わずに的中」の場合、stake=0、payout=0でOK（結果だけ残す）
+    if (result === "買わずに的中") {
+      el("stake").value = 0;
+      // 払戻は入力しない（0扱い）
+      el("payout").value = "";
+    }
+
+    // 不的中ならpayout空でOK
+    if (result === "不的中") {
+      el("payout").value = "";
+    }
+  };
+
+  el("bought").addEventListener("change", normalizeMoneyByResult);
+  el("result").addEventListener("change", normalizeMoneyByResult);
 
   // ===== Save =====
   el("btnSave").addEventListener("click", () => {
@@ -254,14 +332,26 @@
     const track = el("track").value;
     const raceNo = el("raceNo").value;
 
-    const zone = getZone();
-    if (!zone) { alert("STEP2：判断の置き場所（A〜D）を選んでください。"); return; }
+    const zoneEl = document.querySelector('input[name="zone"]:checked');
+    const zone = zoneEl ? zoneEl.value : "";
+    if (!zone) {
+      alert("zone（判断の置き場所）を選んでください。");
+      return;
+    }
 
     const actor = el("actor").value;
-    const writerName = (el("writerName").value || "").trim();
+    const writerName = (actor === "記者") ? (el("writerName").value || "").trim() : "";
     const reason = (el("reason").value || "").trim();
+
     const bought = el("bought").value;
     const result = el("result").value;
+
+    const stake = parseInt(el("stake").value || "0", 10) || 0;
+    const payout = parseInt(el("payout").value || "0", 10) || 0;
+
+    const profit = payout - stake;
+    const roi = stake > 0 ? (payout / stake) : 0;
+
     const memo = (el("memo").value || "").trim();
 
     const logs = loadLogs();
@@ -269,46 +359,74 @@
       ts: nowStr(),
       date, track, raceNo,
       zone, actor,
-      writerName: (actor === "記者" ? writerName : ""),
-      reason, bought, result, memo
+      writerName,
+      reason,
+      bought, result,
+      stake,
+      payout,
+      profit,
+      roi: roi.toFixed(2),
+      memo
     });
+
     saveLogs(logs);
     refreshPreview();
-    alert("保存しました（reviewログ）。");
+    alert("保存しました。");
   });
 
-  // ===== Copy CSV =====
+  // ===== Reset =====
+  el("btnReset").addEventListener("click", () => {
+    el("date").value = todayISO();
+    el("track").value = "中山";
+    el("raceNo").value = "11R";
+
+    document.querySelectorAll('input[name="zone"]').forEach(r => r.checked = false);
+
+    el("actor").value = "自分";
+    actorChanged();
+
+    el("reason").value = "";
+    el("bought").value = "買った";
+    el("result").value = "的中";
+    el("stake").value = 500;
+    el("payout").value = "";
+    el("memo").value = "";
+    refreshPreview();
+  });
+
+  // ===== CSV buttons =====
   el("btnCopyCSV").addEventListener("click", async () => {
     const csv = toCSV(loadLogs());
     try {
       await navigator.clipboard.writeText(csv);
       alert("CSVをコピーしました。");
     } catch {
-      alert("コピーに失敗しました。iOSの設定/権限の影響があるかも。");
+      alert("コピーに失敗しました。iOSの設定で許可が必要な場合があります。");
     }
   });
 
-  // ===== Download CSV =====
   el("btnDownloadCSV").addEventListener("click", () => {
     const csv = toCSV(loadLogs());
     const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `oji_keiba_review_${todayISO()}.csv`;
+    a.download = `oji_review_${todayISO()}.csv`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
   });
 
-  // ===== Clear =====
   el("btnClear").addEventListener("click", () => {
-    if (!confirm("reviewログを全消しします。よろしいですか？")) return;
+    if (!confirm("ログを全消しします。よろしいですか？")) return;
     localStorage.removeItem(KEY);
     refreshPreview();
-    alert("reviewログを全消ししました。");
+    alert("ログを全消ししました。");
   });
+
+  // start
+  refreshPreview();
 })();
 </script>
 </body>
