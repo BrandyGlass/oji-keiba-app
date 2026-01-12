@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>今日の馬券振り返り</title>
+
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
@@ -33,100 +34,115 @@
       padding: 8px;
       font-size: 14px;
     }
-    textarea {
-      resize: none;
-    }
-    .radio-group {
-      margin-top: 8px;
-    }
-    .radio-group label {
-      display: block;
-      font-size: 14px;
-    }
-    .note {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
+    textarea { resize: none; }
+    .radio-group { margin-top: 8px; }
+    .radio-group label { display: block; font-size: 14px; }
+    .note { font-size: 12px; color: #666; margin-top: 4px; }
+
+    /* ▼ 追加：戻るリンクを最低限それっぽく見せる */
+    .header { margin-bottom: 12px; }
+    .title { font-weight: 800; font-size: 18px; margin-bottom: 4px; }
+    .sub { color: #666; font-size: 12px; margin-bottom: 8px; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #111;
+      font-size: 13px;
     }
   </style>
 </head>
+
 <body>
+  <!-- ✅ header は body の先頭へ -->
+  <div class="header">
+    <div class="title">今日の馬券振り返り</div>
+    <div class="sub">結果と判断を切り離して記録する</div>
 
-<h1>🐎 今日の馬券振り返り</h1>
-
-<section>
-  <strong>STEP 1｜レース</strong>
-  <label>日付
-    <input type="date" />
-  </label>
-
-  <label>競馬場
-    <select>
-      <option>中山</option>
-      <option>東京</option>
-      <option>阪神</option>
-      <option>京都</option>
-      <option>その他</option>
-    </select>
-  </label>
-
-  <label>レース番号
-    <select>
-      <option>1R</option><option>2R</option><option>3R</option>
-      <option>4R</option><option>5R</option><option>6R</option>
-      <option>7R</option><option>8R</option><option>9R</option>
-      <option>10R</option><option>11R</option><option>12R</option>
-    </select>
-  </label>
-</section>
-
-<section>
-  <strong>STEP 2｜判断の置き場所</strong>
-  <div class="radio-group">
-    <label><input type="radio" name="zone" /> 🏠 A：主戦場（中山ダ1800・自分）</label>
-    <label><input type="radio" name="zone" /> 📰 B：委任（記者）</label>
-    <label><input type="radio" name="zone" /> 🌊 C：流れ買い</label>
-    <label><input type="radio" name="zone" /> 🛑 D：やり過ごし</label>
+    <div class="chips">
+      <a href="index.html" class="chip" style="text-decoration:none;">
+        ← 予想に戻る
+      </a>
+    </div>
   </div>
-</section>
 
-<section>
-  <strong>STEP 3｜誰の判断か</strong>
-  <label>判断主体
-    <select>
-      <option>自分</option>
-      <option>記者（名前を書く）</option>
-      <option>その他</option>
-    </select>
-  </label>
+  <h1>🐎 今日の馬券振り返り</h1>
 
-  <label>理由（1行）
-    <textarea rows="2" placeholder="調教と前走が良い / オッズが安い など"></textarea>
-  </label>
-  <div class="note">※ 書かなくてもOK</div>
-</section>
+  <section>
+    <strong>STEP 1｜レース</strong>
+    <label>日付
+      <input type="date" />
+    </label>
 
-<section>
-  <strong>STEP 4｜結果</strong>
-  <label>買った？
-    <select>
-      <option>買った</option>
-      <option>買わなかった</option>
-    </select>
-  </label>
+    <label>競馬場
+      <select>
+        <option>中山</option>
+        <option>東京</option>
+        <option>阪神</option>
+        <option>京都</option>
+        <option>その他</option>
+      </select>
+    </label>
 
-  <label>結果
-    <select>
-      <option>的中</option>
-      <option>不的中</option>
-      <option>買わずに的中</option>
-    </select>
-  </label>
+    <label>レース番号
+      <select>
+        <option>1R</option><option>2R</option><option>3R</option>
+        <option>4R</option><option>5R</option><option>6R</option>
+        <option>7R</option><option>8R</option><option>9R</option>
+        <option>10R</option><option>11R</option><option>12R</option>
+      </select>
+    </label>
+  </section>
 
-  <label>一言メモ
-    <textarea rows="2" placeholder="差分は騎手 / 安くてスルーで正解"></textarea>
-  </label>
-</section>
+  <section>
+    <strong>STEP 2｜判断の置き場所</strong>
+    <div class="radio-group">
+      <label><input type="radio" name="zone" /> 🏠 A：主戦場（中山ダ1800・自分）</label>
+      <label><input type="radio" name="zone" /> 📰 B：委任（記者）</label>
+      <label><input type="radio" name="zone" /> 🌊 C：流れ買い</label>
+      <label><input type="radio" name="zone" /> 🛑 D：やり過ごし</label>
+    </div>
+  </section>
 
+  <section>
+    <strong>STEP 3｜誰の判断か</strong>
+    <label>判断主体
+      <select>
+        <option>自分</option>
+        <option>記者（名前を書く）</option>
+        <option>その他</option>
+      </select>
+    </label>
+
+    <label>理由（1行）
+      <textarea rows="2" placeholder="調教と前走が良い / オッズが安い など"></textarea>
+    </label>
+    <div class="note">※ 書かなくてもOK</div>
+  </section>
+
+  <section>
+    <strong>STEP 4｜結果</strong>
+    <label>買った？
+      <select>
+        <option>買った</option>
+        <option>買わなかった</option>
+      </select>
+    </label>
+
+    <label>結果
+      <select>
+        <option>的中</option>
+        <option>不的中</option>
+        <option>買わずに的中</option>
+      </select>
+    </label>
+
+    <label>一言メモ
+      <textarea rows="2" placeholder="差分は騎手 / 安くてスルーで正解"></textarea>
+    </label>
+  </section>
 </body>
 </html>
