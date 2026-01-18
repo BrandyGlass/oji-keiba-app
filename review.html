@@ -3,288 +3,345 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>今日の馬券振り返り</title>
-
+  <title>振り返り | おじ.exe v4.1 Extension</title>
   <style>
+    :root{
+      --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --text:#f8fafc;
+      --muted:#94a3b8; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+      --radius:16px;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 16px;
-      line-height: 1.4;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); margin: 0; padding: 16px; line-height: 1.5;
     }
-    h1 { font-size: 20px; margin-bottom: 12px; }
+    .header { margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
+    .title { font-weight: 900; font-size: 20px; color: var(--accent); }
+    .sub { font-size: 12px; color: var(--muted); }
+    .nav-link { display: inline-block; margin-top: 8px; color: var(--accent); text-decoration: none; font-size: 13px; font-weight: bold; }
+
     section {
-      background: #fff;
-      padding: 12px;
-      margin-bottom: 12px;
-      border-radius: 8px;
+      background: var(--card); padding: 16px; margin-bottom: 16px; border-radius: var(--radius);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
     }
-    label { display: block; font-size: 14px; margin-top: 8px; }
+    strong { display: block; font-size: 14px; color: var(--accent); margin-bottom: 10px; border-left: 3px solid var(--accent); padding-left: 8px; }
+    label { display: block; font-size: 12px; font-weight: bold; margin-top: 12px; color: var(--muted); }
+
     select, input, textarea {
-      width: 100%;
-      margin-top: 4px;
-      padding: 8px;
-      font-size: 14px;
-      box-sizing: border-box;
+      width: 100%; background: #0f172a; border: 1px solid #334155; color: white;
+      padding: 12px; border-radius: 10px; font-size: 16px; margin-top: 4px;
     }
     textarea { resize: none; }
-    .radio-group { margin-top: 8px; }
-    .radio-group label { display: block; font-size: 14px; }
-    .note { font-size: 12px; color: #666; margin-top: 4px; }
+    .note { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-    .header { margin-bottom: 12px; }
-    .title { font-weight: 800; font-size: 18px; margin-bottom: 4px; }
-    .sub { color: #666; font-size: 12px; margin-bottom: 8px; }
-    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
-    .chip {
-      display: inline-block;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fff;
-      color: #111;
-      font-size: 13px;
-      text-decoration: none;
+    .zone-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .zone-item { position: relative; }
+    .zone-item input { position: absolute; opacity: 0; }
+    .zone-item label {
+      margin: 0; padding: 10px; background: #334155; border-radius: 8px; text-align: center;
+      cursor: pointer; display: block; transition: 0.2s; color: var(--text);
     }
+    .zone-item input:checked + label { background: var(--accent); color: #0f172a; }
 
-    .btnRow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .btnRow { display: flex; gap: 10px; margin-top: 20px; }
     button {
-      border: 1px solid #ddd;
-      background: #fff;
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
+      flex: 1; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 15px;
+      cursor: pointer; border: none; transition: 0.2s;
     }
-    button.primary {
-      background: #111;
-      color: #fff;
-      border-color: #111;
-      flex: 1;
-      min-width: 160px;
-    }
-    button.secondary { flex: 1; min-width: 160px; }
-    button.danger {
-      border-color: #ff5d73;
-      color: #b00020;
-      flex: 1;
-      min-width: 160px;
-    }
+    button.primary { background: var(--accent); color: #0f172a; }
+    button.secondary { background: transparent; border: 1px solid #334155; color: var(--muted); }
+    button.danger { background: rgba(239, 68, 68, 0.1); color: var(--bad); border: 1px solid var(--bad); }
+    button:disabled { opacity: 0.3; }
 
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco,
-                   Consolas, "Liberation Mono", "Courier New", monospace;
+    .log-preview {
+      background: #0f172a; padding: 12px; border-radius: 8px; font-family: ui-monospace, monospace;
+      font-size: 10px; overflow-x: auto; color: var(--muted); margin-top: 12px;
+      white-space: pre;
     }
-    .hr { height: 1px; background: #eee; margin: 12px 0; }
+    .log-item {
+      padding: 10px; border-bottom: 1px solid #334155; font-size: 12px;
+    }
+    .res-win { color: var(--good); }
+    .res-loss { color: var(--bad); }
   </style>
 </head>
 
 <body>
   <div class="header">
-    <div class="title">今日の馬券振り返り</div>
-    <div class="sub">結果と判断を切り離して記録する（端末内保存）</div>
-    <div class="chips">
-      <a href="index.html" class="chip">← 予想に戻る</a>
-    </div>
+    <div class="title">振り返り.exe v2.1（安定版）</div>
+    <div class="sub">結果と判断を切り離して「型」を作る</div>
+    <a href="index.html" class="nav-link">← 予想エンジンに戻る</a>
   </div>
 
-  <h1>🐎 今日の馬券振り返り</h1>
-
   <section>
-    <strong>STEP 1｜レース</strong>
-    <label>日付 <input id="date" type="date" /></label>
-
-    <label>競馬場
-      <select id="track">
-        <option>中山</option><option>東京</option><option>阪神</option>
-        <option>京都</option><option>中京</option><option>札幌</option>
-        <option>函館</option><option>福島</option><option>新潟</option>
-        <option>小倉</option><option>その他</option>
-      </select>
-    </label>
-
-    <label>レース番号
-      <select id="raceNo">
-        <option>1R</option><option>2R</option><option>3R</option>
-        <option>4R</option><option>5R</option><option>6R</option>
-        <option>7R</option><option>8R</option><option>9R</option>
-        <option>10R</option><option>11R</option><option>12R</option>
-      </select>
-    </label>
+    <strong>STEP 0｜予想ログを反映</strong>
+    <label>直近の予想結果</label>
+    <select id="pickFromEngine"></select>
+    <div class="btnRow">
+      <button class="secondary" id="btnApplyEngine" style="font-size: 12px;">選択内容を入力に反映</button>
+    </div>
+    <div class="note">※反映が動かないときは、まず予想エンジン側で1件保存してから戻ってきてください。</div>
   </section>
 
   <section>
-    <strong>STEP 2｜判断の置き場所</strong>
-    <div class="radio-group">
-      <label><input type="radio" name="zone" value="A"> A：主戦場</label>
-      <label><input type="radio" name="zone" value="B"> B：委任（記者）</label>
-      <label><input type="radio" name="zone" value="C"> C：流れ</label>
-      <label><input type="radio" name="zone" value="D"> D：やり過ごし</label>
+    <strong>STEP 1｜基本情報</strong>
+    <div style="display: flex; gap: 8px;">
+      <div style="flex: 1.5;"><label>日付</label><input id="date" type="date" /></div>
+      <div style="flex: 1;"><label>場所</label>
+        <select id="track">
+          <option>中山</option><option>東京</option><option>阪神</option><option>京都</option><option>中京</option>
+          <option>札幌</option><option>函館</option><option>福島</option><option>新潟</option><option>小倉</option><option>その他</option>
+        </select>
+      </div>
+      <div style="flex: 1;"><label>R</label>
+        <select id="raceNo">
+          <option>1R</option><option>2R</option><option>3R</option><option>4R</option><option>5R</option><option>6R</option>
+          <option>7R</option><option>8R</option><option>9R</option><option>10R</option><option>11R</option><option>12R</option>
+        </select>
+      </div>
+    </div>
+
+    <label>判断のゾーン（超重要）</label>
+    <div class="zone-group">
+      <div class="zone-item"><input type="radio" name="zone" value="A" id="zA"><label for="zA">A：主戦場</label></div>
+      <div class="zone-item"><input type="radio" name="zone" value="B" id="zB"><label for="zB">B：委任(記者)</label></div>
+      <div class="zone-item"><input type="radio" name="zone" value="C" id="zC"><label for="zC">C：流れ(遊び)</label></div>
+      <div class="zone-item"><input type="radio" name="zone" value="D" id="zD"><label for="zD">D：やり過ごし</label></div>
     </div>
   </section>
 
   <section>
-    <strong>STEP 3｜誰の判断か</strong>
-    <label>判断主体
-      <select id="actor">
-        <option>自分</option>
-        <option>記者</option>
-        <option>その他</option>
-      </select>
-    </label>
-
-    <label id="writerWrap" style="display:none;">記者名
-      <input id="writerName" placeholder="例：サンスポ綿越" />
-    </label>
-
-    <label>理由
-      <textarea id="reason" rows="2"></textarea>
-    </label>
+    <strong>STEP 2｜誰の判断か</strong>
+    <div style="display: flex; gap: 8px;">
+      <div style="flex: 1;"><label>判断主体</label>
+        <select id="actor">
+          <option>自分</option><option>記者</option><option>その他</option>
+        </select>
+      </div>
+      <div style="flex: 1; display: none;" id="writerWrap"><label>記者名</label><input id="writerName" placeholder="氏名" /></div>
+    </div>
+    <label>狙い・理由</label>
+    <textarea id="reason" rows="2" placeholder="例：前走ハイペース逃げ、今回単騎濃厚など"></textarea>
   </section>
 
   <section>
-    <strong>STEP 4｜結果</strong>
+    <strong>STEP 3｜収支と反省</strong>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <div><label>購入状況</label>
+        <select id="bought">
+          <option value="買った">買った</option>
+          <option value="見送った">見送った</option>
+        </select>
+      </div>
+      <div><label>結果</label>
+        <select id="result">
+          <option>的中</option><option>不的中</option><option>買わずに的中</option>
+        </select>
+      </div>
+      <div><label>賭け金（円）</label><input id="stake" type="number" value="500" inputmode="numeric" /></div>
+      <div><label>払戻金（円）</label><input id="payout" type="number" value="0" inputmode="numeric" /></div>
+    </div>
 
-    <label>買った？
-      <select id="bought">
-        <option>買った</option>
-        <option>買わなかった</option>
-      </select>
-    </label>
-
-    <label>結果
-      <select id="result">
-        <option>的中</option>
-        <option>不的中</option>
-        <option>買わずに的中</option>
-      </select>
-    </label>
-
-    <label>賭け金（円）
-      <input id="stake" type="number" value="500" step="100" />
-    </label>
-
-    <label>払戻（円）
-      <input id="payout" type="number" />
-    </label>
-
-    <label>一言メモ
-      <textarea id="memo" rows="2"></textarea>
-    </label>
+    <label>一言メモ（感情を抜いて事実を書く）</label>
+    <textarea id="memo" rows="2" placeholder="例：4角外に膨らむロスあり、次は狙える"></textarea>
 
     <div class="btnRow">
-      <button class="primary" id="btnSave">保存</button>
+      <button class="primary" id="btnSave">この結果を保存</button>
       <button class="secondary" id="btnReset">リセット</button>
     </div>
   </section>
 
-  <section>
-    <strong>LOG（CSV）</strong>
+  <div style="margin-top: 32px;">
+    <h3 style="font-size: 14px; color: var(--muted); margin-bottom: 8px;">振り返りログ</h3>
+    <div id="reviewHistory"></div>
     <div class="btnRow">
-      <button class="secondary" id="btnCopyCSV">CSVコピー</button>
-      <button class="secondary" id="btnDownloadCSV">CSV保存</button>
-      <button class="danger" id="btnClear">全消し</button>
+      <button class="secondary" id="btnCopyCSV" style="font-size: 12px;">CSVコピー</button>
+      <button class="danger" id="btnClear" style="font-size: 12px;">全データ削除</button>
     </div>
-    <div class="hr"></div>
-    <pre class="mono" id="logPreview"></pre>
-  </section>
+    <div class="log-preview" id="logPreview"></div>
+  </div>
 
 <script>
 (() => {
-  const KEY = "oji_review_logs_v2";
+  const KEY_REVIEW = "oji_review_logs_v21";
+  const KEY_ENGINE = "oji_exe_v41_logs";
   const el = (id) => document.getElementById(id);
 
-  const todayISO = () => new Date().toISOString().slice(0,10);
-  const nowStr = () => new Date().toISOString().slice(0,16).replace("T"," ");
+  const safeJSON = (s, fallback) => { try { return JSON.parse(s); } catch { return fallback; } };
 
-  const loadLogs = () => JSON.parse(localStorage.getItem(KEY) || "[]");
-  const saveLogs = (logs) => localStorage.setItem(KEY, JSON.stringify(logs));
+  const loadLogs = () => safeJSON(localStorage.getItem(KEY_REVIEW) || "[]", []);
+  const saveLogs = (logs) => localStorage.setItem(KEY_REVIEW, JSON.stringify(logs));
+  const loadEngine = () => safeJSON(localStorage.getItem(KEY_ENGINE) || "[]", []);
 
-  const csvVal = (v) => {
-    if (v === null || v === undefined) return "";
-    if (typeof v === "number") return v;
-    return `"${String(v).replace(/"/g,'""')}"`;
+  // ---- Engine picker (valueにJSONを入れない：index方式) ----
+  let engineRecent = [];
+  const initEnginePicker = () => {
+    const logs = loadEngine();
+    const sel = el("pickFromEngine");
+
+    if (!Array.isArray(logs) || logs.length === 0) {
+      sel.innerHTML = '<option value="">予想ログがありません</option>';
+      el("btnApplyEngine").disabled = true;
+      return;
+    }
+
+    engineRecent = [...logs].slice(-10).reverse(); // 直近10件
+    sel.innerHTML =
+      '<option value="">（選択してください）</option>' +
+      engineRecent.map((l, i) => {
+        const horse = (l.horse ?? "-");
+        const score = (l.score ?? "-");
+        const dec = (l.decision ?? "");
+        const label = `${l.date || ""} ${l.race || ""} [${dec}] 馬${horse} (${score})`;
+        return `<option value="${i}">${label}</option>`;
+      }).join("");
   };
 
-  const toCSV = (logs) => {
-    const headers = [
-      "ts","date","track","raceNo",
-      "zone","actor","writerName","reason",
-      "bought","result",
-      "stake","payout","profit","roi",
-      "memo"
-    ];
-    const lines = [headers.join(",")];
-    logs.forEach(l => {
-      lines.push([
-        l.ts,l.date,l.track,l.raceNo,
-        l.zone,l.actor,l.writerName,l.reason,
-        l.bought,l.result,
-        l.stake,l.payout,l.profit,l.roi,
-        l.memo
-      ].map(csvVal).join(","));
-    });
-    return lines.join("\n");
+  // race "中山11R" -> {track:"中山", raceNo:"11R"}
+  const splitRace = (raceStr) => {
+    if (!raceStr) return null;
+    const m = String(raceStr).match(/^(.+?)(\d{1,2}R)$/);
+    if (!m) return null;
+    return { track: m[1], raceNo: m[2] };
   };
 
+  // 見送った時：stake/payout=0（結果は固定しない）
+  const syncBought = () => {
+    const isSkip = el("bought").value === "見送った";
+    if (isSkip) {
+      el("stake").value = 0;
+      el("payout").value = 0;
+      el("stake").disabled = true;
+      el("payout").disabled = true;
+      // 結果はユーザーに選ばせる（買わずに的中 もある）
+    } else {
+      el("stake").disabled = false;
+      el("payout").disabled = false;
+      if (Number(el("stake").value) === 0) el("stake").value = 500;
+    }
+  };
+
+  el("btnApplyEngine").onclick = () => {
+    const idxStr = el("pickFromEngine").value;
+    if (idxStr === "") return alert("予想ログを選択してください");
+
+    const data = engineRecent[Number(idxStr)];
+    if (!data) return alert("データが見つかりません");
+
+    el("date").value = data.date || el("date").value;
+
+    const sp = splitRace(data.race);
+    if (sp) {
+      if ([...el("track").options].some(o => o.value === sp.track)) el("track").value = sp.track;
+      el("raceNo").value = sp.raceNo;
+    }
+
+    el("bought").value = (data.decision === "BUY") ? "買った" : "見送った";
+    el("reason").value = `(予想Score: ${data.score ?? "-"}) リスク: ${data.risk ?? ""}`;
+
+    // BUY/SKIPに合わせて結果の推奨値だけ置く（固定はしない）
+    if (data.decision !== "BUY") {
+      el("result").value = "買わずに的中";
+    }
+
+    syncBought();
+    alert("反映しました");
+  };
+
+  el("bought").onchange = syncBought;
+
+  el("actor").onchange = () => {
+    el("writerWrap").style.display = (el("actor").value === "記者") ? "block" : "none";
+  };
+
+  // CSV escape
+  const csvCell = (v) => `"${String(v ?? "").replace(/"/g,'""')}"`;
+
+  // --- 保存・表示 ---
   const refresh = () => {
-    const csv = toCSV(loadLogs());
-    el("logPreview").textContent = csv.split("\n").slice(-10).join("\n");
+    const logs = loadLogs();
+    const history = el("reviewHistory");
+    const preview = el("logPreview");
+
+    history.innerHTML = [...logs].reverse().slice(0, 5).map(l => `
+      <div class="log-item">
+        <span style="color:var(--accent)">${l.date} ${l.track}${l.raceNo}</span>
+        [Zone ${l.zone}] <b>${l.result}</b><br>
+        <span class="${Number(l.profit) >= 0 ? 'res-win' : 'res-loss'}">収支: ${l.profit}円 (ROI: ${l.roi}%)</span>
+      </div>
+    `).join('');
+
+    const headers = ["日時","日付","場","R","Zone","主体","記者名","理由","購入","結果","賭金","払戻","収支","ROI(%)","メモ"];
+    const csv = [
+      headers.join(","),
+      ...logs.map(l => ([
+        l.ts, l.date, l.track, l.raceNo, l.zone,
+        l.actor, l.writerName, l.reason, l.bought, l.result,
+        l.stake, l.payout, l.profit, l.roi, l.memo
+      ].map(csvCell).join(",")))
+    ].join("\n");
+
+    preview.textContent = csv;
   };
 
-  el("date").value = todayISO();
-
-  el("actor").addEventListener("change", () => {
-    el("writerWrap").style.display =
-      el("actor").value === "記者" ? "" : "none";
-  });
-
-  el("btnSave").addEventListener("click", () => {
+  el("btnSave").onclick = () => {
     const zone = document.querySelector('input[name="zone"]:checked')?.value;
-    if (!zone) return alert("zoneを選択してください");
+    if(!zone) return alert("Zoneを選択してください");
 
+    const bought = el("bought").value;
     const stake = Number(el("stake").value || 0);
     const payout = Number(el("payout").value || 0);
-    const profit = payout - stake;
-    const roi = stake > 0 ? Math.round((payout / stake) * 100) / 100 : 0;
+
+    // 見送った時は強制0（整合）
+    const s2 = (bought === "見送った") ? 0 : stake;
+    const p2 = (bought === "見送った") ? 0 : payout;
+
+    const profit = p2 - s2;
+    const roiPct = (s2 > 0) ? Math.round((p2 / s2) * 1000) / 10 : 0; // 例: 280.0
 
     const logs = loadLogs();
     logs.push({
-      ts: nowStr(),
+      ts: new Date().toLocaleString(),
       date: el("date").value,
       track: el("track").value,
       raceNo: el("raceNo").value,
       zone,
       actor: el("actor").value,
-      writerName: el("writerName").value,
-      reason: el("reason").value,
-      bought: el("bought").value,
+      writerName: el("writerName").value || "",
+      reason: el("reason").value || "",
+      bought,
       result: el("result").value,
-      stake, payout, profit, roi,
-      memo: el("memo").value
+      stake: s2, payout: p2,
+      profit, roi: roiPct,
+      memo: el("memo").value || ""
     });
+
     saveLogs(logs);
     refresh();
-    alert("保存しました");
-  });
+    alert("保存しました。");
+  };
 
-  el("btnReset").addEventListener("click", () => location.reload());
-  el("btnCopyCSV").addEventListener("click", () => navigator.clipboard.writeText(toCSV(loadLogs())));
-  el("btnDownloadCSV").addEventListener("click", () => {
-    const blob = new Blob([toCSV(loadLogs())], {type:"text/csv"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "oji_review.csv";
-    a.click();
-  });
-  el("btnClear").addEventListener("click", () => {
-    if (confirm("消しますか？")) {
-      localStorage.removeItem(KEY);
-      refresh();
+  el("btnCopyCSV").onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(el("logPreview").textContent);
+      alert("CSVをコピーしました");
+    } catch {
+      alert("コピーできませんでした（iOS設定の影響の可能性）");
     }
-  });
+  };
 
+  el("btnClear").onclick = () => {
+    if(confirm("全消去しますか？")) {
+      localStorage.removeItem(KEY_REVIEW);
+      location.reload();
+    }
+  };
+  el("btnReset").onclick = () => location.reload();
+
+  // Init
+  el("date").valueAsDate = new Date();
+  initEnginePicker();
+  syncBought();
   refresh();
 })();
 </script>
