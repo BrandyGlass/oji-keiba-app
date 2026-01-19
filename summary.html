@@ -3,188 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>馬券集計サマリー</title>
-
+  <title>集計サマリー | おじ.exe v4.1</title>
   <style>
+    :root{
+      --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --text:#f8fafc;
+      --muted:#94a3b8; --good:#22c55e; --bad:#ef4444; --radius:16px;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); margin: 0; padding: 16px; line-height: 1.5;
     }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-    .sub {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 16px;
-    }
-    section {
-      background: #fff;
-      padding: 12px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    th, td {
-      padding: 8px 6px;
-      border-bottom: 1px solid #eee;
-      text-align: right;
-    }
-    th:first-child, td:first-child {
-      text-align: left;
-    }
-    .good { color: #0a8f4d; font-weight: 700; }
-    .bad { color: #c62828; font-weight: 700; }
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco,
-                   Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
-      white-space: pre-wrap;
-    }
-    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-    .chip {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fff;
-      font-size: 12px;
-      text-decoration: none;
-      color: #111;
-    }
+    .header { margin-bottom: 20px; text-align: center; }
+    .title { font-weight: 900; font-size: 22px; color: var(--accent); }
+    .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .chips { display: flex; gap: 8px; justify-content: center; margin: 16px 0; }
+    .chip { padding: 8px 16px; border-radius: 999px; background: #334155; color: var(--text); font-size: 12px; text-decoration: none; font-weight: bold; }
+    section { background: var(--card); padding: 16px; margin-bottom: 20px; border-radius: var(--radius); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
+    h2 { font-size: 14px; color: var(--accent); margin: 0 0 12px; border-left: 3px solid var(--accent); padding-left: 8px; }
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .kpi-card { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; text-align: center; }
+    .kpi-val { font-size: 20px; font-weight: 900; display: block; }
+    .kpi-label { font-size: 10px; color: var(--muted); }
+    .table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 450px; }
+    th { background: rgba(255,255,255,0.05); color: var(--muted); font-weight: normal; text-align: right; padding: 10px 6px; }
+    td { padding: 12px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; }
+    th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--card); }
+    .good { color: var(--good); font-weight: bold; }
+    .bad { color: var(--bad); font-weight: bold; }
+    .note { font-size: 11px; color: var(--muted); margin-top: 10px; text-align: center; }
   </style>
 </head>
-
 <body>
+
+  <div class="header">
+    <div class="title">集計サマリー.exe</div>
+    <div class="sub">見るだけ・触らない・感情禁止</div>
+  </div>
+
   <div class="chips">
-    <a href="index.html" class="chip">← 予想</a>
-    <a href="review.html" class="chip">← 振り返り</a>
+    <a href="index.html" class="chip">🎯 予想</a>
+    <a href="review.html" class="chip">📝 振り返り</a>
   </div>
 
-  <h1>📊 馬券 集計サマリー</h1>
-  <div class="sub">
-    review.html のログを集計（端末内 localStorage）<br>
-    見るだけ・触らない・感情禁止
-  </div>
-
-  <section>
-    <strong>全体サマリー</strong>
-    <table id="overall"></table>
+  <section id="overall-section">
+    <h2>🏆 総合パフォーマンス</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card"><span class="kpi-val" id="kpi-roi">-</span><span class="kpi-label">通算回収率</span></div>
+      <div class="kpi-card"><span class="kpi-val" id="kpi-profit">-</span><span class="kpi-label">通算純収支</span></div>
+      <div class="kpi-card"><span class="kpi-val" id="kpi-hitrate">-</span><span class="kpi-label">的中率(BUY)</span></div>
+      <div class="kpi-card"><span class="kpi-val" id="kpi-skiprate">-</span><span class="kpi-label">見送り率</span></div>
+    </div>
+    <div class="table-wrapper"><table id="overall"></table></div>
   </section>
 
   <section>
-    <strong>zone別サマリー</strong>
-    <table id="byZone"></table>
+    <h2>⚖️ ゾーン別分析</h2>
+    <div class="table-wrapper"><table id="byZone"></table></div>
+    <div class="note">A:主戦場 / B:委任 / C:流れ / D:やり過ごし（—は未入力/旧データ）</div>
   </section>
 
   <section>
-    <strong>月別サマリー</strong>
-    <table id="byMonth"></table>
+    <h2>📅 月別推移</h2>
+    <div class="table-wrapper"><table id="byMonth"></table></div>
   </section>
 
 <script>
 (() => {
-  const KEY = "oji_review_logs_v2";
+  const KEY = "oji_review_logs_v21";
+  const el = (id) => document.getElementById(id);
 
   const loadLogs = () => {
-    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-    catch { return []; }
+    try {
+      const v = JSON.parse(localStorage.getItem(KEY) || "[]");
+      return Array.isArray(v) ? v : [];
+    } catch { return []; }
   };
 
-  const sum = (arr, fn) => arr.reduce((a,b)=>a+fn(b),0);
-
-  const groupBy = (arr, keyFn) => {
-    return arr.reduce((acc, cur) => {
-      const k = keyFn(cur);
-      acc[k] = acc[k] || [];
-      acc[k].push(cur);
-      return acc;
-    }, {});
+  // ✅ 強い数値化（カンマ除去・NaN対策）
+  const num = (v) => {
+    if (v === null || v === undefined) return 0;
+    const s = String(v).replace(/,/g, "").trim();
+    if (s === "") return 0;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : 0;
   };
 
-  const fmt = (n) => Number(n).toFixed(2);
+  const sum = (arr, fn) => arr.reduce((a, b) => a + fn(b), 0);
+  const groupBy = (arr, keyFn) => arr.reduce((acc, cur) => {
+    const k = keyFn(cur);
+    acc[k] = acc[k] || [];
+    acc[k].push(cur);
+    return acc;
+  }, {});
 
-  const makeTable = (el, headers, rows) => {
-    el.innerHTML =
-      "<tr>" +
-      headers.map(h => `<th>${h}</th>`).join("") +
-      "</tr>" +
-      rows.map(r =>
-        "<tr>" +
-        r.map(c => `<td>${c}</td>`).join("") +
-        "</tr>"
-      ).join("");
+  const fmtRoi = (r) => `<span class="${r >= 1 ? 'good' : 'bad'}">${(r * 100).toFixed(1)}%</span>`;
+  const fmtProfit = (p) => `<span class="${p >= 0 ? 'good' : 'bad'}">${p.toLocaleString()}</span>`;
+
+  const makeTable = (targetEl, headers, rows) => {
+    targetEl.innerHTML =
+      "<thead><tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr></thead>" +
+      "<tbody>" + rows.map(r => "<tr>" + r.map(c => `<td>${c}</td>`).join("") + "</tr>").join("") + "</tbody>";
   };
 
   const logs = loadLogs();
+  if (logs.length === 0) {
+    document.body.innerHTML += '<div style="text-align:center; color:var(--muted); margin-top:50px;">データがありません。</div>';
+    return;
+  }
 
-  // ===== 全体 =====
-  const totalStake = sum(logs, l => l.stake || 0);
-  const totalPayout = sum(logs, l => l.payout || 0);
+  const isBuy = (l) => l.bought === "買った";
+  const isSkip = (l) => l.bought === "見送った" || l.bought === "買わなかった";
+  const isHit = (l) => l.result === "的中";
+
+  const buyLogs = logs.filter(isBuy);
+  const totalStake = sum(logs, l => num(l.stake));
+  const totalPayout = sum(logs, l => num(l.payout));
   const totalProfit = totalPayout - totalStake;
   const totalRoi = totalStake > 0 ? totalPayout / totalStake : 0;
+  const hitRate = buyLogs.length > 0 ? (buyLogs.filter(isHit).length / buyLogs.length) : 0;
+  const skipRate = logs.length > 0 ? (logs.filter(isSkip).length / logs.length) : 0;
 
-  makeTable(
-    document.getElementById("overall"),
-    ["件数","賭け金","払戻","収支","ROI"],
-    [[
-      logs.length,
-      totalStake,
-      totalPayout,
-      totalProfit,
-      `<span class="${totalRoi>=1?'good':'bad'}">${fmt(totalRoi)}</span>`
-    ]]
-  );
+  // KPI
+  el("kpi-roi").innerHTML = (totalRoi * 100).toFixed(1) + "%";
+  el("kpi-roi").className = `kpi-val ${totalRoi >= 1 ? 'good' : 'bad'}`;
 
-  // ===== zone別 =====
+  el("kpi-profit").innerHTML = (totalProfit >= 0 ? "+" : "") + totalProfit.toLocaleString();
+  el("kpi-profit").className = `kpi-val ${totalProfit >= 0 ? 'good' : 'bad'}`;
+
+  el("kpi-hitrate").innerText = (hitRate * 100).toFixed(1) + "%";
+  el("kpi-skiprate").innerText = (skipRate * 100).toFixed(1) + "%";
+
+  // 1) 全体
+  makeTable(el("overall"), ["総数", "BUY", "SKIP", "賭金", "払戻", "収支", "回収率"], [[
+    logs.length,
+    buyLogs.length,
+    logs.filter(isSkip).length,
+    totalStake.toLocaleString(),
+    totalPayout.toLocaleString(),
+    fmtProfit(totalProfit),
+    fmtRoi(totalRoi)
+  ]]);
+
+  // 2) Zone（✅ “—” も含める／0件は表示しない）
   const byZone = groupBy(logs, l => l.zone || "—");
-  const zoneRows = Object.entries(byZone).map(([z, arr]) => {
-    const s = sum(arr, l => l.stake || 0);
-    const p = sum(arr, l => l.payout || 0);
-    const r = s > 0 ? p / s : 0;
+  const zoneRows = ["A", "B", "C", "D", "—"].map(z => {
+    const arr = byZone[z] || [];
+    if (arr.length === 0) return null;
+
+    const bArr = arr.filter(isBuy);
+    const s = sum(arr, l => num(l.stake));
+    const p = sum(arr, l => num(l.payout));
+    const roi = s > 0 ? p / s : 0;
+    const hit = bArr.length > 0 ? (bArr.filter(isHit).length / bArr.length) : 0;
+
     return [
       z,
       arr.length,
-      s,
-      p,
-      p - s,
-      `<span class="${r>=1?'good':'bad'}">${fmt(r)}</span>`
+      bArr.length,
+      (hit * 100).toFixed(1) + "%",
+      s.toLocaleString(),
+      p.toLocaleString(),
+      fmtProfit(p - s),
+      fmtRoi(roi)
     ];
-  });
+  }).filter(Boolean);
 
   makeTable(
-    document.getElementById("byZone"),
-    ["zone","件数","賭け金","払戻","収支","ROI"],
-    zoneRows
+    el("byZone"),
+    ["Zone", "件数", "BUY", "的中率", "賭金", "払戻", "収支", "回収率"],
+    zoneRows.length ? zoneRows : [["-", "0", "0", "-", "0", "0", fmtProfit(0), fmtRoi(0)]]
   );
 
-  // ===== 月別 =====
-  const byMonth = groupBy(logs, l => (l.date || "").slice(0,7));
-  const monthRows = Object.entries(byMonth).sort().map(([m, arr]) => {
-    const s = sum(arr, l => l.stake || 0);
-    const p = sum(arr, l => l.payout || 0);
-    const r = s > 0 ? p / s : 0;
-    return [
-      m,
-      arr.length,
-      s,
-      p,
-      p - s,
-      `<span class="${r>=1?'good':'bad'}">${fmt(r)}</span>`
-    ];
-  });
+  // 3) 月別（✅ Dateで安定ソート）
+  const byMonth = groupBy(logs, l => (l.date || "").slice(0, 7) || "—");
+  const monthRows = Object.entries(byMonth)
+    .sort(([a], [b]) => new Date(b + "-01") - new Date(a + "-01"))
+    .map(([m, arr]) => {
+      const bArr = arr.filter(isBuy);
+      const s = sum(arr, l => num(l.stake));
+      const p = sum(arr, l => num(l.payout));
+      const roi = s > 0 ? p / s : 0;
+      return [
+        m,
+        arr.length,
+        bArr.length,
+        s.toLocaleString(),
+        p.toLocaleString(),
+        fmtProfit(p - s),
+        fmtRoi(roi)
+      ];
+    });
 
-  makeTable(
-    document.getElementById("byMonth"),
-    ["月","件数","賭け金","払戻","収支","ROI"],
-    monthRows
-  );
+  makeTable(el("byMonth"), ["月", "件数", "BUY", "賭金", "払戻", "収支", "回収率"], monthRows);
 })();
 </script>
 </body>
