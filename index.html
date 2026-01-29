@@ -3,451 +3,748 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>おじ.exe v4.1 | 安定版</title>
+  <title>おじ.exe v5.1 | 18頭足切りver</title>
   <style>
     :root{
       --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --text:#f8fafc;
       --muted:#94a3b8; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-      --radius:16px; --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius:16px;
+      --tap:44px;
+      --focus: 0 0 0 3px rgba(56,189,248,.35);
     }
     *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height: 100%; }
     body{
-      margin:0; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
-      background-color: var(--bg); color: var(--text); line-height: 1.6;
+      margin:0;
+      font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
     }
-    .stepper { display: flex; gap: 4px; padding: 12px 16px; background: rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); }
-    .step-dot { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
-    .step-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    /* iOS: input zoom回避（16px以上） */
+    input, select, button { font: inherit; }
+
+    /* 見出しのデフォ余白を揃えてレイアウトのブレを減らす */
+    h2, h3{ margin: 0 0 12px; font-size: 18px; }
+    h3{ font-size: 14px; }
+
+    .stepper{
+      display:flex; gap:4px; padding:12px 16px;
+      background: rgba(0,0,0,0.2);
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+    .step-dot{ flex:1; height:4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .step-dot.active{ background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
     .wrap{ max-width:600px; margin:0 auto; padding:16px; }
-    .header{ margin-bottom: 24px; text-align: center; }
+    .header{ margin-bottom: 24px; text-align:center; }
     .title{ font-weight:900; font-size:24px; color: var(--accent); }
-    .sub{ font-size:12px; color: var(--muted); }
-    .card{ background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); display: none; }
-    h2 { margin: 0 0 16px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-    .note { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-    label { display: block; font-size: 12px; font-weight: bold; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; }
-    select, input, textarea { width: 100%; background: #0f172a; border: 1px solid #334155; color: white; padding: 12px; border-radius: 10px; font-size: 16px; margin-bottom: 16px; }
-    .btn-group { display: flex; gap: 8px; margin-bottom: 16px; }
-    .tgl-btn { flex: 1; background: #334155; border: none; color: var(--muted); padding: 10px 4px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
-    .tgl-btn.active { background: var(--accent); color: #0f172a; }
-    .tgl-btn.active.bad { background: var(--bad); color: white; }
-    .btn-row { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-    button.main { background: var(--accent); color: #0f172a; border: none; padding: 16px; border-radius: 12px; font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.2s; }
-    button.main:disabled { opacity: 0.3; filter: grayscale(1); }
-    button.sub-btn { background: transparent; color: var(--muted); border: 1px solid #334155; padding: 12px; border-radius: 12px; }
-    button.danger { background: rgba(239, 68, 68, 0.1); color: var(--bad); border: 1px solid var(--bad); padding: 12px; border-radius: 12px; }
-    .res-box { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 16px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.1); }
-    .res-score { font-size: 32px; font-weight: 900; color: var(--good); text-align: center; margin: 8px 0; }
-    .res-label { text-align: center; font-size: 14px; color: var(--muted); }
-    .log-item { background: #1e293b; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border-left: 4px solid var(--accent); }
-    .log-item.skip { border-left-color: var(--muted); opacity: 0.7; }
-    .mono { font-family: var(--font-mono); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+    .sub{ color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+    .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .card[aria-hidden="false"]{ display:block; }
+
+    .note{
+      background: rgba(0,0,0,0.2);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* 18頭グリッド */
+    .horse-grid{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .horse-btn{
+      min-height: var(--tap);
+      aspect-ratio: 1/1;
+      background: #334155;
+      border: none;
+      color: white;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    .horse-btn:focus-visible{ outline: none; box-shadow: var(--focus); }
+    .horse-btn.eliminated{
+      background: #1e293b;
+      color: #475569;
+      text-decoration: line-through;
+      opacity: 0.55;
+      border: 1px solid #0f172a;
+    }
+
+    label{
+      display:block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    select, input{
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: white;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 16px; /* iOS zoom回避 */
+    }
+    input:focus-visible, select:focus-visible{ outline:none; box-shadow: var(--focus); border-color: rgba(56,189,248,.6); }
+
+    .btn-group{ display:flex; gap: 4px; margin-bottom: 16px; }
+    .tgl-btn{
+      flex:1;
+      min-height: var(--tap);
+      background: #334155;
+      border: none;
+      color: var(--muted);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .tgl-btn.active{ background: var(--accent); color: #0f172a; }
+    .tgl-btn:focus-visible{ outline:none; box-shadow: var(--focus); }
+
+    button.main{
+      width: 100%;
+      min-height: var(--tap);
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    button.main:disabled{ opacity: 0.3; cursor: not-allowed; }
+    button.main:focus-visible{ outline:none; box-shadow: var(--focus); }
+
+    button.danger{
+      width: 100%;
+      min-height: var(--tap);
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--bad);
+      border: 1px solid var(--bad);
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    button.danger:focus-visible{ outline:none; box-shadow: 0 0 0 3px rgba(239,68,68,.25); }
+
+    .res-box{
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .res-score{ font-size: 32px; font-weight: 900; color: var(--good); text-align:center; }
+
+    .btn-row{ display:flex; gap:8px; }
+    .sub-btn{
+      flex:1;
+      min-height: var(--tap);
+      border:none;
+      padding:10px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 12px;
+      touch-action: manipulation;
+    }
+    .sub-btn:focus-visible{ outline:none; box-shadow: var(--focus); }
+
+    /* 小さめ端末のときはグリッドを詰める */
+    @media (max-width: 360px){
+      .horse-grid{ grid-template-columns: repeat(5, 1fr); }
+      .title{ font-size: 22px; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- 6ステップ（p1〜p6）なのでドットは6個でOK -->
-  <div class="stepper" id="stepper">
+  <div class="stepper" id="stepper" aria-label="進行状況">
     <div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div>
-    <div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div>
+    <div class="step-dot"></div><div class="step-dot"></div>
   </div>
 
   <div class="wrap">
     <div class="header">
-      <div class="title">おじ.exe v4.1</div>
-      <div class="sub">感情を排除。手順を守る。</div>
+      <div class="title">おじ.exe v5.1</div>
+      <div class="sub">18→2の工程表</div>
     </div>
 
-    <div class="card" id="p1" style="display: block;">
+    <div class="card" id="p1" aria-hidden="false">
       <h2>🏇 レース設定</h2>
-      <label>日付</label><input type="date" id="date">
-
-      <div style="display: flex; gap: 8px;">
-        <div style="flex: 1;">
-          <label>場所</label>
-          <select id="track">
-            <option>中山</option><option>東京</option><option>京都</option><option>阪神</option>
-            <option>中京</option><option>札幌</option><option>函館</option><option>福島</option>
-            <option>新潟</option><option>小倉</option>
-          </select>
-        </div>
-        <div style="flex: 1;">
-          <label>R</label>
-          <select id="raceNo">
-            <option>1R</option><option>2R</option><option>3R</option><option>4R</option><option>5R</option><option>6R</option>
-            <option>7R</option><option>8R</option><option>9R</option><option>10R</option><option>11R</option><option>12R</option>
-          </select>
-        </div>
-      </div>
-
-      <label>クラス</label>
-      <select id="raceClass">
-        <option value="G">重賞(G1-G3)</option><option value="OP">OP/L</option><option value="3S">3勝クラス</option>
-        <option value="2S">2勝クラス</option><option value="1S">1勝クラス</option><option value="LOW">未勝利/新馬</option>
-      </select>
-
-      <label>条件</label>
-      <select id="course">
-        <option value="TARGET">得意：中山ダ1800 / 東京ダ1600</option>
-        <option value="NORMAL">その他</option>
-      </select>
-
-      <div id="raceSummary" class="note"></div>
+      <label for="raceName">レース名（任意）</label>
+      <input type="text" id="raceName" placeholder="例：根岸S" autocomplete="off" inputmode="text" />
 
       <div class="btn-row">
-        <button class="main" onclick="startAnalysis()">分析開始</button>
-        <button class="danger" onclick="saveSkip('RACE_SKIP')">今日はやめる（見送り保存）</button>
+        <button class="main" id="btnStart" type="button">分析開始</button>
       </div>
     </div>
 
-    <div class="card" id="p2">
-      <h2>⚖️ 前提チェック</h2>
-      <div class="note">一つでも「NO」があれば即終了。</div>
-
-      <label>Q1. 今日は3レース以内を守れる？</label>
-      <div class="btn-group">
-        <button class="tgl-btn" id="q01y" onclick="setCheck('q01','y')">YES</button>
-        <button class="tgl-btn" id="q01n" onclick="setCheck('q01','n')">NO</button>
-      </div>
-
-      <label>Q2. 1点500円固定を守れる？</label>
-      <div class="btn-group">
-        <button class="tgl-btn" id="q02y" onclick="setCheck('q02','y')">YES</button>
-        <button class="tgl-btn" id="q02n" onclick="setCheck('q02','n')">NO</button>
-      </div>
-
-      <div class="btn-row">
-        <button class="main" id="btnP2Next" disabled onclick="go(3)">次へ</button>
-        <button class="sub-btn" onclick="go(1)">戻る</button>
-      </div>
+    <div class="card" id="p2" aria-hidden="true">
+      <h2>✂️ STEP1: 条件不適合を消す</h2>
+      <div class="note">「距離実績なし」「ダート初挑戦」「明確な苦手コース」の馬をタップして消せ。</div>
+      <div class="horse-grid" id="grid1" aria-label="STEP1 足切り"></div>
+      <div class="note" id="count1">生存数: 18頭</div>
+      <button class="main" id="btnToStep2" type="button">STEP2（脚質）へ</button>
     </div>
 
-    <div class="card" id="p3">
-      <h2>🔍 候補馬抽出</h2>
-      <div class="note">馬番を 1〜18 の範囲で入力（重複無効）。</div>
-
-      <div id="candInputs">
-        <input type="number" id="c1" inputmode="numeric" placeholder="候補1">
-        <input type="number" id="c2" inputmode="numeric" placeholder="候補2">
-        <input type="number" id="c3" inputmode="numeric" placeholder="候補3">
-      </div>
-
-      <div class="btn-row">
-        <button class="main" onclick="setupScoring()">点数付けへ</button>
-        <button class="danger" onclick="saveSkip('NO_CANDIDATES')">候補なし見送り</button>
-      </div>
+    <div class="card" id="p3" aria-hidden="true">
+      <h2>✂️ STEP2: 4角位置で消す</h2>
+      <div class="note">「4角10番手以降がデフォ」「出遅れ癖」「極端な追込」を消せ。4角5番手以内が理想。</div>
+      <div class="horse-grid" id="grid2" aria-label="STEP2 足切り"></div>
+      <div class="note" id="count2">生存数: -</div>
+      <button class="main" id="btnToScore" type="button">三本柱査定へ</button>
+      <button class="danger" id="btnSkipAll" type="button">全滅・見送り</button>
     </div>
 
-    <div class="card" id="p4">
-      <h2>📊 三本柱スコアリング</h2>
+    <div class="card" id="p4" aria-hidden="true">
+      <h2>📊 精密査定（生存馬のみ）</h2>
+      <div class="note">
+        生存馬の「安定感」を付ける。<br />
+        上がり回数（近3走）は「上がり順位3位以内」の回数（0〜3）。※同点タイブレーク専用。回数も同じなら3択（馬A/馬B/見送り）。
+      </div>
       <div id="scoringArea"></div>
-      <div class="btn-row">
-        <button class="main" onclick="calcResult()">結果を見る</button>
-        <button class="sub-btn" onclick="go(3)">戻る</button>
-      </div>
+      <button class="main" id="btnCalc" type="button">結論を出す</button>
     </div>
 
-    <div class="card" id="p5">
-      <h2>🏁 結論</h2>
+    <div class="card" id="p5" aria-hidden="true">
+      <h2>🏁 最終ジャッジ</h2>
       <div id="resultDisplay"></div>
-      <div class="btn-row">
-        <button class="main" id="btnP5Next" onclick="go(6)">最終チェックへ</button>
-        <button class="danger" onclick="saveSkip('LOW_SCORE_OR_TIE')">見送り保存</button>
-        <button class="sub-btn" onclick="go(4)">やり直す</button>
+
+      <label for="risk" style="margin-top:12px;">負け筋（任意）</label>
+      <input type="text" id="risk" placeholder="例：内枠どん詰まり" autocomplete="off" inputmode="text" />
+
+      <button class="main" id="btnFinalBuy" type="button">BUY保存</button>
+      <button class="danger" id="btnFinalSkip" type="button">見送り保存</button>
+
+      <div style="margin-top: 32px; border-top: 1px dashed var(--muted); padding-top: 16px;">
+        <h3 style="font-size: 14px; color: var(--muted); margin:0 0 10px;">📜 直近の戦績</h3>
+        <div id="historyList"></div>
+        <div class="btn-row">
+          <button class="sub-btn" id="btnCopy" style="background:#334155; color:white;" type="button">CSVコピー</button>
+          <button class="sub-btn" id="btnClear" style="background:transparent; color:var(--bad); border:1px solid var(--bad);" type="button">全消去</button>
+        </div>
       </div>
-    </div>
-
-    <div class="card" id="p6">
-      <h2>🚨 最終ブレーキ</h2>
-
-      <label>Q. 馬体重の増減は ±12kg 未満？</label>
-      <div class="btn-group">
-        <button class="tgl-btn" id="f1y" onclick="setCheck('f1','y')">YES</button>
-        <button class="tgl-btn" id="f1n" onclick="setCheck('f1','n')">NO</button>
-      </div>
-
-      <label>Q. 直前で不安要素（馬場悪化等）はない？</label>
-      <div class="btn-group">
-        <button class="tgl-btn" id="f2y" onclick="setCheck('f2','y')">YES</button>
-        <button class="tgl-btn" id="f2n" onclick="setCheck('f2','n')">NO</button>
-      </div>
-
-      <label>負け筋を一言（リスク記入必須）</label>
-      <input type="text" id="risk" placeholder="例：前が止まらない等" oninput="validateFinal()">
-
-      <div class="btn-row">
-        <button class="main" id="btnFinal" disabled onclick="saveFinal('BUY')">BUY保存</button>
-        <button class="danger" onclick="saveFinal('SKIP')">SKIP保存</button>
-      </div>
-    </div>
-
-    <div style="margin-top: 32px;">
-      <h3 style="font-size: 14px; color: var(--muted);">最近の記録</h3>
-      <div id="historyList"></div>
-
-      <div class="btn-row" style="flex-direction: row;">
-        <button class="sub-btn" style="flex:1" onclick="copyLog()">CSVコピー</button>
-        <button class="sub-btn" style="flex:1; color:var(--bad)" onclick="clearLog()">消去</button>
-      </div>
-
-      <div class="note mono" id="csvPreview" style="margin-top: 10px; max-height: 80px;"></div>
     </div>
   </div>
 
 <script>
-  let state = { step: 1, checks: {}, cands: [], scores: {}, best: null };
-  const STORAGE_KEY = "oji_exe_v41_logs";
+(() => {
+  "use strict";
 
-  // --- 1) Race Summary Logic ---
-  function updateRaceSummary() {
-    const vals = {
-      date: document.getElementById('date').value,
-      track: document.getElementById('track').value,
-      raceNo: document.getElementById('raceNo').value,
-      raceClass: document.getElementById('raceClass').value,
-      course: document.getElementById('course').value
-    };
-    const clsLabel = { G:"重賞", OP:"OP/L", "3S":"3勝", "2S":"2勝", "1S":"1勝" }[vals.raceClass] || "未勝利/新馬";
-    const targetOK = (vals.raceClass === "G" || vals.course === "TARGET");
+  const STORAGE_KEY = "oji_exe_v51_logs";
+  const MAX_HORSES = 18;
+  const STEP_COUNT = 5;
 
-    document.getElementById('raceSummary').innerHTML = `
-      <b>${vals.date} ${vals.track}${vals.raceNo}</b><br>
-      クラス：${clsLabel} ／ 判定：${targetOK
-        ? "<span style='color:var(--good)'>対象</span>"
-        : "<span style='color:var(--bad)'>対象外（見送り推奨）</span>"}
-    `;
+  const state = {
+    step: 1,
+    horses: Array.from({length: MAX_HORSES}, (_, i) => i + 1),
+    step1Out: [],
+    step2Out: [],
+    scores: {},
+    best: null,
+    scoringBound: false
+  };
+
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const els = {
+    cards: $$(".card"),
+    dots: $$(".step-dot"),
+    raceName: $("#raceName"),
+    risk: $("#risk"),
+    grid1: $("#grid1"),
+    grid2: $("#grid2"),
+    count1: $("#count1"),
+    count2: $("#count2"),
+    scoringArea: $("#scoringArea"),
+    resultDisplay: $("#resultDisplay"),
+    historyList: $("#historyList"),
+
+    btnStart: $("#btnStart"),
+    btnToStep2: $("#btnToStep2"),
+    btnToScore: $("#btnToScore"),
+    btnSkipAll: $("#btnSkipAll"),
+    btnCalc: $("#btnCalc"),
+    btnFinalBuy: $("#btnFinalBuy"),
+    btnFinalSkip: $("#btnFinalSkip"),
+    btnCopy: $("#btnCopy"),
+    btnClear: $("#btnClear"),
+  };
+
+  // ---------- Storage ----------
+  function safeParseJSON(str, fallback){
+    try { return JSON.parse(str); } catch { return fallback; }
+  }
+  function getLogs(){
+    return safeParseJSON(localStorage.getItem(STORAGE_KEY) || "[]", []);
+  }
+  function setLogs(logs){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+  }
+  function pushLog(entry){
+    const logs = getLogs();
+    logs.push(entry);
+    setLogs(logs);
   }
 
-  ["date","track","raceNo","raceClass","course"].forEach(id => {
-    document.getElementById(id).addEventListener("change", updateRaceSummary);
-  });
+  // ---------- Utils ----------
+  function toggleArray(arr, val){
+    return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val];
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, (m) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+  function survivors(){
+    return state.horses.filter(h => !state.step1Out.includes(h) && !state.step2Out.includes(h));
+  }
+  function scrollTopInstant(){
+    // Safari iOS では behavior: "instant" が未対応なのでフォールバック
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, left: 0 });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }
+  function setAriaBusy(el, busy){
+    if (!el) return;
+    el.setAttribute("aria-busy", busy ? "true" : "false");
+  }
 
-  // --- 2) Analysis Filter（強行ルートを削除：対象外は即SKIP）---
-  function startAnalysis(){
-    const ok =
-      (document.getElementById('raceClass').value === "G" ||
-       document.getElementById('course').value === "TARGET");
+  // ---------- UI ----------
+  function setStep(nextStep){
+    const step = Math.min(Math.max(1, Number(nextStep) || 1), STEP_COUNT);
+    state.step = step;
 
-    if(!ok){
-      alert("対象外です。ルール通り見送り保存します。");
-      saveSkip("OUT_OF_SCOPE");
+    els.cards.forEach(card => {
+      const isTarget = card.id === `p${step}`;
+      card.setAttribute("aria-hidden", String(!isTarget));
+    });
+
+    els.dots.forEach((d, i) => d.classList.toggle("active", i < step));
+    scrollTopInstant();
+
+    if (step === 2) {
+      renderGrid(1);
+      updateCount(1);
+    }
+    if (step === 3) {
+      renderGrid(2);
+      updateCount(2);
+    }
+    if (step === 5) {
+      renderHistory();
+    }
+  }
+
+  function renderGrid(stepNum){
+    const grid = stepNum === 1 ? els.grid1 : els.grid2;
+    if (!grid) return;
+
+    setAriaBusy(grid, true);
+    grid.innerHTML = "";
+
+    const list = (stepNum === 1)
+      ? state.horses
+      : state.horses.filter(h => !state.step1Out.includes(h));
+
+    const frag = document.createDocumentFragment();
+
+    list.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "horse-btn";
+      btn.textContent = String(num);
+
+      const isOut = (stepNum === 1)
+        ? state.step1Out.includes(num)
+        : state.step2Out.includes(num);
+
+      btn.classList.toggle("eliminated", isOut);
+      btn.setAttribute("aria-pressed", String(isOut));
+      btn.setAttribute("aria-label", `馬番${num}${isOut ? "（除外）" : ""}`);
+
+      btn.addEventListener("click", () => {
+        if (stepNum === 1) {
+          state.step1Out = toggleArray(state.step1Out, num);
+          // Step1で消した馬がStep2に残る矛盾を除去
+          if (state.step1Out.includes(num)) {
+            state.step2Out = state.step2Out.filter(x => x !== num);
+          }
+        } else {
+          state.step2Out = toggleArray(state.step2Out, num);
+        }
+        renderGrid(stepNum);
+        updateCount(stepNum);
+      });
+
+      frag.appendChild(btn);
+    });
+
+    grid.appendChild(frag);
+    setAriaBusy(grid, false);
+  }
+
+  function updateCount(stepNum){
+    const after1 = MAX_HORSES - state.step1Out.length;
+    const after2 = after1 - state.step2Out.length;
+
+    if (stepNum === 1) {
+      if (els.count1) els.count1.textContent = `生存数: ${after1}頭`;
+    } else {
+      if (els.count2) els.count2.textContent = `生存数: ${after2}頭`;
+      // 生存1〜5頭だけ次へ（好み）
+      if (els.btnToScore) els.btnToScore.disabled = (after2 === 0 || after2 > 5);
+    }
+  }
+
+  function setupScoring(){
+    const list = survivors();
+    if (list.length === 0) {
+      alert("生存馬が0頭です。見送りを押してください。");
       return;
     }
-    go(2);
-  }
 
-  // --- 3) Scoring Setup (Cleaned) ---
-  function setupScoring() {
     state.scores = {};
-    const raw = [
-      document.getElementById('c1').value,
-      document.getElementById('c2').value,
-      document.getElementById('c3').value
-    ];
+    if (els.scoringArea) els.scoringArea.innerHTML = "";
 
-    const cleaned = [...new Set(
-      raw
-        .map(v => String(v).trim())
-        .filter(v => v !== "")
-        .map(Number)
-        .filter(n => Number.isFinite(n) && n >= 1 && n <= 18)
-    )];
+    const frag = document.createDocumentFragment();
 
-    state.cands = cleaned.map(String);
+    list.forEach(num => {
+      // p1: 安定感（2/1）、p2: 上がり回数（0-3）※同点専用
+      state.scores[num] = { p1: 1, p2: 0 };
 
-    if (state.cands.length === 0) {
-      alert("有効な馬番(1〜18)を1つ以上入れてください");
+      const box = document.createElement("div");
+      box.className = "res-box";
+      box.dataset.horse = String(num);
+
+      box.innerHTML = `
+        <div style="font-weight:bold; color:var(--accent);">馬番: ${num}</div>
+
+        <label>安定感（0.5秒差内を継続？）</label>
+        <div class="btn-group" data-p="p1">
+          <button class="tgl-btn" type="button" data-v="2" aria-pressed="false">◎ 堅実</button>
+          <button class="tgl-btn active" type="button" data-v="1" aria-pressed="true">○ 並</button>
+        </div>
+
+        <label>上がり（近3走：上がり順位3位以内の回数）※同点専用</label>
+        <div class="btn-group" data-p="p2">
+          <button class="tgl-btn active" type="button" data-v="0" aria-pressed="true">0回</button>
+          <button class="tgl-btn" type="button" data-v="1" aria-pressed="false">1回</button>
+          <button class="tgl-btn" type="button" data-v="2" aria-pressed="false">2回</button>
+          <button class="tgl-btn" type="button" data-v="3" aria-pressed="false">3回</button>
+        </div>
+      `;
+
+      frag.appendChild(box);
+    });
+
+    if (els.scoringArea) els.scoringArea.appendChild(frag);
+
+    // イベント委譲（複数回バインド防止）
+    if (!state.scoringBound && els.scoringArea) {
+      els.scoringArea.addEventListener("click", onScoringClick, { passive: true });
+      state.scoringBound = true;
+    }
+
+    // 結論が出るまでBUYは無効
+    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
+
+    setStep(4);
+  }
+
+  function onScoringClick(e){
+    const btn = e.target.closest(".tgl-btn");
+    if (!btn) return;
+
+    const group = btn.closest(".btn-group");
+    const box = btn.closest(".res-box");
+    if (!group || !box) return;
+
+    const horse = Number(box.dataset.horse);
+    const p = group.dataset.p;
+    const v = Number(btn.dataset.v);
+
+    if (!state.scores[horse]) return;
+
+    state.scores[horse][p] = v;
+
+    group.querySelectorAll(".tgl-btn").forEach(x => {
+      x.classList.remove("active");
+      x.setAttribute("aria-pressed", "false");
+    });
+    btn.classList.add("active");
+    btn.setAttribute("aria-pressed", "true");
+  }
+
+  function calcResult(){
+    const keys = Object.keys(state.scores);
+    if (keys.length === 0) {
+      alert("査定対象がありません。");
       return;
     }
 
-    let html = "";
-    state.cands.forEach(num => {
-      state.scores[num] = { p1: 0, p2: 0, p3: 0 };
-      html += `
+    // ★ totalはp1のみ（上がりp2は同点タイブレーク専用）
+    const res = keys.map(n => ({
+      num: Number(n),
+      p1: (state.scores[n].p1 ?? 0),
+      p2: (state.scores[n].p2 ?? 0),  // 0-3
+      total: (state.scores[n].p1 ?? 0)
+    })).sort((a,b) =>
+      (b.total - a.total) || // 安定感
+      (b.p2 - a.p2)          // 同点なら上がり回数
+    );
+
+    const top = res[0];
+    const second = res[1] || null;
+
+    // ★ 完全同点（安定感も上がり回数も同じ）なら「3択」
+    if (second && top.total === second.total && top.p2 === second.p2) {
+      state.best = null;
+
+      if (els.resultDisplay) {
+        els.resultDisplay.innerHTML = `
+          <div class="res-box">
+            <div class="res-score" style="color:var(--warn);">同点</div>
+            <div style="text-align:center; margin-bottom:10px;">
+              馬番 ${top.num} と 馬番 ${second.num} が完全同点。<br>
+              （安定感Score: ${top.total} / 上がり3位内回数: ${top.p2}回）<br>
+              ここは「馬${top.num} / 馬${second.num} / 見送り」で決める。
+            </div>
+
+            <div class="btn-row" style="margin-top:8px;">
+              <button class="sub-btn" type="button" id="btnPickA" style="background:#334155; color:white;">
+                馬${top.num}にする
+              </button>
+              <button class="sub-btn" type="button" id="btnPickB" style="background:#334155; color:white;">
+                馬${second.num}にする
+              </button>
+            </div>
+
+            <button class="sub-btn" type="button"
+              id="btnPickSkip"
+              style="width:100%; margin-top:8px; background:transparent; color:var(--bad); border:1px solid var(--bad);">
+              見送りにする
+            </button>
+
+            <div id="pickStatus" class="note" style="margin-top:10px;">
+              まだ未選択（BUY保存はできない）
+            </div>
+          </div>
+        `;
+      }
+
+      if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
+
+      const btnA = $("#btnPickA");
+      const btnB = $("#btnPickB");
+      const btnS = $("#btnPickSkip");
+      const status = $("#pickStatus");
+
+      if (btnA) btnA.addEventListener("click", () => {
+        state.best = { num: top.num, total: top.total, p2: top.p2 };
+        if (status) status.textContent = `選択：馬番 ${top.num}（同点・手動決定）`;
+        if (els.btnFinalBuy) els.btnFinalBuy.disabled = false;
+      });
+
+      if (btnB) btnB.addEventListener("click", () => {
+        state.best = { num: second.num, total: second.total, p2: second.p2 };
+        if (status) status.textContent = `選択：馬番 ${second.num}（同点・手動決定）`;
+        if (els.btnFinalBuy) els.btnFinalBuy.disabled = false;
+      });
+
+      if (btnS) btnS.addEventListener("click", () => {
+        saveFinal("SKIP");
+      });
+
+      setStep(5);
+      return;
+    }
+
+    // 通常：勝者確定（同点なら上がり回数で決着済み）
+    state.best = { num: top.num, total: top.total, p2: top.p2 };
+
+    const usedTiebreak = !!(second && top.total === second.total && top.p2 !== second.p2);
+
+    if (els.resultDisplay) {
+      els.resultDisplay.innerHTML = `
         <div class="res-box">
-          <div style="font-weight:bold; color:var(--accent); margin-bottom:8px;">馬番: ${num}</div>
-
-          <label>適性(0-2)</label>
-          <div class="btn-group">
-            <button class="tgl-btn" onclick="setScore('${num}','p1',2,this)">◎</button>
-            <button class="tgl-btn" onclick="setScore('${num}','p1',1,this)">○</button>
-            <button class="tgl-btn" onclick="setScore('${num}','p1',0,this)">△</button>
+          <div class="res-score">馬番 ${top.num}</div>
+          <div style="text-align:center">
+            安定感Score: ${top.total}<br>
+            上がり3位内（近3走）: ${top.p2}回
+            ${usedTiebreak ? `<div class="note" style="margin-top:8px;">同点 → 上がり回数で決着</div>` : ""}
           </div>
-
-          <label>展開(0-2)</label>
-          <div class="btn-group">
-            <button class="tgl-btn" onclick="setScore('${num}','p2',2,this)">良</button>
-            <button class="tgl-btn" onclick="setScore('${num}','p2',1,this)">並</button>
-            <button class="tgl-btn" onclick="setScore('${num}','p2',0,this)">不</button>
-          </div>
-
-          <label>騎手(0~-1)</label>
-          <div class="btn-group">
-            <button class="tgl-btn" onclick="setScore('${num}','p3',0,this)">0</button>
-            <button class="tgl-btn" onclick="setScore('${num}','p3',-0.5,this)">-0.5</button>
-            <button class="tgl-btn" onclick="setScore('${num}','p3',-1,this)">-1</button>
-          </div>
-        </div>`;
-    });
-
-    document.getElementById('scoringArea').innerHTML = html;
-    go(4);
-  }
-
-  function setScore(n, p, v, b) {
-    state.scores[n][p] = v;
-    b.parentElement.querySelectorAll('.tgl-btn').forEach(x => x.classList.remove('active', 'bad'));
-    b.classList.add('active');
-    if(v < 0) b.classList.add('bad');
-  }
-
-  // --- 4) Strict Result ---
-  function calcResult() {
-    let res = Object.keys(state.scores).map(n => ({
-      num:n,
-      total: (state.scores[n].p1 + state.scores[n].p2 + state.scores[n].p3),
-      ...state.scores[n]
-    }));
-
-    res.sort((a,b) => b.total - a.total || b.p1 - a.p1 || b.p2 - a.p2 || b.p3 - a.p3);
-
-    state.best = res[0];
-
-    const isTie =
-      res.length > 1 &&
-      res[0].total === res[1].total &&
-      res[0].p1 === res[1].p1 &&
-      res[0].p2 === res[1].p2 &&
-      res[0].p3 === res[1].p3;
-
-    let html =
-      `<div class="res-box">
-        <div class="res-label">本命</div>
-        <div class="res-score">${isTie ? "同点(見送り)" : "馬" + state.best.num}</div>
-        <div class="res-label">Score: ${state.best.total.toFixed(1)}</div>
-      </div>`;
-
-    res.forEach(r => {
-      html += `<div style="font-size:11px; color:var(--muted)">馬${r.num}: ${r.total.toFixed(1)} (適${r.p1}/展${r.p2}/騎${r.p3})</div>`;
-    });
-
-    document.getElementById('resultDisplay').innerHTML = html;
-
-    // 同点 or 1.0未満は次へ行かせない（ルール固定）
-    document.getElementById('btnP5Next').disabled = (isTie || state.best.total < 1.0);
-
-    // 最終保存ボタンの状態も更新（bestが変わるので）
-    validateFinal();
-
-    go(5);
-  }
-
-  // --- 5) Secure Log & CSV ---
-  function toCSV(logs) {
-    const headers = ["ts","date","race","horse","score","decision","risk"];
-    const esc = (v) => `"${String(v ?? "").replace(/"/g,'""')}"`;
-    return [headers.join(","), ...logs.map(l => headers.map(k => esc(l[k])).join(","))].join("\n");
-  }
-
-  function renderHistory() {
-    const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    document.getElementById('historyList').innerHTML = [...all].reverse().slice(0, 5).map(l => `
-      <div class="log-item ${l.decision === 'SKIP' ? 'skip' : ''}">
-        <b>${l.date} ${l.race}</b> [${l.decision}] 馬${l.horse ?? "-"}(${l.score ?? "-"}点)<br>
-        リスク: ${l.risk ?? ""}
-      </div>`).join('');
-    document.getElementById('csvPreview').textContent = toCSV(all);
-  }
-
-  // --- 最終ブレーキの「BUY可能条件」 ---
-  function validateFinal() {
-    const hasChecks = state.checks.f1 && state.checks.f2;
-    const hasRisk = document.getElementById('risk').value.trim() !== "";
-    const okBest = state.best && typeof state.best.total === "number" && state.best.total >= 1.0;
-
-    document.getElementById('btnFinal').disabled = !(hasChecks && hasRisk && okBest);
-  }
-
-  function setCheck(id, val) {
-    state.checks[id] = val;
-    document.getElementById(id + 'y').classList.toggle('active', val === 'y');
-    document.getElementById(id + 'n').classList.toggle('active', val === 'n');
-
-    if (id.startsWith('q')) {
-      document.getElementById('btnP2Next').disabled = !(state.checks.q01 === 'y' && state.checks.q02 === 'y');
-    }
-    if (id.startsWith('f')) {
-      validateFinal();
-    }
-  }
-
-  // --- 保存（BUYは1.0未満禁止＆best未確定禁止）---
-  function saveFinal(dec) {
-    if (!state.best || typeof state.best.total !== "number") {
-      alert("本命が確定していません（結果を出してから保存してください）");
-      return;
-    }
-    if (dec === "BUY" && state.best.total < 1.0) {
-      alert("トップが1.0点未満のため BUY は不可（見送り推奨）");
-      return;
+        </div>
+      `;
     }
 
-    const logs = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    logs.push({
-      ts: new Date().toLocaleString(),
-      date: document.getElementById('date').value,
-      race: document.getElementById('track').value + document.getElementById('raceNo').value,
-      horse: state.best.num,
-      score: state.best.total,
-      decision: dec,
-      risk: document.getElementById('risk').value.trim()
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+    if (els.btnFinalBuy) els.btnFinalBuy.disabled = false;
+    setStep(5);
+  }
+
+  function saveFinal(dec){
+    const race = (els.raceName?.value || "").trim();
+    const risk = (els.risk?.value || "").trim();
+    const now = new Date().toISOString();
+
+    if (dec === "BUY") {
+      if (!state.best) {
+        alert("まだ結論が出ていません。");
+        return;
+      }
+      pushLog({
+        race,
+        horse: state.best.num,
+        score: state.best.total,   // 互換性維持（安定感Score）
+        dec: "BUY",
+        risk,
+        at: now
+      });
+    } else {
+      pushLog({
+        race,
+        horse: "-",
+        score: null,
+        dec: "SKIP",
+        risk: risk || "USER_SKIP",
+        at: now
+      });
+    }
+
+    alert("保存しました");
     location.reload();
   }
 
-  function saveSkip(reason) {
-    const logs = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    logs.push({
-      ts: new Date().toLocaleString(),
-      date: document.getElementById('date').value,
-      race: document.getElementById('track').value + document.getElementById('raceNo').value,
+  function saveSkip(reason){
+    const race = (els.raceName?.value || "").trim();
+    pushLog({
+      race,
       horse: "-",
-      score: "-",
-      decision: "SKIP",
-      risk: reason
+      score: null,
+      dec: "SKIP",
+      risk: reason,
+      at: new Date().toISOString()
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
     location.reload();
   }
 
-  function go(s) {
-    document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
-    document.getElementById('p' + s).style.display = 'block';
-    state.step = s;
-    updateStepper();
-    window.scrollTo(0,0);
-  }
-  function updateStepper() {
-    document.querySelectorAll('.step-dot').forEach((d, i) => d.classList.toggle('active', i < state.step));
+  function renderHistory(){
+    const all = getLogs();
+    const list = els.historyList;
+    if (!list) return;
+
+    if (all.length === 0) {
+      list.innerHTML = "<div class='note'>まだ記録がありません</div>";
+      return;
+    }
+
+    list.innerHTML = [...all].reverse().slice(0, 10).map(l => `
+      <div style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px; border-left:4px solid ${l.dec === 'BUY' ? 'var(--good)' : 'var(--muted)'}">
+        <b>${escapeHtml(l.race || "不明")}</b> [${escapeHtml(l.dec)}] 馬${escapeHtml(l.horse)}
+        ${l.score != null ? ` (安定感: ${escapeHtml(l.score)})` : ""}<br>
+        <span style="color:var(--muted)">リスク: ${escapeHtml(l.risk || "記載なし")}</span>
+      </div>
+    `).join("");
   }
 
-  function copyLog() {
-    navigator.clipboard.writeText(toCSV(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")));
-    alert("CSVコピー完了");
+  async function copyLog(){
+    const raw = localStorage.getItem(STORAGE_KEY) || "[]";
+    try {
+      await navigator.clipboard.writeText(raw);
+      alert("データをクリップボードにコピーしました（Excel等に貼り付け可能）");
+    } catch {
+      // iOSで権限や環境により失敗することがあるのでフォールバック
+      const ta = document.createElement("textarea");
+      ta.value = raw;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.style.top = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      document.execCommand("copy");
+      ta.remove();
+      alert("コピーしました（互換モード）");
+    }
   }
-  function clearLog() {
-    if(confirm("消去しますか？")) {
+
+  function clearLog(){
+    if (confirm("全ての履歴を消去しますか？")) {
       localStorage.removeItem(STORAGE_KEY);
       location.reload();
     }
   }
 
-  // Init
-  document.getElementById('date').valueAsDate = new Date();
-  updateRaceSummary();
-  renderHistory();
-  updateStepper();
+  // ---------- Events ----------
+  function bindEvents(){
+    els.btnStart?.addEventListener("click", () => setStep(2));
+    els.btnToStep2?.addEventListener("click", () => setStep(3));
+
+    els.btnToScore?.addEventListener("click", setupScoring);
+    els.btnSkipAll?.addEventListener("click", () => saveSkip("NO_SURVIVORS"));
+
+    els.btnCalc?.addEventListener("click", calcResult);
+
+    els.btnFinalBuy?.addEventListener("click", () => saveFinal("BUY"));
+    els.btnFinalSkip?.addEventListener("click", () => saveFinal("SKIP"));
+
+    els.btnCopy?.addEventListener("click", copyLog);
+    els.btnClear?.addEventListener("click", clearLog);
+
+    // Enterで進める（input内のみ）
+    els.raceName?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") setStep(2);
+    });
+  }
+
+  // ---------- Init ----------
+  function init(){
+    bindEvents();
+
+    // 初期：結論が出るまでBUY無効（誤爆防止）
+    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
+
+    // 初期：ステップ1表示
+    setStep(1);
+    renderHistory();
+  }
+
+  window.addEventListener("DOMContentLoaded", init, { once: true });
+})();
 </script>
 </body>
 </html>
