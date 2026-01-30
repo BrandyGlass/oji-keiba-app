@@ -200,6 +200,17 @@
 
     <div class="card" id="p1" aria-hidden="false">
       <h2>🏇 レース設定</h2>
+
+      <label for="raceDate">日付</label>
+      <input type="date" id="raceDate" />
+
+      <label for="raceNo">レース</label>
+      <select id="raceNo" aria-label="レース番号">
+        <option value="1">1R</option><option value="2">2R</option><option value="3">3R</option><option value="4">4R</option>
+        <option value="5">5R</option><option value="6">6R</option><option value="7">7R</option><option value="8">8R</option>
+        <option value="9">9R</option><option value="10">10R</option><option value="11">11R</option><option value="12">12R</option>
+      </select>
+
       <label for="raceName">レース名（任意）</label>
       <input type="text" id="raceName" placeholder="例：根岸S" autocomplete="off" inputmode="text" />
 
@@ -218,7 +229,7 @@
 
     <div class="card" id="p3" aria-hidden="true">
       <h2>✂️ STEP2: 4角位置で消す</h2>
-      <div class="note">「4角10番手以降がデフォ」「出遅れ癖」「極端な追込」を消せ。4角5番手以内が理想。</div>
+      <div class="note">「4角10番手以降がデフォ」「出遅れ癖」「極端な追込」を消せ。</div>
       <div class="horse-grid" id="grid2" aria-label="STEP2 足切り"></div>
       <div class="note" id="count2">生存数: -</div>
       <button class="main" id="btnToScore" type="button">三本柱査定へ</button>
@@ -237,7 +248,12 @@
 
     <div class="card" id="p5" aria-hidden="true">
       <h2>🏁 最終ジャッジ</h2>
+
       <div id="resultDisplay"></div>
+
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="sub-btn" id="btnRestart" style="background:#334155; color:white;" type="button">新しい予想へ</button>
+      </div>
 
       <label for="risk" style="margin-top:12px;">負け筋（任意）</label>
       <input type="text" id="risk" placeholder="例：内枠どん詰まり" autocomplete="off" inputmode="text" />
@@ -280,8 +296,12 @@
   const els = {
     cards: $$(".card"),
     dots: $$(".step-dot"),
+
+    raceDate: $("#raceDate"),
+    raceNo: $("#raceNo"),
     raceName: $("#raceName"),
     risk: $("#risk"),
+
     grid1: $("#grid1"),
     grid2: $("#grid2"),
     count1: $("#count1"),
@@ -299,6 +319,7 @@
     btnFinalSkip: $("#btnFinalSkip"),
     btnCopy: $("#btnCopy"),
     btnClear: $("#btnClear"),
+    btnRestart: $("#btnRestart"),
   };
 
   // ---------- Storage ----------
@@ -341,6 +362,40 @@
   function setAriaBusy(el, busy){
     if (!el) return;
     el.setAttribute("aria-busy", busy ? "true" : "false");
+  }
+  function todayISO(){
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+  function getRaceMeta(){
+    const date = (els.raceDate?.value || "").trim();
+    const raceNo = Number(els.raceNo?.value || 0) || null;
+    const raceName = (els.raceName?.value || "").trim();
+    return { date, raceNo, raceName };
+  }
+  function resetForNew(){
+    state.step = 1;
+    state.step1Out = [];
+    state.step2Out = [];
+    state.scores = {};
+    state.best = null;
+
+    if (els.risk) els.risk.value = "";
+
+    // 初期表示更新
+    if (els.scoringArea) els.scoringArea.innerHTML = "";
+    if (els.resultDisplay) els.resultDisplay.innerHTML = "";
+    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
+
+    renderGrid(1);
+    renderGrid(2);
+    updateCount(1);
+    updateCount(2);
+
+    setStep(1);
   }
 
   // ---------- UI ----------
@@ -615,10 +670,33 @@
     setStep(5);
   }
 
+  function afterSaveUI(message){
+    // ここでリロードしない：ログを見る余裕を作る
+    renderHistory();
+    if (els.resultDisplay) {
+      els.resultDisplay.insertAdjacentHTML("beforeend", `
+        <div class="note" style="margin-top:10px;">
+          ✅ ${escapeHtml(message)}<br>
+          このまま戦績を確認できます（「新しい予想へ」で最初に戻る）
+        </div>
+      `);
+    }
+    scrollTopInstant();
+  }
+
   function saveFinal(dec){
-    const race = (els.raceName?.value || "").trim();
+    const meta = getRaceMeta();
     const risk = (els.risk?.value || "").trim();
     const now = new Date().toISOString();
+
+    if (!meta.date) {
+      alert("日付を選んでください。");
+      return;
+    }
+    if (!meta.raceNo) {
+      alert("レース番号を選んでください。");
+      return;
+    }
 
     if (dec === "BUY") {
       if (!state.best) {
@@ -626,39 +704,69 @@
         return;
       }
       pushLog({
-        race,
+        date: meta.date,
+        raceNo: meta.raceNo,
+        race: meta.raceName,
         horse: state.best.num,
         score: state.best.total,   // 互換性維持（安定感Score）
         dec: "BUY",
         risk,
         at: now
       });
+      afterSaveUI("BUYで保存しました");
     } else {
       pushLog({
-        race,
+        date: meta.date,
+        raceNo: meta.raceNo,
+        race: meta.raceName,
         horse: "-",
         score: null,
         dec: "SKIP",
         risk: risk || "USER_SKIP",
         at: now
       });
+      afterSaveUI("見送りで保存しました");
     }
 
-    alert("保存しました");
-    location.reload();
+    // 誤爆防止：保存後はいったんBUY不可に
+    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
   }
 
   function saveSkip(reason){
-    const race = (els.raceName?.value || "").trim();
+    const meta = getRaceMeta();
+    const now = new Date().toISOString();
+
+    if (!meta.date) {
+      alert("日付を選んでください。");
+      return;
+    }
+    if (!meta.raceNo) {
+      alert("レース番号を選んでください。");
+      return;
+    }
+
     pushLog({
-      race,
+      date: meta.date,
+      raceNo: meta.raceNo,
+      race: meta.raceName,
       horse: "-",
       score: null,
       dec: "SKIP",
       risk: reason,
-      at: new Date().toISOString()
+      at: now
     });
-    location.reload();
+
+    setStep(5);
+    if (els.resultDisplay) {
+      els.resultDisplay.innerHTML = `
+        <div class="res-box">
+          <div class="res-score" style="color:var(--bad);">見送り</div>
+          <div style="text-align:center">理由: ${escapeHtml(reason)}</div>
+        </div>
+      `;
+    }
+    afterSaveUI("全滅・見送りで保存しました");
+    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
   }
 
   function renderHistory(){
@@ -671,13 +779,23 @@
       return;
     }
 
-    list.innerHTML = [...all].reverse().slice(0, 10).map(l => `
-      <div style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px; border-left:4px solid ${l.dec === 'BUY' ? 'var(--good)' : 'var(--muted)'}">
-        <b>${escapeHtml(l.race || "不明")}</b> [${escapeHtml(l.dec)}] 馬${escapeHtml(l.horse)}
-        ${l.score != null ? ` (安定感: ${escapeHtml(l.score)})` : ""}<br>
-        <span style="color:var(--muted)">リスク: ${escapeHtml(l.risk || "記載なし")}</span>
-      </div>
-    `).join("");
+    list.innerHTML = [...all].reverse().slice(0, 10).map(l => {
+      const date = l.date ? escapeHtml(l.date) : "----/--/--";
+      const r = l.raceNo ? `${escapeHtml(l.raceNo)}R` : "--R";
+      const raceName = escapeHtml(l.race || "不明");
+      const horse = escapeHtml(l.horse);
+      const dec = escapeHtml(l.dec || "");
+      const score = (l.score != null) ? ` (安定感: ${escapeHtml(l.score)})` : "";
+      const risk = escapeHtml(l.risk || "記載なし");
+      const bar = (l.dec === "BUY") ? "var(--good)" : "var(--muted)";
+
+      return `
+        <div style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px; border-left:4px solid ${bar}">
+          <b>${date} ${r} ${raceName}</b> [${dec}] 馬${horse}${score}<br>
+          <span style="color:var(--muted)">リスク: ${risk}</span>
+        </div>
+      `;
+    }).join("");
   }
 
   async function copyLog(){
@@ -705,7 +823,8 @@
   function clearLog(){
     if (confirm("全ての履歴を消去しますか？")) {
       localStorage.removeItem(STORAGE_KEY);
-      location.reload();
+      renderHistory();
+      alert("消去しました");
     }
   }
 
@@ -725,6 +844,8 @@
     els.btnCopy?.addEventListener("click", copyLog);
     els.btnClear?.addEventListener("click", clearLog);
 
+    els.btnRestart?.addEventListener("click", resetForNew);
+
     // Enterで進める（input内のみ）
     els.raceName?.addEventListener("keydown", (e) => {
       if (e.key === "Enter") setStep(2);
@@ -734,6 +855,15 @@
   // ---------- Init ----------
   function init(){
     bindEvents();
+
+    // 日付：デフォで今日
+    if (els.raceDate && !els.raceDate.value) {
+      els.raceDate.value = todayISO();
+    }
+    // レース：デフォ1R
+    if (els.raceNo && !els.raceNo.value) {
+      els.raceNo.value = "1";
+    }
 
     // 初期：結論が出るまでBUY無効（誤爆防止）
     if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
