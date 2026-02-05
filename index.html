@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>おじ.exe v5.1 | 18頭足切りver</title>
+  <title>おじ.exe v5.4.1 | 流れ反映＋休み明け</title>
+  <meta name="theme-color" content="#0f172a" />
   <style>
     :root{
       --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --text:#f8fafc;
       --muted:#94a3b8; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
-      --radius:16px;
-      --tap:44px;
+      --radius:16px; --tap:44px;
       --focus: 0 0 0 3px rgba(56,189,248,.35);
+      --line: rgba(255,255,255,.10);
     }
     *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     html, body { height: 100%; }
@@ -21,10 +22,8 @@
       color: var(--text);
       line-height: 1.5;
     }
-    /* iOS: input zoom回避（16px以上） */
     input, select, button { font: inherit; }
 
-    /* 見出しのデフォ余白を揃えてレイアウトのブレを減らす */
     h2, h3{ margin: 0 0 12px; font-size: 18px; }
     h3{ font-size: 14px; }
 
@@ -33,9 +32,10 @@
       background: rgba(0,0,0,0.2);
       position: sticky; top: 0; z-index: 100;
       backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .step-dot{ flex:1; height:4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
-    .step-dot.active{ background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    .step-dot.active{ background: var(--accent); box-shadow: 0 0 8px rgba(56,189,248,.75); }
 
     .wrap{ max-width:600px; margin:0 auto; padding:16px; }
     .header{ margin-bottom: 24px; text-align:center; }
@@ -48,6 +48,8 @@
       padding: 20px;
       margin-bottom: 16px;
       display: none;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 10px 28px rgba(0,0,0,.18);
     }
     .card[aria-hidden="false"]{ display:block; }
 
@@ -58,36 +60,12 @@
       font-size: 13px;
       color: var(--muted);
       margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.06);
     }
+    .note b{ color: var(--text); }
 
-    /* 18頭グリッド */
-    .horse-grid{
-      display:grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .horse-btn{
-      min-height: var(--tap);
-      aspect-ratio: 1/1;
-      background: #334155;
-      border: none;
-      color: white;
-      border-radius: 10px;
-      font-weight: 800;
-      font-size: 16px;
-      cursor: pointer;
-      touch-action: manipulation;
-      user-select: none;
-    }
-    .horse-btn:focus-visible{ outline: none; box-shadow: var(--focus); }
-    .horse-btn.eliminated{
-      background: #1e293b;
-      color: #475569;
-      text-decoration: line-through;
-      opacity: 0.55;
-      border: 1px solid #0f172a;
-    }
+    .row{ display:flex; gap:8px; align-items:stretch; }
+    .row > *{ flex:1; }
 
     label{
       display:block;
@@ -104,16 +82,21 @@
       padding: 12px;
       border-radius: 10px;
       margin-bottom: 16px;
-      font-size: 16px; /* iOS zoom回避 */
+      font-size: 16px;
+      min-height: var(--tap);
     }
-    input:focus-visible, select:focus-visible{ outline:none; box-shadow: var(--focus); border-color: rgba(56,189,248,.6); }
+    input:focus-visible, select:focus-visible{
+      outline:none; box-shadow: var(--focus); border-color: rgba(56,189,248,.6);
+    }
 
-    .btn-group{ display:flex; gap: 4px; margin-bottom: 16px; }
+    .btn-row{ display:flex; gap:8px; }
+    .btn-group{ display:flex; gap: 6px; margin-bottom: 14px; }
+
     .tgl-btn{
       flex:1;
       min-height: var(--tap);
       background: #334155;
-      border: none;
+      border: 1px solid rgba(255,255,255,0.06);
       color: var(--muted);
       padding: 10px;
       border-radius: 10px;
@@ -121,9 +104,11 @@
       font-weight: 900;
       cursor: pointer;
       touch-action: manipulation;
+      user-select:none;
     }
-    .tgl-btn.active{ background: var(--accent); color: #0f172a; }
+    .tgl-btn.active{ background: var(--accent); color: #0f172a; border-color: rgba(56,189,248,.35); }
     .tgl-btn:focus-visible{ outline:none; box-shadow: var(--focus); }
+    .tgl-btn:disabled{ opacity:.35; cursor:not-allowed; }
 
     button.main{
       width: 100%;
@@ -155,6 +140,59 @@
     }
     button.danger:focus-visible{ outline:none; box-shadow: 0 0 0 3px rgba(239,68,68,.25); }
 
+    .horse-grid{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .horse-btn{
+      min-height: var(--tap);
+      aspect-ratio: 1/1;
+      background: #334155;
+      border: 1px solid rgba(255,255,255,0.06);
+      color: white;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+    }
+    .horse-btn:focus-visible{ outline: none; box-shadow: var(--focus); }
+    .horse-btn.eliminated{
+      background: #1e293b;
+      color: #475569;
+      text-decoration: line-through;
+      opacity: 0.55;
+      border: 1px solid #0f172a;
+    }
+    /* 割引A：内枠×先行不可 */
+    .horse-btn.discountA{
+      background: rgba(245, 158, 11, 0.22);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fde68a;
+    }
+    /* 5〜8タグ */
+    .horse-btn.tag58{
+      background: rgba(56, 189, 248, 0.18);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #e0f2fe;
+    }
+    /* 自動割引（◎不可） */
+    .horse-btn.flowDiscount{
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fecaca;
+    }
+    .horse-btn.eliminated.discountA,
+    .horse-btn.eliminated.tag58,
+    .horse-btn.eliminated.flowDiscount{
+      background:#1e293b;
+      border: 1px solid #0f172a;
+      color:#475569;
+    }
+
     .res-box{
       background: rgba(255,255,255,0.03);
       border-radius: 12px;
@@ -164,7 +202,6 @@
     }
     .res-score{ font-size: 32px; font-weight: 900; color: var(--good); text-align:center; }
 
-    .btn-row{ display:flex; gap:8px; }
     .sub-btn{
       flex:1;
       min-height: var(--tap);
@@ -175,10 +212,21 @@
       font-weight: 900;
       font-size: 12px;
       touch-action: manipulation;
+      background:#334155; color:white;
     }
     .sub-btn:focus-visible{ outline:none; box-shadow: var(--focus); }
 
-    /* 小さめ端末のときはグリッドを詰める */
+    .pill{
+      display:inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
     @media (max-width: 360px){
       .horse-grid{ grid-template-columns: repeat(5, 1fr); }
       .title{ font-size: 22px; }
@@ -187,22 +235,49 @@
 </head>
 <body>
 
-  <div class="stepper" id="stepper" aria-label="進行状況">
+  <div class="stepper" aria-label="進行状況">
     <div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div>
     <div class="step-dot"></div><div class="step-dot"></div>
   </div>
 
   <div class="wrap">
     <div class="header">
-      <div class="title">おじ.exe v5.1</div>
-      <div class="sub">18→2の工程表</div>
+      <div class="title">おじ.exe v5.4.1</div>
+      <div class="sub">流れ反映（5〜8タグ）＋休み明けB/C</div>
     </div>
 
+    <!-- p1 -->
     <div class="card" id="p1" aria-hidden="false">
       <h2>🏇 レース設定</h2>
 
       <label for="raceDate">日付</label>
       <input type="date" id="raceDate" />
+
+      <label>競馬場 / 芝ダ / 距離</label>
+      <div class="row">
+        <select id="track" aria-label="競馬場">
+          <option value="東京">東京</option><option value="中山">中山</option><option value="阪神">阪神</option><option value="京都">京都</option>
+          <option value="中京">中京</option><option value="新潟">新潟</option><option value="札幌">札幌</option><option value="函館">函館</option>
+          <option value="福島">福島</option><option value="小倉">小倉</option>
+        </select>
+        <select id="surface" aria-label="芝ダ">
+          <option value="ダ">ダ</option><option value="芝">芝</option>
+        </select>
+        <select id="dist" aria-label="距離">
+          <option value="1200">1200</option>
+          <option value="1400" selected>1400</option>
+          <option value="1600">1600</option>
+          <option value="1800">1800</option>
+          <option value="2000">2000</option>
+          <option value="2400">2400</option>
+        </select>
+      </div>
+
+      <label>馬場（メモ用）</label>
+      <div class="btn-group" role="group" aria-label="馬場状態">
+        <button class="tgl-btn active" id="condDry" type="button">良・稍重</button>
+        <button class="tgl-btn" id="condWet" type="button">重・不良</button>
+      </div>
 
       <label for="raceNo">レース</label>
       <select id="raceNo" aria-label="レース番号">
@@ -217,42 +292,90 @@
       <div class="btn-row">
         <button class="main" id="btnStart" type="button">分析開始</button>
       </div>
+
+      <div style="margin-top:10px; text-align:center;">
+        <span class="pill" id="raceBadge">未設定</span>
+      </div>
     </div>
 
+    <!-- p2 -->
     <div class="card" id="p2" aria-hidden="true">
       <h2>✂️ STEP1: 条件不適合を消す</h2>
-      <div class="note">「距離実績なし」「ダート初挑戦」「明確な苦手コース」の馬をタップして消せ。</div>
+      <div class="note" id="noteStep1"></div>
       <div class="horse-grid" id="grid1" aria-label="STEP1 足切り"></div>
       <div class="note" id="count1">生存数: 18頭</div>
-      <button class="main" id="btnToStep2" type="button">STEP2（脚質）へ</button>
+      <button class="main" id="btnToStep2" type="button">STEP2（展開）へ</button>
     </div>
 
+    <!-- p3 -->
     <div class="card" id="p3" aria-hidden="true">
-      <h2>✂️ STEP2: 4角位置で消す</h2>
-      <div class="note">「4角10番手以降がデフォ」「出遅れ癖」「極端な追込」を消せ。</div>
+      <h2>✂️ STEP2: 展開で消す</h2>
+      <div class="note" id="noteStep2"></div>
+
       <div class="horse-grid" id="grid2" aria-label="STEP2 足切り"></div>
       <div class="note" id="count2">生存数: -</div>
+
+      <div class="note" style="border-color: rgba(56,189,248,.22);">
+        <b>🏷 5〜8番手想定（生存馬のみ）</b><br>
+        「この馬は5〜8番手になりそう」を付ける（流れで意味が変わる）。
+      </div>
+      <div class="horse-grid" id="gridTag58" aria-label="5〜8番手タグ"></div>
+
+      <div class="note" style="border-color: rgba(245,158,11,.25);">
+        <b>⚠️ 割引A（消さない）</b><br>
+        「内枠×先行できない（5〜8番手想定）」だけを割引にする。
+      </div>
+      <div class="horse-grid" id="gridDiscountA" aria-label="割引A"></div>
+
+      <div class="note">
+        <b>🔍 流れ（前に行きたい馬の数）</b><br>
+        定義：直近3走の4角で<b>「1〜3番手が2回以上」</b>の馬をカウント。<br>
+        選んだ流れに応じて、<b>5〜8タグ</b>は自動で◎不可になる（普通のときだけ◎OK）。
+      </div>
+      <div class="btn-group" role="group" aria-label="流れ選択">
+        <button class="tgl-btn" id="flowFew" type="button">少ない（1〜2）</button>
+        <button class="tgl-btn active" id="flowMid" type="button">普通（3〜5）</button>
+        <button class="tgl-btn" id="flowMany" type="button">多い（6〜）</button>
+      </div>
+
+      <div class="note" id="noteFlowEffect"></div>
+
+      <div class="note" style="border-color: rgba(56,189,248,.22);">
+        <b>🛌 休み明けタグ（生存馬のみ）</b><br>
+        休み明けは「消し」ではなく基本は<b>割引</b>で扱う（◎不可）。<br>
+        ・9〜20週：割引B　・21週以上：割引C（消し推奨）
+      </div>
+
+      <div class="note" style="margin-top:-8px;">
+        <b>9〜20週（割引B）</b>：タップでON/OFF
+      </div>
+      <div class="horse-grid" id="gridRestMid" aria-label="休み明け9〜20週"></div>
+
+      <div class="note" style="margin-top:-8px;">
+        <b>21週以上（割引C）</b>：タップでON/OFF（迷うならSTEP2で消す）
+      </div>
+      <div class="horse-grid" id="gridRestLong" aria-label="休み明け21週以上"></div>
+
       <button class="main" id="btnToScore" type="button">三本柱査定へ</button>
       <button class="danger" id="btnSkipAll" type="button">全滅・見送り</button>
     </div>
 
+    <!-- p4 -->
     <div class="card" id="p4" aria-hidden="true">
       <h2>📊 精密査定（生存馬のみ）</h2>
-      <div class="note">
-        生存馬の「安定感」を付ける。<br />
-        上がり回数（近3走）は「上がり順位3位以内」の回数（0〜3）。※同点タイブレーク専用。回数も同じなら3択（馬A/馬B/見送り）。
-      </div>
+      <div class="note" id="noteScoringRule"></div>
       <div id="scoringArea"></div>
       <button class="main" id="btnCalc" type="button">結論を出す</button>
     </div>
 
+    <!-- p5 -->
     <div class="card" id="p5" aria-hidden="true">
       <h2>🏁 最終ジャッジ</h2>
 
       <div id="resultDisplay"></div>
 
       <div class="btn-row" style="margin-top:10px;">
-        <button class="sub-btn" id="btnRestart" style="background:#334155; color:white;" type="button">新しい予想へ</button>
+        <button class="sub-btn" id="btnRestart" type="button">新しい予想へ</button>
       </div>
 
       <label for="risk" style="margin-top:12px;">負け筋（任意）</label>
@@ -265,8 +388,8 @@
         <h3 style="font-size: 14px; color: var(--muted); margin:0 0 10px;">📜 直近の戦績</h3>
         <div id="historyList"></div>
         <div class="btn-row">
-          <button class="sub-btn" id="btnCopy" style="background:#334155; color:white;" type="button">CSVコピー</button>
-          <button class="sub-btn" id="btnClear" style="background:transparent; color:var(--bad); border:1px solid var(--bad);" type="button">全消去</button>
+          <button class="sub-btn" id="btnCopy" type="button">CSVコピー</button>
+          <button class="sub-btn" id="btnClear" type="button" style="background:transparent; color:var(--bad); border:1px solid var(--bad);">全消去</button>
         </div>
       </div>
     </div>
@@ -276,15 +399,21 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "oji_exe_v51_logs";
+  const STORAGE_KEY = "oji_exe_v54_logs";
   const MAX_HORSES = 18;
   const STEP_COUNT = 5;
 
   const state = {
     step: 1,
+    condition: "dry", // dry | wet
+    flow: "mid",      // few | mid | many
     horses: Array.from({length: MAX_HORSES}, (_, i) => i + 1),
     step1Out: [],
     step2Out: [],
+    tag58: [],        // 5〜8番手想定
+    discountA: [],    // 内枠×先行不可（5〜8想定）
+    restMid: [],      // 休み明け9〜20週（割引B）
+    restLong: [],     // 休み明け21週以上（割引C）
     scores: {},
     best: null,
     scoringBound: false
@@ -298,14 +427,36 @@
     dots: $$(".step-dot"),
 
     raceDate: $("#raceDate"),
+    track: $("#track"),
+    surface: $("#surface"),
+    dist: $("#dist"),
     raceNo: $("#raceNo"),
     raceName: $("#raceName"),
     risk: $("#risk"),
+    raceBadge: $("#raceBadge"),
+
+    condDry: $("#condDry"),
+    condWet: $("#condWet"),
+
+    flowFew: $("#flowFew"),
+    flowMid: $("#flowMid"),
+    flowMany: $("#flowMany"),
+
+    noteStep1: $("#noteStep1"),
+    noteStep2: $("#noteStep2"),
+    noteFlowEffect: $("#noteFlowEffect"),
+    noteScoringRule: $("#noteScoringRule"),
 
     grid1: $("#grid1"),
     grid2: $("#grid2"),
+    gridTag58: $("#gridTag58"),
+    gridDiscountA: $("#gridDiscountA"),
+    gridRestMid: $("#gridRestMid"),
+    gridRestLong: $("#gridRestLong"),
+
     count1: $("#count1"),
     count2: $("#count2"),
+
     scoringArea: $("#scoringArea"),
     resultDisplay: $("#resultDisplay"),
     historyList: $("#historyList"),
@@ -315,6 +466,7 @@
     btnToScore: $("#btnToScore"),
     btnSkipAll: $("#btnSkipAll"),
     btnCalc: $("#btnCalc"),
+
     btnFinalBuy: $("#btnFinalBuy"),
     btnFinalSkip: $("#btnFinalSkip"),
     btnCopy: $("#btnCopy"),
@@ -323,45 +475,18 @@
   };
 
   // ---------- Storage ----------
-  function safeParseJSON(str, fallback){
-    try { return JSON.parse(str); } catch { return fallback; }
-  }
-  function getLogs(){
-    return safeParseJSON(localStorage.getItem(STORAGE_KEY) || "[]", []);
-  }
-  function setLogs(logs){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-  }
-  function pushLog(entry){
-    const logs = getLogs();
-    logs.push(entry);
-    setLogs(logs);
-  }
+  function safeParseJSON(str, fallback){ try { return JSON.parse(str); } catch { return fallback; } }
+  function getLogs(){ return safeParseJSON(localStorage.getItem(STORAGE_KEY) || "[]", []); }
+  function setLogs(logs){ localStorage.setItem(STORAGE_KEY, JSON.stringify(logs)); }
+  function pushLog(entry){ const logs = getLogs(); logs.push(entry); setLogs(logs); }
 
   // ---------- Utils ----------
-  function toggleArray(arr, val){
-    return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val];
-  }
+  function toggleArray(arr, val){ return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]; }
   function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, (m) => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[m]));
+    return String(s).replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
   }
   function survivors(){
     return state.horses.filter(h => !state.step1Out.includes(h) && !state.step2Out.includes(h));
-  }
-  function scrollTopInstant(){
-    // Safari iOS では behavior: "instant" が未対応なのでフォールバック
-    try {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      window.scrollTo({ top: 0, left: 0 });
-    } catch {
-      window.scrollTo(0, 0);
-    }
-  }
-  function setAriaBusy(el, busy){
-    if (!el) return;
-    el.setAttribute("aria-busy", busy ? "true" : "false");
   }
   function todayISO(){
     const d = new Date();
@@ -370,35 +495,99 @@
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
   }
+  function scrollTopInstant(){
+    try { window.scrollTo({ top: 0, left: 0, behavior: "smooth" }); window.scrollTo({ top: 0, left: 0 }); }
+    catch { window.scrollTo(0,0); }
+  }
+
   function getRaceMeta(){
     const date = (els.raceDate?.value || "").trim();
     const raceNo = Number(els.raceNo?.value || 0) || null;
     const raceName = (els.raceName?.value || "").trim();
-    return { date, raceNo, raceName };
-  }
-  function resetForNew(){
-    state.step = 1;
-    state.step1Out = [];
-    state.step2Out = [];
-    state.scores = {};
-    state.best = null;
-
-    if (els.risk) els.risk.value = "";
-
-    // 初期表示更新
-    if (els.scoringArea) els.scoringArea.innerHTML = "";
-    if (els.resultDisplay) els.resultDisplay.innerHTML = "";
-    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
-
-    renderGrid(1);
-    renderGrid(2);
-    updateCount(1);
-    updateCount(2);
-
-    setStep(1);
+    const track = (els.track?.value || "東京").trim();
+    const surface = (els.surface?.value || "ダ").trim();
+    const dist = Number(els.dist?.value || 1400) || 1400;
+    const condition = state.condition;
+    const flow = state.flow;
+    return { date, raceNo, raceName, track, surface, dist, condition, flow };
   }
 
-  // ---------- UI ----------
+  function updateBadge(){
+    const meta = getRaceMeta();
+    const d = meta.date || "未設定";
+    const r = meta.raceNo ? `${meta.raceNo}R` : "--R";
+    const n = meta.raceName ? ` ${meta.raceName}` : "";
+    const cond = meta.condition === "wet" ? "重不" : "良稍";
+    const flow = meta.flow === "few" ? "流れ:少" : meta.flow === "many" ? "流れ:多" : "流れ:普";
+    els.raceBadge.textContent = `${d} / ${meta.track}${meta.surface}${meta.dist}(${cond}) / ${r}${n} / ${flow}`;
+    els.btnStart.disabled = !meta.date;
+  }
+
+  function updateStep1Note(){
+    els.noteStep1.innerHTML =
+      "<b>【STEP1（適性）】</b><br>" +
+      "・距離/芝ダ/コースが合わない馬を消す。<br>" +
+      "・初挑戦は根拠が薄ければ消し。<br>" +
+      "<span style='color:var(--muted)'>※脚質（4角位置）はSTEP2。</span>";
+  }
+
+  function updateStep2Note(){
+    els.noteStep2.innerHTML =
+      "<b>【STEP2（展開）】</b><br>" +
+      "・「4角9番手以降がデフォ」「出遅れ癖」「極端な追込」は消す。<br>" +
+      "・5〜8番手の扱いは、流れ（前に行きたい馬の数）で変える。";
+  }
+
+  function setCond(c){
+    state.condition = c;
+    els.condDry.classList.toggle("active", c === "dry");
+    els.condWet.classList.toggle("active", c === "wet");
+    updateBadge();
+  }
+
+  function setFlow(f){
+    state.flow = f;
+    els.flowFew.classList.toggle("active", f === "few");
+    els.flowMid.classList.toggle("active", f === "mid");
+    els.flowMany.classList.toggle("active", f === "many");
+    updateFlowEffectNote();
+
+    // 反映：表示更新
+    renderTag58Grid();
+    renderDiscountAGrid();
+    renderRestMidGrid();
+    renderRestLongGrid();
+    updateBadge();
+  }
+
+  // ----- ルール -----
+  function isFlowDiscountHorse(num){
+    const tagged = state.tag58.includes(num);
+    if (!tagged) return false;
+    return state.flow !== "mid"; // 普通以外は◎不可
+  }
+  function isRestMidHorse(num){ return state.restMid.includes(num); }
+  function isRestLongHorse(num){ return state.restLong.includes(num); }
+
+  function isAnyDiscount(num){
+    return (
+      state.discountA.includes(num) ||
+      isFlowDiscountHorse(num) ||
+      isRestMidHorse(num) ||
+      isRestLongHorse(num)
+    );
+  }
+
+  function updateFlowEffectNote(){
+    const msg = (() => {
+      if (state.flow === "few") return "少ない（1〜2）→ 前残り。<b>5〜8タグは危険</b>（◎不可）。";
+      if (state.flow === "many") return "多い（6〜）→ 前崩れ。<b>5〜8タグは巻き添え</b>（◎不可）。";
+      return "普通（3〜5）→ 5〜8が狙いゾーン。<b>5〜8タグも◎OK</b>。";
+    })();
+    els.noteFlowEffect.innerHTML = `<b>反映：</b>${msg}`;
+  }
+
+  // ---------- Step UI ----------
   function setStep(nextStep){
     const step = Math.min(Math.max(1, Number(nextStep) || 1), STEP_COUNT);
     state.step = step;
@@ -407,28 +596,31 @@
       const isTarget = card.id === `p${step}`;
       card.setAttribute("aria-hidden", String(!isTarget));
     });
-
     els.dots.forEach((d, i) => d.classList.toggle("active", i < step));
     scrollTopInstant();
 
     if (step === 2) {
+      updateStep1Note();
       renderGrid(1);
       updateCount(1);
     }
     if (step === 3) {
+      updateStep2Note();
+      updateFlowEffectNote();
       renderGrid(2);
+      renderTag58Grid();
+      renderDiscountAGrid();
+      renderRestMidGrid();
+      renderRestLongGrid();
       updateCount(2);
     }
-    if (step === 5) {
-      renderHistory();
-    }
+    if (step === 5) renderHistory();
   }
 
   function renderGrid(stepNum){
     const grid = stepNum === 1 ? els.grid1 : els.grid2;
     if (!grid) return;
 
-    setAriaBusy(grid, true);
     grid.innerHTML = "";
 
     const list = (stepNum === 1)
@@ -443,25 +635,36 @@
       btn.className = "horse-btn";
       btn.textContent = String(num);
 
-      const isOut = (stepNum === 1)
-        ? state.step1Out.includes(num)
-        : state.step2Out.includes(num);
-
+      const isOut = (stepNum === 1) ? state.step1Out.includes(num) : state.step2Out.includes(num);
       btn.classList.toggle("eliminated", isOut);
       btn.setAttribute("aria-pressed", String(isOut));
-      btn.setAttribute("aria-label", `馬番${num}${isOut ? "（除外）" : ""}`);
 
       btn.addEventListener("click", () => {
         if (stepNum === 1) {
           state.step1Out = toggleArray(state.step1Out, num);
-          // Step1で消した馬がStep2に残る矛盾を除去
           if (state.step1Out.includes(num)) {
+            // STEP1で消したら他のタグも掃除
             state.step2Out = state.step2Out.filter(x => x !== num);
+            state.tag58 = state.tag58.filter(x => x !== num);
+            state.discountA = state.discountA.filter(x => x !== num);
+            state.restMid = state.restMid.filter(x => x !== num);
+            state.restLong = state.restLong.filter(x => x !== num);
           }
         } else {
           state.step2Out = toggleArray(state.step2Out, num);
+          if (state.step2Out.includes(num)) {
+            state.tag58 = state.tag58.filter(x => x !== num);
+            state.discountA = state.discountA.filter(x => x !== num);
+            state.restMid = state.restMid.filter(x => x !== num);
+            state.restLong = state.restLong.filter(x => x !== num);
+          }
         }
+
         renderGrid(stepNum);
+        renderTag58Grid();
+        renderDiscountAGrid();
+        renderRestMidGrid();
+        renderRestLongGrid();
         updateCount(stepNum);
       });
 
@@ -469,7 +672,151 @@
     });
 
     grid.appendChild(frag);
-    setAriaBusy(grid, false);
+  }
+
+  function renderTag58Grid(){
+    const grid = els.gridTag58;
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const list = survivors();
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    list.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "horse-btn";
+      btn.textContent = String(num);
+
+      const tagged = state.tag58.includes(num);
+      const flowDisc = isFlowDiscountHorse(num);
+
+      if (tagged) btn.classList.add("tag58");
+      if (flowDisc) btn.classList.add("flowDiscount");
+
+      btn.setAttribute("aria-pressed", String(tagged));
+      btn.addEventListener("click", () => {
+        state.tag58 = toggleArray(state.tag58, num);
+        renderTag58Grid();
+        renderDiscountAGrid(); // 見た目合わせ
+      });
+
+      frag.appendChild(btn);
+    });
+
+    grid.appendChild(frag);
+  }
+
+  function renderDiscountAGrid(){
+    const grid = els.gridDiscountA;
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const list = survivors();
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    list.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "horse-btn";
+      btn.textContent = String(num);
+
+      const discA = state.discountA.includes(num);
+      const flowDisc = isFlowDiscountHorse(num);
+
+      if (discA) btn.classList.add("discountA");
+      if (flowDisc) btn.classList.add("flowDiscount");
+
+      btn.setAttribute("aria-pressed", String(discA));
+      btn.addEventListener("click", () => {
+        state.discountA = toggleArray(state.discountA, num);
+        renderDiscountAGrid();
+      });
+
+      frag.appendChild(btn);
+    });
+
+    grid.appendChild(frag);
+  }
+
+  // ★休み明けB
+  function renderRestMidGrid(){
+    const grid = els.gridRestMid;
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const list = survivors();
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    list.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "horse-btn";
+      btn.textContent = String(num);
+
+      const on = state.restMid.includes(num);
+      if (on) btn.classList.add("flowDiscount"); // 赤系（◎不可の注意）
+
+      btn.setAttribute("aria-pressed", String(on));
+      btn.addEventListener("click", () => {
+        state.restMid = toggleArray(state.restMid, num);
+        if (state.restMid.includes(num)) state.restLong = state.restLong.filter(x => x !== num);
+        renderRestMidGrid();
+        renderRestLongGrid();
+      });
+
+      frag.appendChild(btn);
+    });
+
+    grid.appendChild(frag);
+  }
+
+  // ★休み明けC
+  function renderRestLongGrid(){
+    const grid = els.gridRestLong;
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const list = survivors();
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    list.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "horse-btn";
+      btn.textContent = String(num);
+
+      const on = state.restLong.includes(num);
+      if (on) btn.classList.add("flowDiscount");
+
+      btn.setAttribute("aria-pressed", String(on));
+      btn.addEventListener("click", () => {
+        state.restLong = toggleArray(state.restLong, num);
+        if (state.restLong.includes(num)) state.restMid = state.restMid.filter(x => x !== num);
+        renderRestLongGrid();
+        renderRestMidGrid();
+      });
+
+      frag.appendChild(btn);
+    });
+
+    grid.appendChild(frag);
   }
 
   function updateCount(stepNum){
@@ -477,14 +824,14 @@
     const after2 = after1 - state.step2Out.length;
 
     if (stepNum === 1) {
-      if (els.count1) els.count1.textContent = `生存数: ${after1}頭`;
+      els.count1.textContent = `生存数: ${after1}頭`;
     } else {
-      if (els.count2) els.count2.textContent = `生存数: ${after2}頭`;
-      // 生存1〜5頭だけ次へ（好み）
-      if (els.btnToScore) els.btnToScore.disabled = (after2 === 0 || after2 > 5);
+      els.count2.textContent = `生存数: ${after2}頭`;
+      els.btnToScore.disabled = (after2 === 0 || after2 > 6);
     }
   }
 
+  // ---------- Scoring ----------
   function setupScoring(){
     const list = survivors();
     if (list.length === 0) {
@@ -493,25 +840,42 @@
     }
 
     state.scores = {};
-    if (els.scoringArea) els.scoringArea.innerHTML = "";
+    els.scoringArea.innerHTML = "";
+
+    els.noteScoringRule.innerHTML =
+      "生存馬の「安定感」を付ける。<br>" +
+      "上がり回数（近3走）は「上がり順位3位以内」の回数（0〜3）。※同点タイブレーク専用。<br>" +
+      "<b>割引（A / 流れ / 休み明けB/C）</b>が付いた馬は「◎不可（○まで）」。";
 
     const frag = document.createDocumentFragment();
 
     list.forEach(num => {
-      // p1: 安定感（2/1）、p2: 上がり回数（0-3）※同点専用
       state.scores[num] = { p1: 1, p2: 0 };
+
+      const disc = isAnyDiscount(num);
+      const badges = [
+        state.tag58.includes(num) ? "5〜8" : null,
+        state.discountA.includes(num) ? "割引A" : null,
+        isFlowDiscountHorse(num) ? "流れ割引" : null,
+        state.restMid.includes(num) ? "休み明けB" : null,
+        state.restLong.includes(num) ? "休み明けC" : null,
+      ].filter(Boolean);
 
       const box = document.createElement("div");
       box.className = "res-box";
       box.dataset.horse = String(num);
 
       box.innerHTML = `
-        <div style="font-weight:bold; color:var(--accent);">馬番: ${num}</div>
+        <div style="font-weight:bold; color:var(--accent);">
+          馬番: ${num}
+          ${badges.length ? `<span style="color:var(--muted); font-size:12px;">（${badges.join(" / ")}）</span>` : ""}
+        </div>
 
         <label>安定感（0.5秒差内を継続？）</label>
         <div class="btn-group" data-p="p1">
-          <button class="tgl-btn" type="button" data-v="2" aria-pressed="false">◎ 堅実</button>
+          <button class="tgl-btn" type="button" data-v="2" aria-pressed="false" ${disc ? "disabled" : ""}>◎ 堅実</button>
           <button class="tgl-btn active" type="button" data-v="1" aria-pressed="true">○ 並</button>
+          <button class="tgl-btn" type="button" data-v="0" aria-pressed="false">△ 不安</button>
         </div>
 
         <label>上がり（近3走：上がり順位3位以内の回数）※同点専用</label>
@@ -526,23 +890,20 @@
       frag.appendChild(box);
     });
 
-    if (els.scoringArea) els.scoringArea.appendChild(frag);
+    els.scoringArea.appendChild(frag);
 
-    // イベント委譲（複数回バインド防止）
-    if (!state.scoringBound && els.scoringArea) {
+    if (!state.scoringBound) {
       els.scoringArea.addEventListener("click", onScoringClick, { passive: true });
       state.scoringBound = true;
     }
 
-    // 結論が出るまでBUYは無効
-    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
-
+    els.btnFinalBuy.disabled = true;
     setStep(4);
   }
 
   function onScoringClick(e){
     const btn = e.target.closest(".tgl-btn");
-    if (!btn) return;
+    if (!btn || btn.disabled) return;
 
     const group = btn.closest(".btn-group");
     const box = btn.closest(".res-box");
@@ -551,8 +912,10 @@
     const horse = Number(box.dataset.horse);
     const p = group.dataset.p;
     const v = Number(btn.dataset.v);
-
     if (!state.scores[horse]) return;
+
+    // 保険：割引馬は◎不可
+    if (p === "p1" && v === 2 && isAnyDiscount(horse)) return;
 
     state.scores[horse][p] = v;
 
@@ -566,121 +929,90 @@
 
   function calcResult(){
     const keys = Object.keys(state.scores);
-    if (keys.length === 0) {
-      alert("査定対象がありません。");
-      return;
-    }
+    if (keys.length === 0) { alert("査定対象がありません。"); return; }
 
-    // ★ totalはp1のみ（上がりp2は同点タイブレーク専用）
     const res = keys.map(n => ({
       num: Number(n),
       p1: (state.scores[n].p1 ?? 0),
-      p2: (state.scores[n].p2 ?? 0),  // 0-3
+      p2: (state.scores[n].p2 ?? 0),
       total: (state.scores[n].p1 ?? 0)
-    })).sort((a,b) =>
-      (b.total - a.total) || // 安定感
-      (b.p2 - a.p2)          // 同点なら上がり回数
-    );
+    })).sort((a,b) => (b.total - a.total) || (b.p2 - a.p2));
 
     const top = res[0];
     const second = res[1] || null;
 
-    // ★ 完全同点（安定感も上がり回数も同じ）なら「3択」
     if (second && top.total === second.total && top.p2 === second.p2) {
       state.best = null;
-
-      if (els.resultDisplay) {
-        els.resultDisplay.innerHTML = `
-          <div class="res-box">
-            <div class="res-score" style="color:var(--warn);">同点</div>
-            <div style="text-align:center; margin-bottom:10px;">
-              馬番 ${top.num} と 馬番 ${second.num} が完全同点。<br>
-              （安定感Score: ${top.total} / 上がり3位内回数: ${top.p2}回）<br>
-              ここは「馬${top.num} / 馬${second.num} / 見送り」で決める。
-            </div>
-
-            <div class="btn-row" style="margin-top:8px;">
-              <button class="sub-btn" type="button" id="btnPickA" style="background:#334155; color:white;">
-                馬${top.num}にする
-              </button>
-              <button class="sub-btn" type="button" id="btnPickB" style="background:#334155; color:white;">
-                馬${second.num}にする
-              </button>
-            </div>
-
-            <button class="sub-btn" type="button"
-              id="btnPickSkip"
-              style="width:100%; margin-top:8px; background:transparent; color:var(--bad); border:1px solid var(--bad);">
-              見送りにする
-            </button>
-
-            <div id="pickStatus" class="note" style="margin-top:10px;">
-              まだ未選択（BUY保存はできない）
-            </div>
+      els.resultDisplay.innerHTML = `
+        <div class="res-box">
+          <div class="res-score" style="color:var(--warn);">同点</div>
+          <div style="text-align:center; margin-bottom:10px;">
+            馬番 ${top.num} と 馬番 ${second.num} が完全同点。<br>
+            （安定感Score: ${top.total} / 上がり3位内回数: ${top.p2}回）
           </div>
-        `;
-      }
+          <div class="btn-row" style="margin-top:8px;">
+            <button class="sub-btn" type="button" id="btnPickA">馬${top.num}にする</button>
+            <button class="sub-btn" type="button" id="btnPickB">馬${second.num}にする</button>
+          </div>
+          <button class="sub-btn" type="button"
+            id="btnPickSkip"
+            style="width:100%; margin-top:8px; background:transparent; color:var(--bad); border:1px solid var(--bad);">
+            見送りにする
+          </button>
+          <div id="pickStatus" class="note" style="margin-top:10px;">まだ未選択（BUY保存はできない）</div>
+        </div>
+      `;
+      els.btnFinalBuy.disabled = true;
 
-      if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
-
-      const btnA = $("#btnPickA");
-      const btnB = $("#btnPickB");
-      const btnS = $("#btnPickSkip");
-      const status = $("#pickStatus");
-
-      if (btnA) btnA.addEventListener("click", () => {
+      $("#btnPickA")?.addEventListener("click", () => {
         state.best = { num: top.num, total: top.total, p2: top.p2 };
-        if (status) status.textContent = `選択：馬番 ${top.num}（同点・手動決定）`;
-        if (els.btnFinalBuy) els.btnFinalBuy.disabled = false;
+        $("#pickStatus").textContent = `選択：馬番 ${top.num}（同点・手動決定）`;
+        els.btnFinalBuy.disabled = false;
       });
-
-      if (btnB) btnB.addEventListener("click", () => {
+      $("#btnPickB")?.addEventListener("click", () => {
         state.best = { num: second.num, total: second.total, p2: second.p2 };
-        if (status) status.textContent = `選択：馬番 ${second.num}（同点・手動決定）`;
-        if (els.btnFinalBuy) els.btnFinalBuy.disabled = false;
+        $("#pickStatus").textContent = `選択：馬番 ${second.num}（同点・手動決定）`;
+        els.btnFinalBuy.disabled = false;
       });
-
-      if (btnS) btnS.addEventListener("click", () => {
-        saveFinal("SKIP");
-      });
+      $("#btnPickSkip")?.addEventListener("click", () => saveFinal("SKIP"));
 
       setStep(5);
       return;
     }
 
-    // 通常：勝者確定（同点なら上がり回数で決着済み）
     state.best = { num: top.num, total: top.total, p2: top.p2 };
-
     const usedTiebreak = !!(second && top.total === second.total && top.p2 !== second.p2);
 
-    if (els.resultDisplay) {
-      els.resultDisplay.innerHTML = `
-        <div class="res-box">
-          <div class="res-score">馬番 ${top.num}</div>
-          <div style="text-align:center">
-            安定感Score: ${top.total}<br>
-            上がり3位内（近3走）: ${top.p2}回
-            ${usedTiebreak ? `<div class="note" style="margin-top:8px;">同点 → 上がり回数で決着</div>` : ""}
-          </div>
-        </div>
-      `;
-    }
+    const badges = [
+      state.tag58.includes(top.num) ? "5〜8" : null,
+      state.discountA.includes(top.num) ? "割引A" : null,
+      isFlowDiscountHorse(top.num) ? "流れ割引" : null,
+      state.restMid.includes(top.num) ? "休み明けB" : null,
+      state.restLong.includes(top.num) ? "休み明けC" : null,
+    ].filter(Boolean);
 
-    if (els.btnFinalBuy) els.btnFinalBuy.disabled = false;
+    els.resultDisplay.innerHTML = `
+      <div class="res-box">
+        <div class="res-score">馬番 ${top.num}</div>
+        <div style="text-align:center">
+          安定感Score: ${top.total}<br>
+          上がり3位内（近3走）: ${top.p2}回
+          ${badges.length ? `<div class="note" style="margin-top:8px;">タグ/割引：${badges.join(" / ")}</div>` : ""}
+          ${usedTiebreak ? `<div class="note" style="margin-top:8px;">同点 → 上がり回数で決着</div>` : ""}
+        </div>
+      </div>
+    `;
+
+    els.btnFinalBuy.disabled = false;
     setStep(5);
   }
 
+  // ---------- Save / History ----------
   function afterSaveUI(message){
-    // ここでリロードしない：ログを見る余裕を作る
     renderHistory();
-    if (els.resultDisplay) {
-      els.resultDisplay.insertAdjacentHTML("beforeend", `
-        <div class="note" style="margin-top:10px;">
-          ✅ ${escapeHtml(message)}<br>
-          このまま戦績を確認できます（「新しい予想へ」で最初に戻る）
-        </div>
-      `);
-    }
+    els.resultDisplay.insertAdjacentHTML("beforeend", `
+      <div class="note" style="margin-top:10px;">✅ ${escapeHtml(message)}<br>このまま戦績を確認できます（「新しい予想へ」で最初に戻る）</div>
+    `);
     scrollTopInstant();
   }
 
@@ -689,84 +1021,75 @@
     const risk = (els.risk?.value || "").trim();
     const now = new Date().toISOString();
 
-    if (!meta.date) {
-      alert("日付を選んでください。");
-      return;
-    }
-    if (!meta.raceNo) {
-      alert("レース番号を選んでください。");
-      return;
-    }
+    if (!meta.date) { alert("日付を選んでください。"); return; }
+    if (!meta.raceNo) { alert("レース番号を選んでください。"); return; }
 
     if (dec === "BUY") {
-      if (!state.best) {
-        alert("まだ結論が出ていません。");
-        return;
-      }
+      if (!state.best) { alert("まだ結論が出ていません。"); return; }
       pushLog({
         date: meta.date,
-        raceNo: meta.raceNo,
-        race: meta.raceName,
+        track: meta.track, surface: meta.surface, dist: meta.dist,
+        cond: meta.condition, flow: meta.flow,
+        raceNo: meta.raceNo, race: meta.raceName,
         horse: state.best.num,
-        score: state.best.total,   // 互換性維持（安定感Score）
+        score: state.best.total,
         dec: "BUY",
         risk,
+        tag58: state.tag58.includes(state.best.num) ? 1 : 0,
+        discountA: state.discountA.includes(state.best.num) ? 1 : 0,
+        flowDiscount: isFlowDiscountHorse(state.best.num) ? 1 : 0,
+        restMid: state.restMid.includes(state.best.num) ? 1 : 0,
+        restLong: state.restLong.includes(state.best.num) ? 1 : 0,
         at: now
       });
       afterSaveUI("BUYで保存しました");
     } else {
       pushLog({
         date: meta.date,
-        raceNo: meta.raceNo,
-        race: meta.raceName,
+        track: meta.track, surface: meta.surface, dist: meta.dist,
+        cond: meta.condition, flow: meta.flow,
+        raceNo: meta.raceNo, race: meta.raceName,
         horse: "-",
         score: null,
         dec: "SKIP",
         risk: risk || "USER_SKIP",
+        tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
         at: now
       });
       afterSaveUI("見送りで保存しました");
     }
 
-    // 誤爆防止：保存後はいったんBUY不可に
-    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
+    els.btnFinalBuy.disabled = true;
   }
 
   function saveSkip(reason){
     const meta = getRaceMeta();
     const now = new Date().toISOString();
-
-    if (!meta.date) {
-      alert("日付を選んでください。");
-      return;
-    }
-    if (!meta.raceNo) {
-      alert("レース番号を選んでください。");
-      return;
-    }
+    if (!meta.date) { alert("日付を選んでください。"); return; }
+    if (!meta.raceNo) { alert("レース番号を選んでください。"); return; }
 
     pushLog({
       date: meta.date,
-      raceNo: meta.raceNo,
-      race: meta.raceName,
+      track: meta.track, surface: meta.surface, dist: meta.dist,
+      cond: meta.condition, flow: meta.flow,
+      raceNo: meta.raceNo, race: meta.raceName,
       horse: "-",
       score: null,
       dec: "SKIP",
       risk: reason,
+      tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
       at: now
     });
 
     setStep(5);
-    if (els.resultDisplay) {
-      els.resultDisplay.innerHTML = `
-        <div class="res-box">
-          <div class="res-score" style="color:var(--bad);">見送り</div>
-          <div style="text-align:center">理由: ${escapeHtml(reason)}</div>
-        </div>
-      `;
-    }
+    els.resultDisplay.innerHTML = `
+      <div class="res-box">
+        <div class="res-score" style="color:var(--bad);">見送り</div>
+        <div style="text-align:center">理由: ${escapeHtml(reason)}</div>
+      </div>
+    `;
     afterSaveUI("全滅・見送りで保存しました");
-    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
+    els.btnFinalBuy.disabled = true;
   }
 
   function renderHistory(){
@@ -781,6 +1104,9 @@
 
     list.innerHTML = [...all].reverse().slice(0, 10).map(l => {
       const date = l.date ? escapeHtml(l.date) : "----/--/--";
+      const place = `${escapeHtml(l.track || "?")}${escapeHtml(l.surface || "?")}${escapeHtml(l.dist || "?")}`;
+      const cond = l.cond ? (l.cond === "wet" ? "重不" : "良稍") : "-";
+      const flow = l.flow ? (l.flow === "few" ? "少" : l.flow === "many" ? "多" : "普") : "-";
       const r = l.raceNo ? `${escapeHtml(l.raceNo)}R` : "--R";
       const raceName = escapeHtml(l.race || "不明");
       const horse = escapeHtml(l.horse);
@@ -789,9 +1115,19 @@
       const risk = escapeHtml(l.risk || "記載なし");
       const bar = (l.dec === "BUY") ? "var(--good)" : "var(--muted)";
 
+      const tags = [
+        l.tag58 ? "5〜8" : null,
+        l.discountA ? "割引A" : null,
+        l.flowDiscount ? "流れ割引" : null,
+        l.restMid ? "休B" : null,
+        l.restLong ? "休C" : null,
+      ].filter(Boolean);
+
+      const tagStr = tags.length ? ` / ${tags.join(",")}` : "";
+
       return `
         <div style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px; border-left:4px solid ${bar}">
-          <b>${date} ${r} ${raceName}</b> [${dec}] 馬${horse}${score}<br>
+          <b>${date} ${place}(${cond}) 流れ:${flow} ${r} ${raceName}</b> [${dec}] 馬${horse}${score}${tagStr}<br>
           <span style="color:var(--muted)">リスク: ${risk}</span>
         </div>
       `;
@@ -804,7 +1140,6 @@
       await navigator.clipboard.writeText(raw);
       alert("データをクリップボードにコピーしました（Excel等に貼り付け可能）");
     } catch {
-      // iOSで権限や環境により失敗することがあるのでフォールバック
       const ta = document.createElement("textarea");
       ta.value = raw;
       ta.setAttribute("readonly", "");
@@ -828,8 +1163,49 @@
     }
   }
 
+  function resetForNew(){
+    state.step = 1;
+    state.step1Out = [];
+    state.step2Out = [];
+    state.tag58 = [];
+    state.discountA = [];
+    state.restMid = [];
+    state.restLong = [];
+    state.scores = {};
+    state.best = null;
+
+    if (els.risk) els.risk.value = "";
+    if (els.scoringArea) els.scoringArea.innerHTML = "";
+    if (els.resultDisplay) els.resultDisplay.innerHTML = "";
+    els.btnFinalBuy.disabled = true;
+
+    setStep(1);
+    renderGrid(1);
+    renderGrid(2);
+    renderTag58Grid();
+    renderDiscountAGrid();
+    renderRestMidGrid();
+    renderRestLongGrid();
+    updateCount(1);
+    updateCount(2);
+  }
+
   // ---------- Events ----------
   function bindEvents(){
+    els.condDry?.addEventListener("click", () => setCond("dry"));
+    els.condWet?.addEventListener("click", () => setCond("wet"));
+
+    els.flowFew?.addEventListener("click", () => setFlow("few"));
+    els.flowMid?.addEventListener("click", () => setFlow("mid"));
+    els.flowMany?.addEventListener("click", () => setFlow("many"));
+
+    els.raceDate?.addEventListener("change", updateBadge);
+    els.track?.addEventListener("change", updateBadge);
+    els.surface?.addEventListener("change", updateBadge);
+    els.dist?.addEventListener("change", updateBadge);
+    els.raceNo?.addEventListener("change", updateBadge);
+    els.raceName?.addEventListener("input", updateBadge);
+
     els.btnStart?.addEventListener("click", () => setStep(2));
     els.btnToStep2?.addEventListener("click", () => setStep(3));
 
@@ -846,30 +1222,32 @@
 
     els.btnRestart?.addEventListener("click", resetForNew);
 
-    // Enterで進める（input内のみ）
-    els.raceName?.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") setStep(2);
-    });
+    els.raceName?.addEventListener("keydown", (e) => { if (e.key === "Enter") setStep(2); });
   }
 
   // ---------- Init ----------
   function init(){
     bindEvents();
 
-    // 日付：デフォで今日
-    if (els.raceDate && !els.raceDate.value) {
-      els.raceDate.value = todayISO();
-    }
-    // レース：デフォ1R
-    if (els.raceNo && !els.raceNo.value) {
-      els.raceNo.value = "1";
-    }
+    if (els.raceDate && !els.raceDate.value) els.raceDate.value = todayISO();
+    if (els.raceNo && !els.raceNo.value) els.raceNo.value = "1";
 
-    // 初期：結論が出るまでBUY無効（誤爆防止）
-    if (els.btnFinalBuy) els.btnFinalBuy.disabled = true;
+    els.btnFinalBuy.disabled = true;
 
-    // 初期：ステップ1表示
+    updateStep1Note();
+    updateStep2Note();
+    setCond("dry");
+    setFlow("mid");
+
+    updateBadge();
     setStep(1);
+
+    renderGrid(1);
+    renderGrid(2);
+    renderTag58Grid();
+    renderDiscountAGrid();
+    renderRestMidGrid();
+    renderRestLongGrid();
     renderHistory();
   }
 
