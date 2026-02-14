@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>おじ.exe v5.4.1 | 流れ反映＋休み明け</title>
+  <title>おじ.exe v5.4.2 | 4角最優先（東京ダ1400）</title>
   <meta name="theme-color" content="#0f172a" />
   <style>
     :root{
@@ -167,6 +167,7 @@
       opacity: 0.55;
       border: 1px solid #0f172a;
     }
+
     /* 割引A：内枠×先行不可 */
     .horse-btn.discountA{
       background: rgba(245, 158, 11, 0.22);
@@ -185,9 +186,18 @@
       border: 1px solid rgba(239, 68, 68, 0.35);
       color: #fecaca;
     }
+
+    /* front5（4角1〜5想定） */
+    .horse-btn.front5{
+      background: rgba(34,197,94,.18);
+      border: 1px solid rgba(34,197,94,.45);
+      color: #dcfce7;
+    }
+
     .horse-btn.eliminated.discountA,
     .horse-btn.eliminated.tag58,
-    .horse-btn.eliminated.flowDiscount{
+    .horse-btn.eliminated.flowDiscount,
+    .horse-btn.eliminated.front5{
       background:#1e293b;
       border: 1px solid #0f172a;
       color:#475569;
@@ -242,8 +252,8 @@
 
   <div class="wrap">
     <div class="header">
-      <div class="title">おじ.exe v5.4.1</div>
-      <div class="sub">流れ反映（5〜8タグ）＋休み明けB/C</div>
+      <div class="title">おじ.exe v5.4.2</div>
+      <div class="sub">4角1〜5を最優先（東京ダ1400は自動消し）＋流れ＋休み明け</div>
     </div>
 
     <!-- p1 -->
@@ -287,7 +297,7 @@
       </select>
 
       <label for="raceName">レース名（任意）</label>
-      <input type="text" id="raceName" placeholder="例：根岸S" autocomplete="off" inputmode="text" />
+      <input type="text" id="raceName" placeholder="例：銀蹄S" autocomplete="off" inputmode="text" />
 
       <div class="btn-row">
         <button class="main" id="btnStart" type="button">分析開始</button>
@@ -314,6 +324,12 @@
 
       <div class="horse-grid" id="grid2" aria-label="STEP2 足切り"></div>
       <div class="note" id="count2">生存数: -</div>
+
+      <div class="note" style="border-color: rgba(34,197,94,.22);">
+        <b>🎯 4角1〜5番手想定（最重要）</b><br>
+        東京ダ1400はここが生命線。<b>front5を付けてない生存馬は自動で消し（100%）</b>。
+      </div>
+      <div class="horse-grid" id="gridFront5" aria-label="4角1〜5番手タグ"></div>
 
       <div class="note" style="border-color: rgba(56,189,248,.22);">
         <b>🏷 5〜8番手想定（生存馬のみ）</b><br>
@@ -379,7 +395,7 @@
       </div>
 
       <label for="risk" style="margin-top:12px;">負け筋（任意）</label>
-      <input type="text" id="risk" placeholder="例：内枠どん詰まり" autocomplete="off" inputmode="text" />
+      <input type="text" id="risk" placeholder="例：前が止まらず届かない" autocomplete="off" inputmode="text" />
 
       <button class="main" id="btnFinalBuy" type="button">BUY保存</button>
       <button class="danger" id="btnFinalSkip" type="button">見送り保存</button>
@@ -410,6 +426,7 @@
     horses: Array.from({length: MAX_HORSES}, (_, i) => i + 1),
     step1Out: [],
     step2Out: [],
+    front5: [],       // ★4角1〜5番手想定（最重要）
     tag58: [],        // 5〜8番手想定
     discountA: [],    // 内枠×先行不可（5〜8想定）
     restMid: [],      // 休み明け9〜20週（割引B）
@@ -449,6 +466,7 @@
 
     grid1: $("#grid1"),
     grid2: $("#grid2"),
+    gridFront5: $("#gridFront5"),
     gridTag58: $("#gridTag58"),
     gridDiscountA: $("#gridDiscountA"),
     gridRestMid: $("#gridRestMid"),
@@ -512,6 +530,11 @@
     return { date, raceNo, raceName, track, surface, dist, condition, flow };
   }
 
+  function isTokyoD1400(){
+    const meta = getRaceMeta();
+    return (meta.track === "東京" && meta.surface === "ダ" && meta.dist === 1400);
+  }
+
   function updateBadge(){
     const meta = getRaceMeta();
     const d = meta.date || "未設定";
@@ -519,7 +542,8 @@
     const n = meta.raceName ? ` ${meta.raceName}` : "";
     const cond = meta.condition === "wet" ? "重不" : "良稍";
     const flow = meta.flow === "few" ? "流れ:少" : meta.flow === "many" ? "流れ:多" : "流れ:普";
-    els.raceBadge.textContent = `${d} / ${meta.track}${meta.surface}${meta.dist}(${cond}) / ${r}${n} / ${flow}`;
+    const scope = isTokyoD1400() ? " / 4角ルールON" : "";
+    els.raceBadge.textContent = `${d} / ${meta.track}${meta.surface}${meta.dist}(${cond}) / ${r}${n} / ${flow}${scope}`;
     els.btnStart.disabled = !meta.date;
   }
 
@@ -535,7 +559,7 @@
     els.noteStep2.innerHTML =
       "<b>【STEP2（展開）】</b><br>" +
       "・「4角9番手以降がデフォ」「出遅れ癖」「極端な追込」は消す。<br>" +
-      "・5〜8番手の扱いは、流れ（前に行きたい馬の数）で変える。";
+      "・東京ダ1400は <b>4角1〜5（front5）</b> が主役。";
   }
 
   function setCond(c){
@@ -552,7 +576,6 @@
     els.flowMany.classList.toggle("active", f === "many");
     updateFlowEffectNote();
 
-    // 反映：表示更新
     renderTag58Grid();
     renderDiscountAGrid();
     renderRestMidGrid();
@@ -607,7 +630,13 @@
     if (step === 3) {
       updateStep2Note();
       updateFlowEffectNote();
+
       renderGrid(2);
+      renderFront5Grid();
+      applyTokyoD1400FrontRule(); // ★強制消し
+      renderGrid(2);              // ★反映して再描画
+
+      renderFront5Grid();
       renderTag58Grid();
       renderDiscountAGrid();
       renderRestMidGrid();
@@ -643,8 +672,8 @@
         if (stepNum === 1) {
           state.step1Out = toggleArray(state.step1Out, num);
           if (state.step1Out.includes(num)) {
-            // STEP1で消したら他のタグも掃除
             state.step2Out = state.step2Out.filter(x => x !== num);
+            state.front5 = state.front5.filter(x => x !== num);
             state.tag58 = state.tag58.filter(x => x !== num);
             state.discountA = state.discountA.filter(x => x !== num);
             state.restMid = state.restMid.filter(x => x !== num);
@@ -653,6 +682,7 @@
         } else {
           state.step2Out = toggleArray(state.step2Out, num);
           if (state.step2Out.includes(num)) {
+            state.front5 = state.front5.filter(x => x !== num);
             state.tag58 = state.tag58.filter(x => x !== num);
             state.discountA = state.discountA.filter(x => x !== num);
             state.restMid = state.restMid.filter(x => x !== num);
@@ -661,6 +691,13 @@
         }
 
         renderGrid(stepNum);
+
+        if (stepNum === 2) {
+          applyTokyoD1400FrontRule();
+          renderGrid(2);
+        }
+
+        renderFront5Grid();
         renderTag58Grid();
         renderDiscountAGrid();
         renderRestMidGrid();
@@ -672,6 +709,67 @@
     });
 
     grid.appendChild(frag);
+  }
+
+  // ★ front5
+  function renderFront5Grid(){
+    const grid = els.gridFront5;
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const list = survivors();
+    if (list.length === 0) {
+      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    list.forEach(num => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "horse-btn";
+      btn.textContent = String(num);
+
+      const on = state.front5.includes(num);
+      if (on) btn.classList.add("front5");
+
+      btn.setAttribute("aria-pressed", String(on));
+      btn.addEventListener("click", () => {
+        state.front5 = toggleArray(state.front5, num);
+
+        // 東京ダ1400は即反映で強制消し
+        applyTokyoD1400FrontRule();
+
+        renderGrid(2);
+        renderFront5Grid();
+        renderTag58Grid();
+        renderDiscountAGrid();
+        renderRestMidGrid();
+        renderRestLongGrid();
+        updateCount(2);
+      });
+
+      frag.appendChild(btn);
+    });
+
+    grid.appendChild(frag);
+  }
+
+  // ★ 東京ダ1400：front5無しは100%消し
+  function applyTokyoD1400FrontRule(){
+    if (!isTokyoD1400()) return;
+
+    const alive = survivors();
+    const mustOut = alive.filter(n => !state.front5.includes(n));
+    if (mustOut.length === 0) return;
+
+    state.step2Out = Array.from(new Set([...state.step2Out, ...mustOut]));
+
+    // 迷いの芽を消す（消えた馬のタグは全部掃除）
+    state.tag58 = state.tag58.filter(n => !mustOut.includes(n));
+    state.discountA = state.discountA.filter(n => !mustOut.includes(n));
+    state.restMid = state.restMid.filter(n => !mustOut.includes(n));
+    state.restLong = state.restLong.filter(n => !mustOut.includes(n));
   }
 
   function renderTag58Grid(){
@@ -702,7 +800,7 @@
       btn.addEventListener("click", () => {
         state.tag58 = toggleArray(state.tag58, num);
         renderTag58Grid();
-        renderDiscountAGrid(); // 見た目合わせ
+        renderDiscountAGrid();
       });
 
       frag.appendChild(btn);
@@ -747,7 +845,7 @@
     grid.appendChild(frag);
   }
 
-  // ★休み明けB
+  // 休み明けB
   function renderRestMidGrid(){
     const grid = els.gridRestMid;
     if (!grid) return;
@@ -767,7 +865,7 @@
       btn.textContent = String(num);
 
       const on = state.restMid.includes(num);
-      if (on) btn.classList.add("flowDiscount"); // 赤系（◎不可の注意）
+      if (on) btn.classList.add("flowDiscount");
 
       btn.setAttribute("aria-pressed", String(on));
       btn.addEventListener("click", () => {
@@ -783,7 +881,7 @@
     grid.appendChild(frag);
   }
 
-  // ★休み明けC
+  // 休み明けC
   function renderRestLongGrid(){
     const grid = els.gridRestLong;
     if (!grid) return;
@@ -854,6 +952,7 @@
 
       const disc = isAnyDiscount(num);
       const badges = [
+        state.front5.includes(num) ? "4角1-5" : null,
         state.tag58.includes(num) ? "5〜8" : null,
         state.discountA.includes(num) ? "割引A" : null,
         isFlowDiscountHorse(num) ? "流れ割引" : null,
@@ -914,7 +1013,6 @@
     const v = Number(btn.dataset.v);
     if (!state.scores[horse]) return;
 
-    // 保険：割引馬は◎不可
     if (p === "p1" && v === 2 && isAnyDiscount(horse)) return;
 
     state.scores[horse][p] = v;
@@ -984,6 +1082,7 @@
     const usedTiebreak = !!(second && top.total === second.total && top.p2 !== second.p2);
 
     const badges = [
+      state.front5.includes(top.num) ? "4角1-5" : null,
       state.tag58.includes(top.num) ? "5〜8" : null,
       state.discountA.includes(top.num) ? "割引A" : null,
       isFlowDiscountHorse(top.num) ? "流れ割引" : null,
@@ -1035,6 +1134,7 @@
         score: state.best.total,
         dec: "BUY",
         risk,
+        front5: state.front5.includes(state.best.num) ? 1 : 0,
         tag58: state.tag58.includes(state.best.num) ? 1 : 0,
         discountA: state.discountA.includes(state.best.num) ? 1 : 0,
         flowDiscount: isFlowDiscountHorse(state.best.num) ? 1 : 0,
@@ -1053,7 +1153,7 @@
         score: null,
         dec: "SKIP",
         risk: risk || "USER_SKIP",
-        tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
+        front5: 0, tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
         at: now
       });
       afterSaveUI("見送りで保存しました");
@@ -1077,7 +1177,7 @@
       score: null,
       dec: "SKIP",
       risk: reason,
-      tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
+      front5: 0, tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
       at: now
     });
 
@@ -1088,7 +1188,7 @@
         <div style="text-align:center">理由: ${escapeHtml(reason)}</div>
       </div>
     `;
-    afterSaveUI("全滅・見送りで保存しました");
+    afterSaveUI("見送りで保存しました");
     els.btnFinalBuy.disabled = true;
   }
 
@@ -1116,6 +1216,7 @@
       const bar = (l.dec === "BUY") ? "var(--good)" : "var(--muted)";
 
       const tags = [
+        l.front5 ? "4角" : null,
         l.tag58 ? "5〜8" : null,
         l.discountA ? "割引A" : null,
         l.flowDiscount ? "流れ割引" : null,
@@ -1167,6 +1268,7 @@
     state.step = 1;
     state.step1Out = [];
     state.step2Out = [];
+    state.front5 = [];
     state.tag58 = [];
     state.discountA = [];
     state.restMid = [];
@@ -1180,12 +1282,6 @@
     els.btnFinalBuy.disabled = true;
 
     setStep(1);
-    renderGrid(1);
-    renderGrid(2);
-    renderTag58Grid();
-    renderDiscountAGrid();
-    renderRestMidGrid();
-    renderRestLongGrid();
     updateCount(1);
     updateCount(2);
   }
@@ -1210,7 +1306,12 @@
     els.btnToStep2?.addEventListener("click", () => setStep(3));
 
     els.btnToScore?.addEventListener("click", setupScoring);
-    els.btnSkipAll?.addEventListener("click", () => saveSkip("NO_SURVIVORS"));
+
+    // ★修正：全滅じゃないのに NO_SURVIVORS を保存しない
+    els.btnSkipAll?.addEventListener("click", () => {
+      const n = survivors().length;
+      saveSkip(n === 0 ? "NO_SURVIVORS" : "USER_SKIP");
+    });
 
     els.btnCalc?.addEventListener("click", calcResult);
 
@@ -1242,12 +1343,6 @@
     updateBadge();
     setStep(1);
 
-    renderGrid(1);
-    renderGrid(2);
-    renderTag58Grid();
-    renderDiscountAGrid();
-    renderRestMidGrid();
-    renderRestLongGrid();
     renderHistory();
   }
 
