@@ -99,7 +99,7 @@
     </div>
 
     <div class="note">
-      ※ v4.1 / v5.1 の予想ログ両方に対応。反映が動かないときは、予想エンジン側で1件保存してから戻ってきてください。
+      ※ v4.1 / v5.1 / v5.4 の予想ログに対応。反映が動かないときは、予想エンジン側で1件保存してから戻ってきてください。
     </div>
   </section>
 
@@ -206,9 +206,10 @@
   // review logs
   const KEY_REVIEW = "oji_review_logs_v21";
 
-  // engine logs (互換：v4.1 / v5.1)
+  // engine logs (互換：v4.1 / v5.1 / v5.4)
   const KEY_ENGINE_V41 = "oji_exe_v41_logs";
   const KEY_ENGINE_V51 = "oji_exe_v51_logs";
+  const KEY_ENGINE_V54 = "oji_exe_v54_logs"; // ★追加：v5.4.1
 
   const el = (id) => document.getElementById(id);
 
@@ -220,26 +221,42 @@
   const loadEngineRaw = (key) => safeJSON(localStorage.getItem(key) || "[]", []);
   const toArray = (v) => Array.isArray(v) ? v : [];
 
-  // ---- Engine data normalize (v4.1/v5.1吸収) ----
+  // ---- Engine data normalize (v4.1/v5.1/v5.4吸収) ----
   function normalizeEngineLog(raw){
-    // v5.1: { race, horse, score, dec, risk, at }
+    // v5.4: { date, track, surface, dist, raceNo(Number), race, horse, score, dec, risk, research?, at }
+    // v5.1: { date, track?, surface?, dist?, raceNo?, race, horse, score, dec, risk, at }
     // v4.1: { date, race, horse, score, decision, risk, at? }
     const dec = raw?.dec ?? raw?.decision ?? "";
     const at = raw?.at ?? "";
+    const date = raw?.date ?? (typeof at === "string" ? at.slice(0,10) : "") ?? "";
+
+    // v5.4は track/surface/dist/raceNo がある
+    const track = raw?.track ?? "";
+    const surface = raw?.surface ?? "";
+    const dist = raw?.dist ?? "";
+    const raceNoNum = raw?.raceNo ?? null;
+    const raceNoStr = (raceNoNum != null && raceNoNum !== "")
+      ? `${Number(raceNoNum)}R`
+      : "";
+
+    // 旧は race に "中山11R" 形式が入ってる場合あり
     const race = raw?.race ?? "";
+
     const horse = raw?.horse ?? "-";
     const score = raw?.score ?? "-";
     const risk = raw?.risk ?? "";
-    const date = raw?.date ?? (typeof at === "string" && at.slice(0,10)) ?? "";
-    return { date, at, race, horse, score, dec, risk };
+    const research = raw?.research ?? 0;
+
+    return { date, at, track, surface, dist, raceNoStr, race, horse, score, dec, risk, research };
   }
 
   function loadEngineMerged(){
+    const v54 = toArray(loadEngineRaw(KEY_ENGINE_V54)).map(normalizeEngineLog);
     const v51 = toArray(loadEngineRaw(KEY_ENGINE_V51)).map(normalizeEngineLog);
     const v41 = toArray(loadEngineRaw(KEY_ENGINE_V41)).map(normalizeEngineLog);
 
-    // 直近優先：atがISOのv5.1を上にしたいが、無い場合もあるので date/atでゆるく
-    const merged = [...v51, ...v41].filter(x => x && (x.race || x.at || x.date));
+    // v5.4 → v5.1 → v4.1 の順で優先
+    const merged = [...v54, ...v51, ...v41].filter(x => x && (x.race || x.at || x.date || x.track));
 
     merged.sort((a, b) => {
       const ta = Date.parse(a.at || a.date || "") || 0;
@@ -249,16 +266,28 @@
     return merged;
   }
 
-  // ---- Engine picker (valueにJSONを入れない：index方式) ----
+  // ---- Engine picker ----
   let engineRecent = [];
+
+  function labelFromMeta(l){
+    // v5.4なら「東京ダ1400 11R」みたいに出す
+    if (l.track && l.raceNoStr) {
+      const s = l.surface || "";
+      const d = l.dist ? `${l.dist}` : "";
+      const sd = (s && d) ? `${s}${d}` : "";
+      return `${l.track}${sd} ${l.raceNoStr}`.trim();
+    }
+    return l.race || "";
+  }
 
   function formatEngineLabel(l){
     const d = l.date || "";
-    const race = l.race || "";
+    const raceLabel = labelFromMeta(l);
     const dec = l.dec || "";
     const horse = (l.horse ?? "-");
     const score = (l.score ?? "-");
-    return `${d} ${race} [${dec}] 馬${horse} (${score})`;
+    const tag = l.research ? "研究" : "";
+    return `${d} ${raceLabel} [${dec}] 馬${horse} (${score})${tag ? " / " + tag : ""}`;
   }
 
   function initEnginePicker(){
@@ -274,7 +303,7 @@
       return;
     }
 
-    engineRecent = logs.slice(0, 10);
+    engineRecent = logs.slice(0, 15);
     sel.innerHTML =
       '<option value="">（選択してください）</option>' +
       engineRecent.map((l, i) => `<option value="${i}">${formatEngineLabel(l)}</option>`).join("");
@@ -310,6 +339,14 @@
     }
   }
 
+  function setZoneIfEmpty(zoneChar){
+    const current = document.querySelector('input[name="zone"]:checked')?.value;
+    if (current) return;
+    const id = zoneChar === "A" ? "zA" : zoneChar === "B" ? "zB" : zoneChar === "C" ? "zC" : "zD";
+    const radio = el(id);
+    if (radio) radio.checked = true;
+  }
+
   function applyEngineSelection(){
     const idxStr = el("pickFromEngine")?.value ?? "";
     if (idxStr === "") return alert("予想ログを選択してください");
@@ -317,28 +354,56 @@
     const data = engineRecent[Number(idxStr)];
     if (!data) return alert("データが見つかりません");
 
+    // 1) date
     const dateEl = el("date");
     if (dateEl && data.date) dateEl.value = data.date;
 
-    const sp = splitRace(data.race);
-    if (sp) {
-      const trackEl = el("track");
-      const raceNoEl = el("raceNo");
-      if (trackEl && [...trackEl.options].some(o => o.value === sp.track)) trackEl.value = sp.track;
-      if (raceNoEl) raceNoEl.value = sp.raceNo;
+    // 2) track / raceNo（v5.4優先、無いなら race文字列から抽出）
+    const trackEl = el("track");
+    const raceNoEl = el("raceNo");
+
+    let track = data.track || "";
+    let raceNo = data.raceNoStr || "";
+
+    if (!track || !raceNo) {
+      const sp = splitRace(data.race);
+      if (sp) { track = track || sp.track; raceNo = raceNo || sp.raceNo; }
     }
 
+    if (trackEl && track && [...trackEl.options].some(o => o.value === track)) trackEl.value = track;
+    if (raceNoEl && raceNo) raceNoEl.value = raceNo;
+
+    // 3) bought
     const boughtEl = el("bought");
     if (boughtEl) boughtEl.value = (data.dec === "BUY") ? "買った" : "見送った";
 
+    // 4) reason（予想側の情報をテンプレ化して持ってくる）
     const reasonEl = el("reason");
-    if (reasonEl) reasonEl.value = `(予想Score: ${data.score ?? "-"}) リスク: ${data.risk ?? ""}`;
+    if (reasonEl) {
+      const metaBits = [];
+      if (data.track) metaBits.push(`${data.track}${data.surface || ""}${data.dist || ""}`);
+      if (data.raceNoStr) metaBits.push(data.raceNoStr);
+      if (data.research) metaBits.push("研究モード");
+      const metaStr = metaBits.length ? `（${metaBits.join(" / ")}）` : "";
 
-    // BUY/SKIPに合わせて結果の推奨値だけ置く（固定はしない）
+      reasonEl.value = `${metaStr}(予想Score: ${data.score ?? "-"}) リスク: ${data.risk ?? ""}`.trim();
+    }
+
+    // 5) result（SKIPの場合だけ推奨値を置く：固定はしない）
     const resultEl = el("result");
     if (resultEl && data.dec !== "BUY") {
       resultEl.value = "買わずに的中";
     }
+
+    // 6) stake（研究モードなら200円に寄せる）
+    const stakeEl = el("stake");
+    if (stakeEl && (data.dec === "BUY")) {
+      stakeEl.value = data.research ? 200 : (Number(stakeEl.value) || 500);
+    }
+
+    // 7) zone（研究モードはC推奨、通常はA推奨：未選択の時だけ自動）
+    if (data.research) setZoneIfEmpty("C");
+    else setZoneIfEmpty("A");
 
     syncBought();
     alert("反映しました");
