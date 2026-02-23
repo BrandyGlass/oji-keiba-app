@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>おじ.exe v5.4.1 | 流れ反映＋休み明け</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>おじ.exe v5.5 | 3頭収束・ハード足切り固定</title>
   <meta name="theme-color" content="#0f172a" />
   <style>
     :root{
@@ -33,11 +33,12 @@
       position: sticky; top: 0; z-index: 100;
       backdrop-filter: blur(8px);
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
     }
     .step-dot{ flex:1; height:4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
     .step-dot.active{ background: var(--accent); box-shadow: 0 0 8px rgba(56,189,248,.75); }
 
-    .wrap{ max-width:600px; margin:0 auto; padding:16px; }
+    .wrap{ max-width:600px; margin:0 auto; padding:16px; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
     .header{ margin-bottom: 24px; text-align:center; }
     .title{ font-weight:900; font-size:24px; color: var(--accent); }
     .sub{ color: var(--muted); font-size: 13px; margin-top: 6px; }
@@ -63,6 +64,10 @@
       border: 1px solid rgba(255,255,255,0.06);
     }
     .note b{ color: var(--text); }
+    .note .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .note.ok{ border-color: rgba(34,197,94,.25); }
+    .note.warn{ border-color: rgba(245,158,11,.30); }
+    .note.bad{ border-color: rgba(239,68,68,.35); }
 
     .row{ display:flex; gap:8px; align-items:stretch; }
     .row > *{ flex:1; }
@@ -90,7 +95,7 @@
     }
 
     .btn-row{ display:flex; gap:8px; }
-    .btn-group{ display:flex; gap: 6px; margin-bottom: 14px; }
+    .btn-group{ display:flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
 
     .tgl-btn{
       flex:1;
@@ -105,6 +110,7 @@
       cursor: pointer;
       touch-action: manipulation;
       user-select:none;
+      white-space: nowrap;
     }
     .tgl-btn.active{ background: var(--accent); color: #0f172a; border-color: rgba(56,189,248,.35); }
     .tgl-btn:focus-visible{ outline:none; box-shadow: var(--focus); }
@@ -140,68 +146,6 @@
     }
     button.danger:focus-visible{ outline:none; box-shadow: 0 0 0 3px rgba(239,68,68,.25); }
 
-    .horse-grid{
-      display:grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .horse-btn{
-      min-height: var(--tap);
-      aspect-ratio: 1/1;
-      background: #334155;
-      border: 1px solid rgba(255,255,255,0.06);
-      color: white;
-      border-radius: 10px;
-      font-weight: 900;
-      font-size: 16px;
-      cursor: pointer;
-      touch-action: manipulation;
-      user-select: none;
-    }
-    .horse-btn:focus-visible{ outline: none; box-shadow: var(--focus); }
-    .horse-btn.eliminated{
-      background: #1e293b;
-      color: #475569;
-      text-decoration: line-through;
-      opacity: 0.55;
-      border: 1px solid #0f172a;
-    }
-    /* 割引A：内枠×先行不可 */
-    .horse-btn.discountA{
-      background: rgba(245, 158, 11, 0.22);
-      border: 1px solid rgba(245, 158, 11, 0.45);
-      color: #fde68a;
-    }
-    /* 5〜8タグ */
-    .horse-btn.tag58{
-      background: rgba(56, 189, 248, 0.18);
-      border: 1px solid rgba(56, 189, 248, 0.45);
-      color: #e0f2fe;
-    }
-    /* 自動割引（◎不可） */
-    .horse-btn.flowDiscount{
-      background: rgba(239, 68, 68, 0.16);
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      color: #fecaca;
-    }
-    .horse-btn.eliminated.discountA,
-    .horse-btn.eliminated.tag58,
-    .horse-btn.eliminated.flowDiscount{
-      background:#1e293b;
-      border: 1px solid #0f172a;
-      color:#475569;
-    }
-
-    .res-box{
-      background: rgba(255,255,255,0.03);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .res-score{ font-size: 32px; font-weight: 900; color: var(--good); text-align:center; }
-
     .sub-btn{
       flex:1;
       min-height: var(--tap);
@@ -226,20 +170,83 @@
       font-size: 12px;
       font-weight: 800;
     }
+    .pill.good{ color: #bbf7d0; border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.08); }
+    .pill.warn{ color: #fde68a; border-color: rgba(245,158,11,.28); background: rgba(245,158,11,.08); }
+    .pill.bad{ color: #fecaca; border-color: rgba(239,68,68,.30); background: rgba(239,68,68,.08); }
 
     .tools{
       margin: 0 0 14px;
       display: flex;
       justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tools .sub-btn{ flex: 0 0 auto; }
+
+    .res-box{
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .res-score{ font-size: 32px; font-weight: 900; color: var(--good); text-align:center; }
+
+    .horse-chip{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.15);
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .horse-chip .left{ display:flex; align-items:center; gap:10px; }
+    .horse-no{
+      width: 44px; height: 44px; border-radius: 12px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 900; font-size: 18px;
+      background: #0f172a; border: 1px solid rgba(255,255,255,0.10);
+    }
+    .horse-meta{ font-size: 12px; color: var(--muted); }
+    .horse-meta b{ color: var(--text); }
+    .horse-chip .right{ display:flex; align-items:center; gap:6px; flex-wrap: wrap; justify-content:flex-end; }
+
+    details{
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.12);
+      margin: 12px 0 0;
+      overflow: hidden;
+    }
+    summary{
+      cursor:pointer;
+      padding: 12px;
+      font-weight: 900;
+      color: var(--accent);
+      list-style: none;
+      user-select:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    .detail-body{ padding: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+
+    .mini{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: -10px;
+      margin-bottom: 14px;
     }
 
-    .tools .sub-btn{
-      flex: 0 0 auto;
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
+    .split > div{ min-width: 0; }
 
     @media (max-width: 360px){
-      .horse-grid{ grid-template-columns: repeat(5, 1fr); }
       .title{ font-size: 22px; }
+      .split{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -252,8 +259,8 @@
 
   <div class="wrap">
     <div class="header">
-      <div class="title">おじ.exe v5.4.1</div>
-      <div class="sub">流れ反映（5〜8タグ）＋休み明けB/C</div>
+      <div class="title">おじ.exe v5.5</div>
+      <div class="sub">3頭収束 / ハード足切り固定 / 最終は複勝1点(500円)</div>
     </div>
 
     <div class="tools">
@@ -303,10 +310,21 @@
       <label for="raceName">レース名（任意）</label>
       <input type="text" id="raceName" placeholder="例：根岸S" autocomplete="off" inputmode="text" />
 
-      <!-- ★買い方ガード（追加） -->
       <div class="note" id="policyNote" style="border-color: rgba(245,158,11,.25); display:none;"></div>
 
       <div class="note" style="margin-top:-8px;">
+        <b>運用のコツ（固定）</b><br>
+        まずは「気になる3頭」だけ入れて回す。<br>
+        どうしても全頭からやりたい時だけ「全頭モード」を使う（入力は増える）。
+      </div>
+
+      <label>候補入力モード</label>
+      <div class="btn-group" role="group" aria-label="入力モード">
+        <button class="tgl-btn active" id="mode3" type="button">3頭モード（推奨）</button>
+        <button class="tgl-btn" id="modeAll" type="button">全頭モード</button>
+      </div>
+
+      <div class="note" style="margin-top:-4px;">
         <b>🧪 研究モード（例外パス）</b><br>
         東京ダ1300/1600・12Rなど、普段はブロックされる条件を「200円の研究枠」として通す。
       </div>
@@ -326,72 +344,79 @@
 
     <!-- p2 -->
     <div class="card" id="p2" aria-hidden="true">
-      <h2>✂️ STEP1: 条件不適合を消す</h2>
-      <div class="note" id="noteStep1"></div>
-      <div class="horse-grid" id="grid1" aria-label="STEP1 足切り"></div>
-      <div class="note" id="count1">生存数: 18頭</div>
-      <button class="main" id="btnToStep2" type="button">STEP2（展開）へ</button>
+      <h2>✂️ STEP1: 候補入力 → ハード足切り</h2>
+
+      <div class="note ok" id="noteStep1">
+        <b>ここでやること</b><br>
+        ・候補（馬番）を入れる（3頭モードは最大3頭まで）<br>
+        ・A1〜A4を入力して「消し」か「△固定」かを確定する<br>
+        <span class="mono">Aの例外は各ルール1つだけ（チェック1発）</span>
+      </div>
+
+      <div class="note" id="liveRemain"></div>
+
+      <!-- 3-head mode -->
+      <div id="panelMode3">
+        <div class="note" style="border-color: rgba(56,189,248,.22);">
+          <b>3頭モード（推奨）</b><br>
+          馬番を入れて、最低限だけチェックする。迷いが出やすい項目は「例外」に逃がして△固定にする。
+        </div>
+
+        <div id="cand3Area"></div>
+
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="sub-btn" id="btnQuick123" type="button">1,2,3を入れる</button>
+          <button class="sub-btn" id="btnClearCands" type="button" style="background:transparent; border:1px solid rgba(255,255,255,.18);">候補リセット</button>
+        </div>
+      </div>
+
+      <!-- all mode -->
+      <div id="panelModeAll" style="display:none;">
+        <div class="note warn">
+          <b>全頭モード（任意）</b><br>
+          馬番をまとめて追加して、必要な馬だけ開いてチェック。<br>
+          <span class="mono">入力が増えるので、基本は3頭モード推奨。</span>
+        </div>
+
+        <label for="bulkAdd">馬番をまとめて追加（例：1 3 7 12 / 1,3,7,12）</label>
+        <input id="bulkAdd" type="text" placeholder="例：1 2 3 4 5" autocomplete="off" inputmode="text" />
+        <div class="btn-row" style="margin-top:-6px;">
+          <button class="sub-btn" id="btnBulkApply" type="button">追加</button>
+          <button class="sub-btn" id="btnAddAll18" type="button">1〜18を追加</button>
+        </div>
+
+        <div id="candAllArea" style="margin-top:12px;"></div>
+      </div>
+
+      <button class="main" id="btnApplyHard" type="button">ハード足切りを実行 → STEP2へ</button>
+      <button class="danger" id="btnSkipFromStep1" type="button">見送り（入力不足/買い過ぎ防止）</button>
     </div>
 
     <!-- p3 -->
     <div class="card" id="p3" aria-hidden="true">
-      <h2>✂️ STEP2: 展開で消す</h2>
-      <div class="note" id="noteStep2"></div>
+      <h2>⚠️ STEP2: ソフト警戒 + 直前不安（暴走防止）</h2>
 
-      <div class="horse-grid" id="grid2" aria-label="STEP2 足切り"></div>
-      <div class="note" id="count2">生存数: -</div>
-
-      <div class="note" style="border-color: rgba(56,189,248,.22);">
-        <b>🏷 5〜8番手想定（生存馬のみ）</b><br>
-        「この馬は5〜8番手になりそう」を付ける（流れで意味が変わる）。
-      </div>
-      <div class="horse-grid" id="gridTag58" aria-label="5〜8番手タグ"></div>
-
-      <div class="note" style="border-color: rgba(245,158,11,.25);">
-        <b>⚠️ 割引A（消さない）</b><br>
-        「内枠×先行できない（5〜8番手想定）」だけを割引にする。
-      </div>
-      <div class="horse-grid" id="gridDiscountA" aria-label="割引A"></div>
-
-      <div class="note">
-        <b>🔍 流れ（前に行きたい馬の数）</b><br>
-        定義：直近3走の4角で<b>「1〜3番手が2回以上」</b>の馬をカウント。<br>
-        選んだ流れに応じて、<b>5〜8タグ</b>は自動で◎不可になる（普通のときだけ◎OK）。
-      </div>
-      <div class="btn-group" role="group" aria-label="流れ選択">
-        <button class="tgl-btn" id="flowFew" type="button">少ない（1〜2）</button>
-        <button class="tgl-btn active" id="flowMid" type="button">普通（3〜5）</button>
-        <button class="tgl-btn" id="flowMany" type="button">多い（6〜）</button>
+      <div class="note ok" id="noteStep2">
+        <b>ここでやること</b><br>
+        ・B1/B2で「印を1段下げ」を付ける（消しではない）<br>
+        ・D1（直前不安）に該当したら <b>△以下固定</b>（買い過ぎ防止）<br>
+        <span class="mono">D1は“当てる”ではなく“止める”</span>
       </div>
 
-      <div class="note" id="noteFlowEffect"></div>
+      <div id="softArea"></div>
 
-      <div class="note" style="border-color: rgba(56,189,248,.22);">
-        <b>🛌 休み明けタグ（生存馬のみ）</b><br>
-        休み明けは「消し」ではなく基本は<b>割引</b>で扱う（◎不可）。<br>
-        ・9〜20週：割引B　・21週以上：割引C（消し推奨）
-      </div>
-
-      <div class="note" style="margin-top:-8px;">
-        <b>9〜20週（割引B）</b>：タップでON/OFF
-      </div>
-      <div class="horse-grid" id="gridRestMid" aria-label="休み明け9〜20週"></div>
-
-      <div class="note" style="margin-top:-8px;">
-        <b>21週以上（割引C）</b>：タップでON/OFF（迷うならSTEP2で消す）
-      </div>
-      <div class="horse-grid" id="gridRestLong" aria-label="休み明け21週以上"></div>
-
-      <button class="main" id="btnToScore" type="button">三本柱査定へ</button>
-      <button class="danger" id="btnSkipAll" type="button">全滅・見送り</button>
+      <button class="main" id="btnToScore" type="button">収束（最大3頭）→ 三本柱査定へ</button>
+      <button class="danger" id="btnSkipFromStep2" type="button">見送り（直前不安/迷い）</button>
     </div>
 
     <!-- p4 -->
     <div class="card" id="p4" aria-hidden="true">
-      <h2>📊 精密査定（生存馬のみ）</h2>
+      <h2>📊 STEP3: 三本柱ライト版（上位3頭に収束）</h2>
+
       <div class="note" id="noteScoringRule"></div>
       <div id="scoringArea"></div>
-      <button class="main" id="btnCalc" type="button">結論を出す</button>
+
+      <button class="main" id="btnCalc" type="button">結論（買う/見送る）を出す</button>
     </div>
 
     <!-- p5 -->
@@ -405,9 +430,9 @@
       </div>
 
       <label for="risk" style="margin-top:12px;">負け筋（任意）</label>
-      <input type="text" id="risk" placeholder="例：内枠どん詰まり" autocomplete="off" inputmode="text" />
+      <input type="text" id="risk" placeholder="例：同型多すぎ" autocomplete="off" inputmode="text" />
 
-      <button class="main" id="btnFinalBuy" type="button">BUY保存</button>
+      <button class="main" id="btnFinalBuy" type="button">BUY保存（複勝1点/500円）</button>
       <button class="danger" id="btnFinalSkip" type="button">見送り保存</button>
 
       <div style="margin-top: 32px; border-top: 1px dashed var(--muted); padding-top: 16px;">
@@ -425,25 +450,86 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "oji_exe_v54_logs";
-  const MAX_HORSES = 18;
+  // =========================
+  // Storage (互換維持)
+  // =========================
+  const STORAGE_KEY = "oji_exe_v54_logs"; // 既存キーを維持（過去ログ互換）
   const STEP_COUNT = 5;
+  const MAX_HORSES = 18;
+
+  const HARD_RULES = [
+    {
+      id: "A1",
+      name: "半年以上休み明け（180日+）",
+      key: "a1_days180",
+      exceptionKey: "exA1",
+      exceptionText: "例外：同条件で連対あり → △固定",
+      cutText: "A1:180日+休み明け",
+      triText: "A1例外:同条件連対"
+    },
+    {
+      id: "A2",
+      name: "昇級初戦",
+      key: "a2_classUp",
+      exceptionKey: "exA2",
+      exceptionText: "例外：前走1着 → △固定",
+      cutText: "A2:昇級初戦",
+      triText: "A2例外:前走1着"
+    },
+    {
+      id: "A3",
+      name: "近2走とも大敗（1.0秒+負け×2）",
+      key: "a3_bigLoss2",
+      exceptionKey: "exA3",
+      exceptionText: "例外：不利/道悪が明確 → △固定",
+      cutText: "A3:大敗×2",
+      triText: "A3例外:不利/道悪"
+    },
+    {
+      id: "A4",
+      name: "近2走とも後方（4角9番手以下×2）",
+      key: "a4_back2",
+      exceptionKey: "exA4",
+      exceptionText: "例外：上がり最速級 → △固定",
+      cutText: "A4:後方×2",
+      triText: "A4例外:上がり最速級"
+    }
+  ];
+
+  const SOFT_RULES = [
+    { id:"B1", name:"連闘/使い詰め（6週3走+ or 2連闘+）", text:"B1:使い詰め" },
+    { id:"B2", name:"前走見せ場なし + 改善なし（逃げ想定は例外）", text:"B2:見せ場なし" }
+  ];
+
+  const D_RULE = {
+    id:"D1",
+    name:"直前不安（馬場急変/同型多すぎ/枠が極端で不利感）",
+    text:"D1:直前不安"
+  };
 
   const state = {
     step: 1,
-    condition: "dry", // dry | wet
-    flow: "mid",      // few | mid | many
-    horses: Array.from({length: MAX_HORSES}, (_, i) => i + 1),
-    step1Out: [],
-    step2Out: [],
-    tag58: [],        // 5〜8番手想定
-    discountA: [],    // 内枠×先行不可（5〜8想定）
-    restMid: [],      // 休み明け9〜20週（割引B）
-    restLong: [],     // 休み明け21週以上（割引C）
-    scores: {},
-    best: null,
-    scoringBound: false,
-    research: false   // ★研究モード（例外パス）
+    condition: "dry",
+    flow: "mid",
+    research: false,
+
+    inputMode: "mode3", // mode3 | modeAll
+
+    // candidates: { num, a1_days180, a2_classUp, a3_bigLoss2, a4_back2, exA1.., exA4.., b1_busy, b2_badNoImprove, b2_escape, d1_anxiety, d1_reason, pillar:{p1,p2,p3}, hardCutReasons[], triFixedReasons[], softDownReasons[] }
+    candidates: [],
+
+    // derived
+    hardApplied: false,
+    softApplied: false,
+    converged: false,
+    convergedTriggered: false,
+    convergedTieSkip: false,
+
+    // after selection
+    shortlist: [], // max 3
+    best: null, // {num, score, p1,p2,p3, reason1}
+    finalDecision: null, // BUY/SKIP
+    finalReasonTemplate: ""
   };
 
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -465,45 +551,46 @@
     condDry: $("#condDry"),
     condWet: $("#condWet"),
 
-    flowFew: $("#flowFew"),
-    flowMid: $("#flowMid"),
-    flowMany: $("#flowMany"),
+    mode3: $("#mode3"),
+    modeAll: $("#modeAll"),
 
-    noteStep1: $("#noteStep1"),
-    noteStep2: $("#noteStep2"),
-    noteFlowEffect: $("#noteFlowEffect"),
+    panelMode3: $("#panelMode3"),
+    panelModeAll: $("#panelModeAll"),
+    cand3Area: $("#cand3Area"),
+    candAllArea: $("#candAllArea"),
+    bulkAdd: $("#bulkAdd"),
+    btnBulkApply: $("#btnBulkApply"),
+    btnAddAll18: $("#btnAddAll18"),
+
+    btnQuick123: $("#btnQuick123"),
+    btnClearCands: $("#btnClearCands"),
+    btnApplyHard: $("#btnApplyHard"),
+    btnSkipFromStep1: $("#btnSkipFromStep1"),
+
+    softArea: $("#softArea"),
+    btnToScore: $("#btnToScore"),
+    btnSkipFromStep2: $("#btnSkipFromStep2"),
+
     noteScoringRule: $("#noteScoringRule"),
-
-    grid1: $("#grid1"),
-    grid2: $("#grid2"),
-    gridTag58: $("#gridTag58"),
-    gridDiscountA: $("#gridDiscountA"),
-    gridRestMid: $("#gridRestMid"),
-    gridRestLong: $("#gridRestLong"),
-
-    count1: $("#count1"),
-    count2: $("#count2"),
-
     scoringArea: $("#scoringArea"),
+    btnCalc: $("#btnCalc"),
+
     resultDisplay: $("#resultDisplay"),
     historyList: $("#historyList"),
 
     btnStart: $("#btnStart"),
-    btnToStep2: $("#btnToStep2"),
-    btnToScore: $("#btnToScore"),
-    btnSkipAll: $("#btnSkipAll"),
-    btnCalc: $("#btnCalc"),
-
     btnFinalBuy: $("#btnFinalBuy"),
     btnFinalSkip: $("#btnFinalSkip"),
     btnCopy: $("#btnCopy"),
     btnClear: $("#btnClear"),
     btnRestart: $("#btnRestart"),
 
-    // ★policy / research
+    // policy / research
     policyNote: $("#policyNote"),
     researchOff: $("#researchOff"),
     researchOn: $("#researchOn"),
+
+    liveRemain: $("#liveRemain"),
   };
 
   // ---------- Storage ----------
@@ -520,7 +607,6 @@
     const escaped = s.replace(/"/g, '""');
     return needsQuote ? `"${escaped}"` : escaped;
   }
-
   function downloadTextAsFile(filename, text){
     const blob = new Blob([text], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -532,7 +618,6 @@
     a.remove();
     URL.revokeObjectURL(url);
   }
-
   function exportLogsToCsv(){
     const logs = getLogs();
     if (!Array.isArray(logs) || logs.length === 0){
@@ -540,11 +625,22 @@
       return;
     }
 
+    // 既存列を壊さず残しつつ、新列を追加
     const cols = [
       "date","track","surface","dist","cond","flow","raceNo","race",
       "horse","score","dec","risk",
+
+      // 旧v5.4.1互換（残す）
       "tag58","discountA","flowDiscount","restMid","restLong",
-      "research", // ★追加（研究モード）
+      "research",
+
+      // v5.5追加
+      "hardCutReasons",         // 文字列（;区切り）
+      "convergedTriggered",     // 0/1
+      "triFixedReasons",        // 文字列（;区切り）
+      "softDownReasons",        // 文字列（;区切り）
+      "finalTemplate",          // 理由一言（固定テンプレ）
+      "shortlist",              // 文字列（例: 3|7|12）
       "at"
     ];
 
@@ -560,12 +656,8 @@
   }
 
   // ---------- Utils ----------
-  function toggleArray(arr, val){ return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]; }
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
-  }
-  function survivors(){
-    return state.horses.filter(h => !state.step1Out.includes(h) && !state.step2Out.includes(h));
   }
   function todayISO(){
     const d = new Date();
@@ -577,6 +669,21 @@
   function scrollTopInstant(){
     try { window.scrollTo({ top: 0, left: 0, behavior: "smooth" }); window.scrollTo({ top: 0, left: 0 }); }
     catch { window.scrollTo(0,0); }
+  }
+
+  function normalizeHorseNum(n){
+    const x = Number(n);
+    if (!Number.isFinite(x)) return null;
+    if (x < 1 || x > MAX_HORSES) return null;
+    return x;
+  }
+  function uniq(nums){
+    const seen = new Set();
+    const out = [];
+    for (const n of nums){
+      if (!seen.has(n)) { seen.add(n); out.push(n); }
+    }
+    return out;
   }
 
   function getRaceMeta(){
@@ -595,29 +702,19 @@
   function evaluatePolicy(meta){
     const isTokyoD = (meta.track === "東京" && meta.surface === "ダ");
     const isTokyoD1400 = isTokyoD && meta.dist === 1400;
-
-    const isKyotoOrKokura = (meta.track === "京都" || meta.track === "小倉");
-    const isMain = meta.raceNo === 11;
     const isLast = meta.raceNo === 12;
 
-    // ブロック条件（研究ONなら通す）
     const hardBlocks = [];
-
-    // 東京ダ1300/1600（=東京ダ1400以外）を“ついで買い”から守る
     if (isTokyoD && meta.dist !== 1400) hardBlocks.push("東京ダ1400以外");
-
-    // 12Rは事故りやすいので原則ブロック（例外：東京ダ1400 or 研究ON）
     if (isLast && !isTokyoD1400) hardBlocks.push("12R（例外は東京ダ1400のみ）");
 
     const blocked = (!state.research && hardBlocks.length > 0);
 
-    // 警告（ブロックはしない）
     const warns = [];
-    if (isKyotoOrKokura && !isMain) warns.push("京都/小倉のメイン以外（なんとなく注意）");
-    if (isMain) warns.push("11Rメイン（A条件 or 200円寄せが安全）");
+    if (meta.raceNo === 11) warns.push("11Rメイン（A条件 or 研究枠が安全）");
     if (isLast) warns.push("12R（終盤の散り買い注意）");
 
-    let level = "ok"; // ok | warn | block
+    let level = "ok";
     if (blocked) level = "block";
     else if (warns.length) level = "warn";
 
@@ -641,7 +738,6 @@
     els.raceBadge.textContent = `${d} / ${meta.track}${meta.surface}${meta.dist}(${cond}) / ${r}${n} / ${flow} / ${res}`;
 
     const pol = evaluatePolicy(meta);
-
     if (els.policyNote){
       if (pol.level === "ok") {
         els.policyNote.style.display = "none";
@@ -655,24 +751,8 @@
       }
     }
 
-    // 日付未設定 or ブロックなら開始不可
     const baseDisabled = !meta.date;
     els.btnStart.disabled = baseDisabled || (pol.level === "block");
-  }
-
-  function updateStep1Note(){
-    els.noteStep1.innerHTML =
-      "<b>【STEP1（適性）】</b><br>" +
-      "・距離/芝ダ/コースが合わない馬を消す。<br>" +
-      "・初挑戦は根拠が薄ければ消し。<br>" +
-      "<span style='color:var(--muted)'>※脚質（4角位置）はSTEP2。</span>";
-  }
-
-  function updateStep2Note(){
-    els.noteStep2.innerHTML =
-      "<b>【STEP2（展開）】</b><br>" +
-      "・「4角9番手以降がデフォ」「出遅れ癖」「極端な追込」は消す。<br>" +
-      "・5〜8番手の扱いは、流れ（前に行きたい馬の数）で変える。";
   }
 
   function setCond(c){
@@ -682,18 +762,9 @@
     updateBadge();
   }
 
+  // flow UIは残す（メモ用）
   function setFlow(f){
     state.flow = f;
-    els.flowFew.classList.toggle("active", f === "few");
-    els.flowMid.classList.toggle("active", f === "mid");
-    els.flowMany.classList.toggle("active", f === "many");
-    updateFlowEffectNote();
-
-    // 反映：表示更新
-    renderTag58Grid();
-    renderDiscountAGrid();
-    renderRestMidGrid();
-    renderRestLongGrid();
     updateBadge();
   }
 
@@ -704,34 +775,439 @@
     updateBadge();
   }
 
-  // ----- ルール -----
-  function isFlowDiscountHorse(num){
-    const tagged = state.tag58.includes(num);
-    if (!tagged) return false;
-    return state.flow !== "mid"; // 普通以外は◎不可
-  }
-  function isRestMidHorse(num){ return state.restMid.includes(num); }
-  function isRestLongHorse(num){ return state.restLong.includes(num); }
-
-  function isAnyDiscount(num){
-    return (
-      state.discountA.includes(num) ||
-      isFlowDiscountHorse(num) ||
-      isRestMidHorse(num) ||
-      isRestLongHorse(num)
-    );
+  function setInputMode(mode){
+    state.inputMode = mode;
+    els.mode3?.classList.toggle("active", mode === "mode3");
+    els.modeAll?.classList.toggle("active", mode === "modeAll");
+    if (els.panelMode3) els.panelMode3.style.display = (mode === "mode3") ? "" : "none";
+    if (els.panelModeAll) els.panelModeAll.style.display = (mode === "modeAll") ? "" : "none";
+    renderCandidates();
+    updateLiveRemain();
   }
 
-  function updateFlowEffectNote(){
-    const msg = (() => {
-      if (state.flow === "few") return "少ない（1〜2）→ 前残り。<b>5〜8タグは危険</b>（◎不可）。";
-      if (state.flow === "many") return "多い（6〜）→ 前崩れ。<b>5〜8タグは巻き添え</b>（◎不可）。";
-      return "普通（3〜5）→ 5〜8が狙いゾーン。<b>5〜8タグも◎OK</b>。";
+  // =========================
+  // Candidate model
+  // =========================
+  function makeCandidate(num){
+    return {
+      num,
+      // A rules
+      a1_days180: false,
+      a2_classUp: false,
+      a3_bigLoss2: false,
+      a4_back2: false,
+
+      // exceptions (each rule 1 checkbox)
+      exA1: false,
+      exA2: false,
+      exA3: false,
+      exA4: false,
+
+      // B rules (soft)
+      b1_busy: false,
+      b2_badNoImprove: false,
+      b2_escapeNige: false, // 逃げ想定（B2例外）
+      b2_explainable: false, // 逃げの負け方が説明できる（例外ON）
+      d1_anxiety: false,
+      d1_reason: "馬場急変", // 馬場急変 / 同型多すぎ / 枠が極端で不利感
+
+      // scoring pillars
+      pillar: { p1: 1, p2: 1, p3: 1 }, // 0..2
+
+      // derived
+      hardCutReasons: [],
+      triFixedReasons: [],
+      softDownReasons: [],
+      hardCut: false,
+      triFixed: false
+    };
+  }
+
+  function findCand(num){
+    return state.candidates.find(c => c.num === num) || null;
+  }
+
+  function replaceOrAddCand(c){
+    const idx = state.candidates.findIndex(x => x.num === c.num);
+    if (idx >= 0) state.candidates[idx] = c;
+    else state.candidates.push(c);
+  }
+
+  function removeCand(num){
+    state.candidates = state.candidates.filter(c => c.num !== num);
+  }
+
+  // =========================
+  // Render candidates UI
+  // =========================
+  function updateLiveRemain(){
+    const total = state.candidates.length;
+    const uniqNums = uniq(state.candidates.map(c => c.num)).length;
+    const modeText = (state.inputMode === "mode3") ? "3頭モード" : "全頭モード";
+    const warn = (state.inputMode === "mode3" && uniqNums > 3)
+      ? "（3頭モードは最大3頭。超過は自動で無視されます）"
+      : "";
+    els.liveRemain.innerHTML = `
+      <b>入力中：</b>${uniqNums}頭 / ${modeText} ${warn}<br>
+      <span class="mono">ここで候補を増やすほど、最後は“見送り”になりやすい設計です。</span>
+    `;
+  }
+
+  function renderCandidates(){
+    if (!els.cand3Area || !els.candAllArea) return;
+
+    if (state.inputMode === "mode3"){
+      // 3 slots (max 3 unique)
+      const nums = uniq(state.candidates.map(c => c.num)).slice(0,3);
+      // ensure 3 visible slots
+      const slots = [0,1,2].map(i => nums[i] ?? null);
+
+      els.cand3Area.innerHTML = slots.map((n, i) => renderCandidateCard(n, i+1, true)).join("");
+      bindCandidateCardEvents(els.cand3Area, true);
+    } else {
+      const nums = uniq(state.candidates.map(c => c.num));
+      if (nums.length === 0){
+        els.candAllArea.innerHTML = `<div class="note">まだ追加されていません</div>`;
+      } else {
+        els.candAllArea.innerHTML = nums.map((n, i) => renderCandidateCard(n, i+1, false)).join("");
+        bindCandidateCardEvents(els.candAllArea, false);
+      }
+    }
+    updateLiveRemain();
+  }
+
+  function renderCandidateCard(numOrNull, slotIndex, isSlotMode){
+    const num = numOrNull;
+    const cand = (num != null) ? findCand(num) : null;
+
+    const header = (num == null)
+      ? `<span class="pill">枠 ${slotIndex}</span>`
+      : `<span class="pill good">枠 ${slotIndex}</span>`;
+
+    const numSel = (() => {
+      const opts = Array.from({length: MAX_HORSES}, (_,i)=>i+1).map(n => {
+        const selected = (num === n) ? "selected" : "";
+        return `<option value="${n}" ${selected}>${n}</option>`;
+      }).join("");
+      const emptyOpt = isSlotMode ? `<option value="" ${(num==null)?"selected":""}>未選択</option>` : "";
+      return `
+        <label>馬番</label>
+        <select data-role="num" data-slot="${slotIndex}">
+          ${emptyOpt}
+          ${opts}
+        </select>
+      `;
     })();
-    els.noteFlowEffect.innerHTML = `<b>反映：</b>${msg}`;
+
+    const aBlock = `
+      <details ${cand ? "" : ""}>
+        <summary>ハード足切り（A1〜A4）</summary>
+        <div class="detail-body">
+          <div class="note" style="margin-top:0; border-color: rgba(56,189,248,.22);">
+            <b>入力は最短でOK</b><br>
+            分からない時は「例外」を押して<b>△固定</b>に逃がす（本命にしない）。
+          </div>
+
+          ${HARD_RULES.map(r => `
+            <div class="res-box" style="margin-top:10px;">
+              <div style="font-weight:900; color:var(--accent);">${r.id} ${escapeHtml(r.name)}</div>
+
+              <div class="btn-group" role="group" style="margin-top:8px;">
+                <button class="tgl-btn ${cand?.[r.key] ? "active" : ""}" type="button"
+                  data-role="toggle" data-k="${r.key}" data-num="${num ?? ""}" ${cand ? "" : "disabled"}>
+                  該当（消し）
+                </button>
+                <button class="tgl-btn ${cand?.[r.exceptionKey] ? "active" : ""}" type="button"
+                  data-role="toggle" data-k="${r.exceptionKey}" data-num="${num ?? ""}" ${cand ? "" : "disabled"}>
+                  ${escapeHtml(r.exceptionText)}
+                </button>
+              </div>
+
+              <div class="mini">
+                ・「該当（消し）」は候補から除外<br>
+                ・「例外」は<b>消しにしない</b>が<b>△固定</b>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </details>
+    `;
+
+    const quickStatus = (() => {
+      if (!cand) return "";
+      const pills = [];
+      if (cand.hardCut) pills.push(`<span class="pill bad">消し</span>`);
+      if (!cand.hardCut && cand.triFixed) pills.push(`<span class="pill warn">△固定</span>`);
+      if (!cand.hardCut && !cand.triFixed) pills.push(`<span class="pill good">生存</span>`);
+      if (cand.softDownReasons.length) pills.push(`<span class="pill warn">1段下げ</span>`);
+      return pills.join(" ");
+    })();
+
+    const reasons = (() => {
+      if (!cand) return "";
+      const hard = cand.hardCutReasons.length ? `消し: ${cand.hardCutReasons.join(" / ")}` : "";
+      const tri = cand.triFixedReasons.length ? `△固定: ${cand.triFixedReasons.join(" / ")}` : "";
+      const soft = cand.softDownReasons.length ? `下げ: ${cand.softDownReasons.join(" / ")}` : "";
+      const parts = [hard, tri, soft].filter(Boolean);
+      if (!parts.length) return `<div class="horse-meta">まだ判定前</div>`;
+      return `<div class="horse-meta">${escapeHtml(parts.join(" | "))}</div>`;
+    })();
+
+    const removeBtn = (!isSlotMode && num != null)
+      ? `<button class="sub-btn" type="button" data-role="remove" data-num="${num}">削除</button>`
+      : "";
+
+    return `
+      <div class="horse-chip" data-cand="${num ?? ""}">
+        <div class="left">
+          <div class="horse-no">${num ?? "—"}</div>
+          <div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              ${header}
+              <span class="pill">${num ? `馬${num}` : "未選択"}</span>
+              <span>${quickStatus}</span>
+            </div>
+            ${reasons}
+          </div>
+        </div>
+        <div class="right">
+          ${removeBtn}
+        </div>
+      </div>
+
+      <div class="split">
+        <div>${numSel}</div>
+        <div>
+          <label>メモ（任意）</label>
+          <input type="text" data-role="memo" data-num="${num ?? ""}" placeholder="例：差し良さげ" autocomplete="off" inputmode="text" ${cand ? "" : "disabled"} />
+          <div class="mini">このメモはログには保存しません（迷いが増えるので）。</div>
+        </div>
+      </div>
+
+      ${aBlock}
+    `;
   }
 
-  // ---------- Step UI ----------
+  function bindCandidateCardEvents(rootEl, isSlotMode){
+    // num select
+    rootEl.querySelectorAll('select[data-role="num"]').forEach(sel => {
+      sel.addEventListener("change", () => {
+        const slot = Number(sel.dataset.slot || "0");
+        const v = sel.value;
+        const num = (v === "") ? null : normalizeHorseNum(v);
+
+        if (state.inputMode === "mode3"){
+          // 3 slot mode: assign or clear
+          // existing slot number before change
+          // Find current slot mapping from UI by reading existing selected values in panel
+          const current = Array.from(rootEl.querySelectorAll('select[data-role="num"]'))
+            .map(x => x.value === "" ? null : normalizeHorseNum(x.value))
+            .filter(Boolean);
+
+          // We will rebuild candidates based on selected values (keep existing data if any)
+          const uniqueSelected = uniq(current).slice(0,3);
+          const newCands = [];
+          for (const n of uniqueSelected){
+            const existing = findCand(n);
+            newCands.push(existing ? existing : makeCandidate(n));
+          }
+          state.candidates = newCands;
+        } else {
+          // all mode: selection change on a row is not expected (num is always present), but keep safe
+          if (num == null) return;
+          const existing = findCand(num);
+          if (!existing) replaceOrAddCand(makeCandidate(num));
+        }
+
+        renderCandidates();
+      }, { passive:true });
+    });
+
+    // toggles
+    rootEl.querySelectorAll('button[data-role="toggle"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const k = btn.dataset.k;
+        const num = normalizeHorseNum(btn.dataset.num);
+        if (!k || !num) return;
+        const c = findCand(num);
+        if (!c) return;
+
+        // toggle boolean
+        c[k] = !c[k];
+
+        // mutual sanity: for each A rule, if exception on then keep rule flag off? (例外は“消し回避”なので両方ONは混乱)
+        if (k.startsWith("exA")){
+          const ruleId = k.replace("ex", "").toUpperCase();
+          const rule = HARD_RULES.find(r => r.exceptionKey === k);
+          if (rule){
+            // If exception ON, we still allow the base condition to be ON/unknown, but UI should not be both ON.
+            // Force the "該当(消し)" OFF when exception ON to prevent double state.
+            if (c[k]) c[rule.key] = false;
+          }
+        } else if (k.startsWith("a") && k.includes("_")){
+          const rule = HARD_RULES.find(r => r.key === k);
+          if (rule){
+            if (c[k]) c[rule.exceptionKey] = false; // 該当ONなら例外OFF
+          }
+        }
+
+        replaceOrAddCand(c);
+        // 判定は「実行」ボタンでまとめてやる（入力の途中で判定が揺れないように）
+        renderCandidates();
+      }, { passive:true });
+    });
+
+    // remove
+    rootEl.querySelectorAll('button[data-role="remove"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const num = normalizeHorseNum(btn.dataset.num);
+        if (!num) return;
+        removeCand(num);
+        renderCandidates();
+      });
+    });
+  }
+
+  // =========================
+  // A/B/D apply + converge
+  // =========================
+  function applyHardCuts(cands){
+    // returns new list with derived fields updated
+    const out = cands.map(c => {
+      c.hardCutReasons = [];
+      c.triFixedReasons = [];
+      c.softDownReasons = [];
+      c.hardCut = false;
+      c.triFixed = false;
+
+      // A1..A4
+      for (const r of HARD_RULES){
+        const hit = !!c[r.key];
+        const ex = !!c[r.exceptionKey];
+
+        if (hit){
+          c.hardCut = true;
+          c.hardCutReasons.push(r.cutText);
+        } else if (ex){
+          // 消しにしないが△固定
+          c.triFixed = true;
+          c.triFixedReasons.push(r.triText);
+        }
+      }
+
+      return c;
+    });
+
+    return out;
+  }
+
+  function applySoftDowngrade(cands){
+    return cands.map(c => {
+      c.softDownReasons = c.softDownReasons || [];
+
+      // B1
+      if (c.b1_busy) c.softDownReasons.push(SOFT_RULES[0].text);
+
+      // B2: bad + noImprove + (逃げ例外なら下げない)
+      if (c.b2_badNoImprove){
+        const isNige = !!c.b2_escapeNige;
+        const explainable = !!c.b2_explainable;
+        if (isNige && explainable){
+          // no downgrade
+        } else {
+          c.softDownReasons.push(SOFT_RULES[1].text);
+        }
+      }
+
+      // D1 anxiety => △固定
+      if (c.d1_anxiety){
+        c.triFixed = true;
+        const r = c.d1_reason || "直前不安";
+        if (!c.triFixedReasons.includes(`${D_RULE.text}:${r}`)){
+          c.triFixedReasons.push(`${D_RULE.text}:${r}`);
+        }
+      }
+
+      return c;
+    });
+  }
+
+  function computePillarTotal(c){
+    const p1 = Number(c.pillar?.p1 ?? 0);
+    const p2 = Number(c.pillar?.p2 ?? 0);
+    const p3 = Number(c.pillar?.p3 ?? 0);
+    return { p1, p2, p3, total: p1 + p2 + p3 };
+  }
+
+  function enforceTop3(cands){
+    // Hard-cut removed first; then top3 by pillars if 4+ remain
+    const alive = cands.filter(c => !c.hardCut);
+
+    state.convergedTriggered = (alive.length >= 4);
+    state.convergedTieSkip = false;
+
+    if (alive.length <= 3){
+      state.converged = true;
+      return { shortlist: alive.slice(0,3), tieSkip: false };
+    }
+
+    // sort by p1 -> p2 -> p3 (固定)
+    const scored = alive.map(c => {
+      const s = computePillarTotal(c);
+      return { c, ...s };
+    }).sort((a,b) =>
+      (b.p1 - a.p1) || (b.p2 - a.p2) || (b.p3 - a.p3)
+    );
+
+    // pick top3
+    const top3 = scored.slice(0,3);
+    const fourth = scored[3];
+
+    // boundary tie check: if 3rd and 4th are exactly tied on (p1,p2,p3) => 見送り（C2）
+    if (fourth && top3[2] && top3[2].p1 === fourth.p1 && top3[2].p2 === fourth.p2 && top3[2].p3 === fourth.p3){
+      state.convergedTieSkip = true;
+      state.converged = true;
+      return { shortlist: [], tieSkip: true };
+    }
+
+    state.converged = true;
+    return { shortlist: top3.map(x => x.c), tieSkip: false };
+  }
+
+  function chooseBestOne(shortlist){
+    // ルール：同点は ①→②→③ → それでも同点なら見送り
+    if (!shortlist || shortlist.length === 0) return { best:null, skip:true, reason:"TIE_SKIP_OR_NONE" };
+
+    // △固定の扱い：本命にしない。非△が1頭でもいるなら、非△のみで決める。
+    const nonTri = shortlist.filter(c => !c.triFixed);
+    const pool = nonTri.length ? nonTri : shortlist;
+
+    // sort by p1->p2->p3
+    const ranked = pool.map(c => ({ c, ...computePillarTotal(c) }))
+      .sort((a,b) => (b.p1-a.p1) || (b.p2-a.p2) || (b.p3-a.p3));
+
+    const top = ranked[0];
+    const second = ranked[1] || null;
+
+    if (second && top.p1===second.p1 && top.p2===second.p2 && top.p3===second.p3){
+      return { best:null, skip:true, reason:"TOP_TIE_SKIP" };
+    }
+
+    // if all are triFixed (pool=shortlist), spec says "本命にしない" so SKIP
+    if (!nonTri.length){
+      return { best:null, skip:true, reason:"ONLY_TRI_FIXED" };
+    }
+
+    return {
+      best: { num: top.c.num, score: top.total, p1: top.p1, p2: top.p2, p3: top.p3 },
+      skip:false,
+      reason:"OK"
+    };
+  }
+
+  // =========================
+  // Step UI
+  // =========================
   function setStep(nextStep){
     const step = Math.min(Math.max(1, Number(nextStep) || 1), STEP_COUNT);
     state.step = step;
@@ -744,413 +1220,415 @@
     scrollTopInstant();
 
     if (step === 2) {
-      updateStep1Note();
-      renderGrid(1);
-      updateCount(1);
+      renderCandidates();
+      updateLiveRemain();
+      // リセット（STEP1に入ったら判定前に戻す）
+      state.hardApplied = false;
+      state.softApplied = false;
+      state.shortlist = [];
+      state.best = null;
+      state.finalDecision = null;
+      state.finalReasonTemplate = "";
+      els.btnFinalBuy.disabled = true;
     }
     if (step === 3) {
-      updateStep2Note();
-      updateFlowEffectNote();
-      renderGrid(2);
-      renderTag58Grid();
-      renderDiscountAGrid();
-      renderRestMidGrid();
-      renderRestLongGrid();
-      updateCount(2);
+      renderSoftStep();
+      els.btnToScore.disabled = false;
     }
-    if (step === 5) renderHistory();
+    if (step === 4) {
+      renderScoringStep();
+    }
+    if (step === 5) {
+      renderHistory();
+    }
   }
 
-  function renderGrid(stepNum){
-    const grid = stepNum === 1 ? els.grid1 : els.grid2;
-    if (!grid) return;
+  // =========================
+  // Soft step render
+  // =========================
+  function renderSoftStep(){
+    const cands = uniq(state.candidates.map(c => c.num)).map(n => findCand(n)).filter(Boolean);
 
-    grid.innerHTML = "";
+    // if hard not applied, apply now (safety)
+    if (!state.hardApplied){
+      applyHardCuts(cands);
+      state.hardApplied = true;
+    }
 
-    const list = (stepNum === 1)
-      ? state.horses
-      : state.horses.filter(h => !state.step1Out.includes(h));
+    // show only alive (not hard cut) because removed are gone
+    const alive = cands.filter(c => !c.hardCut);
+    if (alive.length === 0){
+      els.softArea.innerHTML = `<div class="note bad"><b>生存0頭</b><br>ハード足切りで全滅。ここは見送りが安全。</div>`;
+      els.btnToScore.disabled = true;
+      return;
+    }
 
-    const frag = document.createDocumentFragment();
+    els.softArea.innerHTML = alive.map(c => {
+      const pillHard = c.triFixed ? `<span class="pill warn">△固定</span>` : `<span class="pill good">生存</span>`;
+      const baseReasons = [
+        c.triFixedReasons?.length ? `△固定: ${c.triFixedReasons.join(" / ")}` : ""
+      ].filter(Boolean).join(" | ");
 
-    list.forEach(num => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "horse-btn";
-      btn.textContent = String(num);
+      const d1Opts = ["馬場急変","同型多すぎ","枠が極端で不利感"].map(x => {
+        const selected = (c.d1_reason === x) ? "selected" : "";
+        return `<option value="${escapeHtml(x)}" ${selected}>${escapeHtml(x)}</option>`;
+      }).join("");
 
-      const isOut = (stepNum === 1) ? state.step1Out.includes(num) : state.step2Out.includes(num);
-      btn.classList.toggle("eliminated", isOut);
-      btn.setAttribute("aria-pressed", String(isOut));
+      return `
+        <div class="res-box" data-soft="${c.num}">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div style="font-weight:900; color:var(--accent);">馬番 ${c.num}</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">${pillHard}</div>
+          </div>
+          ${baseReasons ? `<div class="mini">${escapeHtml(baseReasons)}</div>` : `<div class="mini">△固定がなければそのまま</div>`}
 
+          <details>
+            <summary>ソフト警戒（B1/B2）</summary>
+            <div class="detail-body">
+              <div class="note" style="margin-top:0; border-color: rgba(245,158,11,.25);">
+                <b>Bは消しではない</b><br>
+                印を1段下げる（◎→○ / ○→△ / △→×のイメージ）。<br>
+                最終は「買う/見送る」と「複勝1点」しか出さないので、ここは<b>抑止のため</b>に使う。
+              </div>
+
+              <div class="btn-group" role="group">
+                <button class="tgl-btn ${c.b1_busy ? "active" : ""}" type="button" data-role="softToggle" data-k="b1_busy" data-num="${c.num}">
+                  B1 使い詰め（連闘/6週3走+）
+                </button>
+              </div>
+
+              <div class="note" style="margin-top:0; border-color: rgba(56,189,248,.22);">
+                <b>B2（短文固定）</b><br>
+                「前走見せ場なし」かつ「改善なし」なら下げ。<br>
+                <span class="mono">逃げ馬は別枠</span>：負け方が説明できるなら下げない。
+              </div>
+
+              <div class="btn-group" role="group">
+                <button class="tgl-btn ${c.b2_badNoImprove ? "active" : ""}" type="button" data-role="softToggle" data-k="b2_badNoImprove" data-num="${c.num}">
+                  B2 見せ場なし+改善なし
+                </button>
+                <button class="tgl-btn ${c.b2_escapeNige ? "active" : ""}" type="button" data-role="softToggle" data-k="b2_escapeNige" data-num="${c.num}">
+                  逃げ想定
+                </button>
+                <button class="tgl-btn ${c.b2_explainable ? "active" : ""}" type="button" data-role="softToggle" data-k="b2_explainable" data-num="${c.num}">
+                  逃げの負け方が説明できる
+                </button>
+              </div>
+
+              <div class="mini">
+                ・B2は「見せ場なし+改善なし」がONのときだけ効く<br>
+                ・「逃げ想定」かつ「説明できる」がONなら、B2は下げない
+              </div>
+            </div>
+          </details>
+
+          <details>
+            <summary>直前不安（D1：△以下固定）</summary>
+            <div class="detail-body">
+              <div class="note warn" style="margin-top:0;">
+                <b>具体例つき（短く固定）</b><br>
+                ・馬場急変：雨で前/後ろの有利がひっくり返る<br>
+                ・同型多すぎ：逃げ・先行が多くて事故りそう<br>
+                ・枠が極端：内で詰まり/外でロスが濃い
+              </div>
+
+              <div class="btn-group" role="group">
+                <button class="tgl-btn ${c.d1_anxiety ? "active" : ""}" type="button" data-role="softToggle" data-k="d1_anxiety" data-num="${c.num}">
+                  D1 直前不安に該当 → △以下固定
+                </button>
+              </div>
+
+              <label>直前不安の種類（短い）</label>
+              <select data-role="d1Reason" data-num="${c.num}" ${c.d1_anxiety ? "" : ""}>
+                ${d1Opts}
+              </select>
+            </div>
+          </details>
+
+          <div class="note" style="margin-top:12px;">
+            <b>現在の付与</b><br>
+            <span class="mono" data-role="softSummary" data-num="${c.num}">未反映</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    bindSoftEvents();
+    // apply soft once for display
+    applySoftNowAndUpdateSummary();
+  }
+
+  function bindSoftEvents(){
+    els.softArea.querySelectorAll('button[data-role="softToggle"]').forEach(btn => {
       btn.addEventListener("click", () => {
-        if (stepNum === 1) {
-          state.step1Out = toggleArray(state.step1Out, num);
-          if (state.step1Out.includes(num)) {
-            // STEP1で消したら他のタグも掃除
-            state.step2Out = state.step2Out.filter(x => x !== num);
-            state.tag58 = state.tag58.filter(x => x !== num);
-            state.discountA = state.discountA.filter(x => x !== num);
-            state.restMid = state.restMid.filter(x => x !== num);
-            state.restLong = state.restLong.filter(x => x !== num);
-          }
-        } else {
-          state.step2Out = toggleArray(state.step2Out, num);
-          if (state.step2Out.includes(num)) {
-            state.tag58 = state.tag58.filter(x => x !== num);
-            state.discountA = state.discountA.filter(x => x !== num);
-            state.restMid = state.restMid.filter(x => x !== num);
-            state.restLong = state.restLong.filter(x => x !== num);
-          }
+        const num = normalizeHorseNum(btn.dataset.num);
+        const k = btn.dataset.k;
+        if (!num || !k) return;
+        const c = findCand(num);
+        if (!c) return;
+
+        c[k] = !c[k];
+
+        // D1 OFFなら理由は保持でOK（迷い増えない）
+        // B2: explainableは逃げ想定がONの時だけ意味があるけど、強制しない（入力負担を増やさない）
+        replaceOrAddCand(c);
+
+        btn.classList.toggle("active", !!c[k]);
+        applySoftNowAndUpdateSummary();
+      }, { passive:true });
+    });
+
+    els.softArea.querySelectorAll('select[data-role="d1Reason"]').forEach(sel => {
+      sel.addEventListener("change", () => {
+        const num = normalizeHorseNum(sel.dataset.num);
+        if (!num) return;
+        const c = findCand(num);
+        if (!c) return;
+        c.d1_reason = sel.value || "馬場急変";
+        replaceOrAddCand(c);
+        applySoftNowAndUpdateSummary();
+      }, { passive:true });
+    });
+  }
+
+  function applySoftNowAndUpdateSummary(){
+    const cands = uniq(state.candidates.map(c => c.num)).map(n => findCand(n)).filter(Boolean);
+    // ensure hard applied
+    applyHardCuts(cands);
+    state.hardApplied = true;
+
+    applySoftDowngrade(cands);
+    state.softApplied = true;
+
+    // update summaries
+    els.softArea.querySelectorAll('[data-role="softSummary"]').forEach(el => {
+      const num = normalizeHorseNum(el.dataset.num);
+      const c = num ? findCand(num) : null;
+      if (!c) return;
+      const downs = (c.softDownReasons || []).join(" / ") || "なし";
+      const tri = (c.triFixedReasons || []).join(" / ") || "なし";
+      el.textContent = `下げ: ${downs} | △固定: ${tri}`;
+    });
+  }
+
+  // =========================
+  // Scoring step (pillars + converge)
+  // =========================
+  function renderScoringStep(){
+    const cands = uniq(state.candidates.map(c => c.num)).map(n => findCand(n)).filter(Boolean);
+
+    // ensure A/B/D applied
+    applyHardCuts(cands);
+    applySoftDowngrade(cands);
+    state.hardApplied = true;
+    state.softApplied = true;
+
+    const alive = cands.filter(c => !c.hardCut);
+    if (alive.length === 0){
+      els.noteScoringRule.innerHTML = `<b>生存0頭</b>（ハード足切りで全滅）`;
+      els.scoringArea.innerHTML = `<div class="note bad"><b>見送り</b><br>ここは買い足し防止のため、見送り推奨。</div>`;
+      return;
+    }
+
+    const triCount = alive.filter(c => c.triFixed).length;
+
+    els.noteScoringRule.innerHTML = `
+      <b>収束ルール（固定）</b><br>
+      ・4頭以上残ったら、①→②→③の順で並べて<b>上位3頭だけ</b>残す。<br>
+      ・境界が完全同点なら<b>見送り</b>（同点タイブレーク固定）。<br>
+      ・△固定は<b>本命にしない</b>（非△がいれば非△から1頭だけ選ぶ）。<br>
+      <div class="mini">現在：生存 ${alive.length}頭 / △固定 ${triCount}頭</div>
+    `;
+
+    // scoring inputs (0..2)
+    els.scoringArea.innerHTML = alive.map(c => {
+      const triPill = c.triFixed ? `<span class="pill warn">△固定（本命NG）</span>` : `<span class="pill good">本命候補OK</span>`;
+      const downPill = c.softDownReasons.length ? `<span class="pill warn">1段下げあり</span>` : `<span class="pill">下げなし</span>`;
+      const triTxt = c.triFixedReasons.length ? `△固定: ${c.triFixedReasons.join(" / ")}` : "";
+      const downTxt = c.softDownReasons.length ? `下げ: ${c.softDownReasons.join(" / ")}` : "";
+
+      const mkBtn = (pKey, v, label) => {
+        const active = (Number(c.pillar?.[pKey] ?? 0) === v) ? "active" : "";
+        return `<button class="tgl-btn ${active}" type="button" data-role="pillar" data-num="${c.num}" data-p="${pKey}" data-v="${v}">${label}</button>`;
+      };
+
+      return `
+        <div class="res-box" data-score="${c.num}">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div style="font-weight:900; color:var(--accent);">馬番 ${c.num}</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+              ${triPill} ${downPill}
+            </div>
+          </div>
+          ${(triTxt || downTxt) ? `<div class="mini">${escapeHtml([triTxt, downTxt].filter(Boolean).join(" | "))}</div>` : `<div class="mini">付与なし</div>`}
+
+          <label>① コース距離（0〜2）</label>
+          <div class="btn-group" data-group="p1">
+            ${mkBtn("p1", 2, "2:強い")}
+            ${mkBtn("p1", 1, "1:普通")}
+            ${mkBtn("p1", 0, "0:不安")}
+          </div>
+
+          <label>② 流れ×脚質（0〜2）</label>
+          <div class="btn-group" data-group="p2">
+            ${mkBtn("p2", 2, "2:噛む")}
+            ${mkBtn("p2", 1, "1:普通")}
+            ${mkBtn("p2", 0, "0:噛まない")}
+          </div>
+
+          <label>③ 騎手（0〜2）</label>
+          <div class="btn-group" data-group="p3">
+            ${mkBtn("p3", 2, "2:強い")}
+            ${mkBtn("p3", 1, "1:普通")}
+            ${mkBtn("p3", 0, "0:不安")}
+          </div>
+
+          <div class="note" style="margin-top:12px; margin-bottom:0;">
+            <b>現在スコア</b><br>
+            <span class="mono" data-role="scoreText" data-num="${c.num}">-</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    bindScoringEvents();
+    updateScoreTexts();
+  }
+
+  function bindScoringEvents(){
+    els.scoringArea.querySelectorAll('button[data-role="pillar"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        const num = normalizeHorseNum(btn.dataset.num);
+        const p = btn.dataset.p;
+        const v = Number(btn.dataset.v);
+        if (!num || !p || !Number.isFinite(v)) return;
+        const c = findCand(num);
+        if (!c) return;
+
+        c.pillar = c.pillar || { p1:1,p2:1,p3:1 };
+        c.pillar[p] = v;
+        replaceOrAddCand(c);
+
+        // update active within the same group and same candidate
+        const box = btn.closest('.res-box');
+        if (box){
+          box.querySelectorAll(`button[data-role="pillar"][data-p="${p}"]`).forEach(x => x.classList.remove("active"));
         }
-
-        renderGrid(stepNum);
-        renderTag58Grid();
-        renderDiscountAGrid();
-        renderRestMidGrid();
-        renderRestLongGrid();
-        updateCount(stepNum);
-      });
-
-      frag.appendChild(btn);
+        btn.classList.add("active");
+        updateScoreTexts();
+      }, { passive:true });
     });
-
-    grid.appendChild(frag);
   }
 
-  function renderTag58Grid(){
-    const grid = els.gridTag58;
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    const list = survivors();
-    if (list.length === 0) {
-      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    list.forEach(num => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "horse-btn";
-      btn.textContent = String(num);
-
-      const tagged = state.tag58.includes(num);
-      const flowDisc = isFlowDiscountHorse(num);
-
-      if (tagged) btn.classList.add("tag58");
-      if (flowDisc) btn.classList.add("flowDiscount");
-
-      btn.setAttribute("aria-pressed", String(tagged));
-      btn.addEventListener("click", () => {
-        state.tag58 = toggleArray(state.tag58, num);
-        renderTag58Grid();
-        renderDiscountAGrid(); // 見た目合わせ
-      });
-
-      frag.appendChild(btn);
+  function updateScoreTexts(){
+    els.scoringArea.querySelectorAll('[data-role="scoreText"]').forEach(el => {
+      const num = normalizeHorseNum(el.dataset.num);
+      const c = num ? findCand(num) : null;
+      if (!c) return;
+      const s = computePillarTotal(c);
+      el.textContent = `①${s.p1} / ②${s.p2} / ③${s.p3} （合計 ${s.total}）`;
     });
-
-    grid.appendChild(frag);
   }
 
-  function renderDiscountAGrid(){
-    const grid = els.gridDiscountA;
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    const list = survivors();
-    if (list.length === 0) {
-      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    list.forEach(num => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "horse-btn";
-      btn.textContent = String(num);
-
-      const discA = state.discountA.includes(num);
-      const flowDisc = isFlowDiscountHorse(num);
-
-      if (discA) btn.classList.add("discountA");
-      if (flowDisc) btn.classList.add("flowDiscount");
-
-      btn.setAttribute("aria-pressed", String(discA));
-      btn.addEventListener("click", () => {
-        state.discountA = toggleArray(state.discountA, num);
-        renderDiscountAGrid();
-      });
-
-      frag.appendChild(btn);
-    });
-
-    grid.appendChild(frag);
-  }
-
-  // ★休み明けB
-  function renderRestMidGrid(){
-    const grid = els.gridRestMid;
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    const list = survivors();
-    if (list.length === 0) {
-      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    list.forEach(num => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "horse-btn";
-      btn.textContent = String(num);
-
-      const on = state.restMid.includes(num);
-      if (on) btn.classList.add("flowDiscount"); // 赤系（◎不可の注意）
-
-      btn.setAttribute("aria-pressed", String(on));
-      btn.addEventListener("click", () => {
-        state.restMid = toggleArray(state.restMid, num);
-        if (state.restMid.includes(num)) state.restLong = state.restLong.filter(x => x !== num);
-        renderRestMidGrid();
-        renderRestLongGrid();
-      });
-
-      frag.appendChild(btn);
-    });
-
-    grid.appendChild(frag);
-  }
-
-  // ★休み明けC
-  function renderRestLongGrid(){
-    const grid = els.gridRestLong;
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    const list = survivors();
-    if (list.length === 0) {
-      grid.innerHTML = `<div class="note" style="grid-column:1/-1; margin:0;">生存馬がいません</div>`;
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    list.forEach(num => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "horse-btn";
-      btn.textContent = String(num);
-
-      const on = state.restLong.includes(num);
-      if (on) btn.classList.add("flowDiscount");
-
-      btn.setAttribute("aria-pressed", String(on));
-      btn.addEventListener("click", () => {
-        state.restLong = toggleArray(state.restLong, num);
-        if (state.restLong.includes(num)) state.restMid = state.restMid.filter(x => x !== num);
-        renderRestLongGrid();
-        renderRestMidGrid();
-      });
-
-      frag.appendChild(btn);
-    });
-
-    grid.appendChild(frag);
-  }
-
-  function updateCount(stepNum){
-    const after1 = MAX_HORSES - state.step1Out.length;
-    const after2 = after1 - state.step2Out.length;
-
-    if (stepNum === 1) {
-      els.count1.textContent = `生存数: ${after1}頭`;
-    } else {
-      els.count2.textContent = `生存数: ${after2}頭`;
-      els.btnToScore.disabled = (after2 === 0 || after2 > 6);
-    }
-  }
-
-  // ---------- Scoring ----------
-  function setupScoring(){
-    const list = survivors();
-    if (list.length === 0) {
-      alert("生存馬が0頭です。見送りを押してください。");
-      return;
-    }
-
-    state.scores = {};
-    els.scoringArea.innerHTML = "";
-
-    els.noteScoringRule.innerHTML =
-      "生存馬の「安定感」を付ける。<br>" +
-      "上がり回数（近3走）は「上がり順位3位以内」の回数（0〜3）。※同点タイブレーク専用。<br>" +
-      "<b>割引（A / 流れ / 休み明けB/C）</b>が付いた馬は「◎不可（○まで）」。";
-
-    const frag = document.createDocumentFragment();
-
-    list.forEach(num => {
-      state.scores[num] = { p1: 1, p2: 0 };
-
-      const badges = [
-        state.tag58.includes(num) ? "5〜8" : null,
-        state.discountA.includes(num) ? "割引A" : null,
-        isFlowDiscountHorse(num) ? "流れ割引" : null,
-        state.restMid.includes(num) ? "休み明けB" : null,
-        state.restLong.includes(num) ? "休み明けC" : null,
-      ].filter(Boolean);
-
-      const box = document.createElement("div");
-      box.className = "res-box";
-      box.dataset.horse = String(num);
-
-      box.innerHTML = `
-        <div style="font-weight:bold; color:var(--accent);">
-          馬番: ${num}
-          ${badges.length ? `<span style="color:var(--muted); font-size:12px;">（${badges.join(" / ")}）</span>` : ""}
-        </div>
-
-        <label>安定感（0.5秒差内を継続？）</label>
-        <div class="btn-group" data-p="p1">
-          <button class="tgl-btn" type="button" data-v="2" aria-pressed="false" ${isAnyDiscount(num) ? "disabled" : ""}>◎ 堅実</button>
-          <button class="tgl-btn active" type="button" data-v="1" aria-pressed="true">○ 並</button>
-          <button class="tgl-btn" type="button" data-v="0" aria-pressed="false">△ 不安</button>
-        </div>
-
-        <label>上がり（近3走：上がり順位3位以内の回数）※同点専用</label>
-        <div class="btn-group" data-p="p2">
-          <button class="tgl-btn active" type="button" data-v="0" aria-pressed="true">0回</button>
-          <button class="tgl-btn" type="button" data-v="1" aria-pressed="false">1回</button>
-          <button class="tgl-btn" type="button" data-v="2" aria-pressed="false">2回</button>
-          <button class="tgl-btn" type="button" data-v="3" aria-pressed="false">3回</button>
-        </div>
-      `;
-
-      frag.appendChild(box);
-    });
-
-    els.scoringArea.appendChild(frag);
-
-    if (!state.scoringBound) {
-      els.scoringArea.addEventListener("click", onScoringClick, { passive: true });
-      state.scoringBound = true;
-    }
-
-    els.btnFinalBuy.disabled = true;
-    setStep(4);
-  }
-
-  function onScoringClick(e){
-    const btn = e.target.closest(".tgl-btn");
-    if (!btn || btn.disabled) return;
-
-    const group = btn.closest(".btn-group");
-    const box = btn.closest(".res-box");
-    if (!group || !box) return;
-
-    const horse = Number(box.dataset.horse);
-    const p = group.dataset.p;
-    const v = Number(btn.dataset.v);
-    if (!state.scores[horse]) return;
-
-    // 保険：割引馬は◎不可
-    if (p === "p1" && v === 2 && isAnyDiscount(horse)) return;
-
-    state.scores[horse][p] = v;
-
-    group.querySelectorAll(".tgl-btn").forEach(x => {
-      x.classList.remove("active");
-      x.setAttribute("aria-pressed", "false");
-    });
-    btn.classList.add("active");
-    btn.setAttribute("aria-pressed", "true");
-  }
-
+  // =========================
+  // Final calc (BUY/SKIP only)
+  // =========================
   function calcResult(){
-    const keys = Object.keys(state.scores);
-    if (keys.length === 0) { alert("査定対象がありません。"); return; }
+    const cands = uniq(state.candidates.map(c => c.num)).map(n => findCand(n)).filter(Boolean);
 
-    const res = keys.map(n => ({
-      num: Number(n),
-      p1: (state.scores[n].p1 ?? 0),
-      p2: (state.scores[n].p2 ?? 0),
-      total: (state.scores[n].p1 ?? 0)
-    })).sort((a,b) => (b.total - a.total) || (b.p2 - a.p2));
+    applyHardCuts(cands);
+    applySoftDowngrade(cands);
 
-    const top = res[0];
-    const second = res[1] || null;
-
-    if (second && top.total === second.total && top.p2 === second.p2) {
+    const alive = cands.filter(c => !c.hardCut);
+    if (alive.length === 0){
+      state.finalDecision = "SKIP";
       state.best = null;
-      els.resultDisplay.innerHTML = `
-        <div class="res-box">
-          <div class="res-score" style="color:var(--warn);">同点</div>
-          <div style="text-align:center; margin-bottom:10px;">
-            馬番 ${top.num} と 馬番 ${second.num} が完全同点。<br>
-            （安定感Score: ${top.total} / 上がり3位内回数: ${top.p2}回）
-          </div>
-          <div class="btn-row" style="margin-top:8px;">
-            <button class="sub-btn" type="button" id="btnPickA">馬${top.num}にする</button>
-            <button class="sub-btn" type="button" id="btnPickB">馬${second.num}にする</button>
-          </div>
-          <button class="sub-btn" type="button"
-            id="btnPickSkip"
-            style="width:100%; margin-top:8px; background:transparent; color:var(--bad); border:1px solid var(--bad);">
-            見送りにする
-          </button>
-          <div id="pickStatus" class="note" style="margin-top:10px;">まだ未選択（BUY保存はできない）</div>
-        </div>
-      `;
-      els.btnFinalBuy.disabled = true;
-
-      $("#btnPickA")?.addEventListener("click", () => {
-        state.best = { num: top.num, total: top.total, p2: top.p2 };
-        $("#pickStatus").textContent = `選択：馬番 ${top.num}（同点・手動決定）`;
-        els.btnFinalBuy.disabled = false;
-      });
-      $("#btnPickB")?.addEventListener("click", () => {
-        state.best = { num: second.num, total: second.total, p2: second.p2 };
-        $("#pickStatus").textContent = `選択：馬番 ${second.num}（同点・手動決定）`;
-        els.btnFinalBuy.disabled = false;
-      });
-      $("#btnPickSkip")?.addEventListener("click", () => saveFinal("SKIP"));
-
+      state.shortlist = [];
+      state.finalReasonTemplate = "全滅（ハード足切り）";
+      renderFinal();
       setStep(5);
       return;
     }
 
-    state.best = { num: top.num, total: top.total, p2: top.p2 };
-    const usedTiebreak = !!(second && top.total === second.total && top.p2 !== second.p2);
+    // enforce top3 if 4+
+    const { shortlist, tieSkip } = enforceTop3(alive);
+    state.shortlist = shortlist.slice(0,3);
 
-    const badges = [
-      state.tag58.includes(top.num) ? "5〜8" : null,
-      state.discountA.includes(top.num) ? "割引A" : null,
-      isFlowDiscountHorse(top.num) ? "流れ割引" : null,
-      state.restMid.includes(top.num) ? "休み明けB" : null,
-      state.restLong.includes(top.num) ? "休み明けC" : null,
-    ].filter(Boolean);
+    if (tieSkip){
+      state.finalDecision = "SKIP";
+      state.best = null;
+      state.finalReasonTemplate = "収束同点→見送り";
+      renderFinal();
+      setStep(5);
+      return;
+    }
 
-    els.resultDisplay.innerHTML = `
-      <div class="res-box">
-        <div class="res-score">馬番 ${top.num}</div>
-        <div style="text-align:center">
-          安定感Score: ${top.total}<br>
-          上がり3位内（近3走）: ${top.p2}回
-          ${badges.length ? `<div class="note" style="margin-top:8px;">タグ/割引：${badges.join(" / ")}</div>` : ""}
-          ${usedTiebreak ? `<div class="note" style="margin-top:8px;">同点 → 上がり回数で決着</div>` : ""}
-        </div>
-      </div>
-    `;
+    // choose best one
+    const pick = chooseBestOne(state.shortlist);
 
-    els.btnFinalBuy.disabled = false;
+    if (pick.skip){
+      state.finalDecision = "SKIP";
+      state.best = null;
+      state.finalReasonTemplate = (pick.reason === "ONLY_TRI_FIXED")
+        ? "△固定のみ→見送り"
+        : "本命同点→見送り";
+      renderFinal();
+      setStep(5);
+      return;
+    }
+
+    state.best = pick.best;
+    state.finalDecision = "BUY";
+    // 理由テンプレ（固定・短い）
+    // 収束発動なら「収束→上位1」/ それ以外は「3頭運用→上位1」
+    state.finalReasonTemplate = state.convergedTriggered ? "収束→上位1" : "3頭運用→上位1";
+    renderFinal();
     setStep(5);
   }
 
-  // ---------- Save / History ----------
+  function renderFinal(){
+    const meta = getRaceMeta();
+
+    const shortlistStr = (state.shortlist || []).map(c => c.num).join("|");
+    const convergedNote = state.convergedTriggered
+      ? `<div class="note warn" style="margin-top:10px;"><b>収束ルール発動</b><br>4頭以上残ったため、①→②→③で上位3頭に収束。</div>`
+      : `<div class="note ok" style="margin-top:10px;"><b>3頭運用</b><br>最初から候補を絞ったので、収束は最小限。</div>`;
+
+    if (state.finalDecision === "BUY" && state.best){
+      els.resultDisplay.innerHTML = `
+        <div class="res-box">
+          <div class="res-score">買う</div>
+          <div style="text-align:center; margin-top:6px;">
+            <div style="font-size:18px; font-weight:900;">複勝 1点 / 500円</div>
+            <div style="margin-top:8px; font-size:16px;"><b>本命：馬番 ${state.best.num}</b></div>
+            <div class="mini">（①${state.best.p1} / ②${state.best.p2} / ③${state.best.p3}）</div>
+            <div class="note" style="margin-top:10px;"><b>理由一言（固定）</b><br><span class="mono">${escapeHtml(state.finalReasonTemplate)}</span></div>
+            <div class="note" style="margin-top:10px;"><b>残った3頭（最大）</b><br><span class="mono">${escapeHtml(shortlistStr || "-")}</span></div>
+          </div>
+        </div>
+        ${convergedNote}
+      `;
+      els.btnFinalBuy.disabled = false;
+      return;
+    }
+
+    // SKIP
+    els.resultDisplay.innerHTML = `
+      <div class="res-box">
+        <div class="res-score" style="color:var(--bad);">見送り</div>
+        <div style="text-align:center; margin-top:6px;">
+          <div class="note" style="margin-top:10px;"><b>理由一言（固定）</b><br><span class="mono">${escapeHtml(state.finalReasonTemplate || "見送り")}</span></div>
+          <div class="note" style="margin-top:10px;"><b>残った3頭（最大）</b><br><span class="mono">${escapeHtml(shortlistStr || "-")}</span></div>
+        </div>
+      </div>
+      ${convergedNote}
+    `;
+    els.btnFinalBuy.disabled = true;
+  }
+
+  // =========================
+  // Save / History (互換 + 追加列)
+  // =========================
   function afterSaveUI(message){
     renderHistory();
     els.resultDisplay.insertAdjacentHTML("beforeend", `
@@ -1159,83 +1637,97 @@
     scrollTopInstant();
   }
 
-  function saveFinal(dec){
+  function buildLogPayload(dec){
     const meta = getRaceMeta();
     const riskRaw = (els.risk?.value || "").trim();
     const risk = state.research ? (riskRaw ? `${riskRaw} / RESEARCH_200` : "RESEARCH_200") : riskRaw;
     const now = new Date().toISOString();
 
-    if (!meta.date) { alert("日付を選んでください。"); return; }
-    if (!meta.raceNo) { alert("レース番号を選んでください。"); return; }
+    const shortlistStr = (state.shortlist || []).map(c => c.num).join("|");
 
-    if (dec === "BUY") {
-      if (!state.best) { alert("まだ結論が出ていません。"); return; }
-      pushLog({
-        date: meta.date,
-        track: meta.track, surface: meta.surface, dist: meta.dist,
-        cond: meta.condition, flow: meta.flow,
-        raceNo: meta.raceNo, race: meta.raceName,
-        horse: state.best.num,
-        score: state.best.total,
-        dec: "BUY",
-        risk,
-        tag58: state.tag58.includes(state.best.num) ? 1 : 0,
-        discountA: state.discountA.includes(state.best.num) ? 1 : 0,
-        flowDiscount: isFlowDiscountHorse(state.best.num) ? 1 : 0,
-        restMid: state.restMid.includes(state.best.num) ? 1 : 0,
-        restLong: state.restLong.includes(state.best.num) ? 1 : 0,
-        research: state.research ? 1 : 0,
-        at: now
-      });
-      afterSaveUI("BUYで保存しました");
+    // collect reasons (for the chosen horse, or for all alive if skip)
+    const cands = uniq(state.candidates.map(c => c.num)).map(n => findCand(n)).filter(Boolean);
+    applyHardCuts(cands);
+    applySoftDowngrade(cands);
+
+    const alive = cands.filter(c => !c.hardCut);
+
+    let hardCutReasons = [];
+    let triFixedReasons = [];
+    let softDownReasons = [];
+
+    if (dec === "BUY" && state.best){
+      const chosen = findCand(state.best.num);
+      hardCutReasons = (chosen?.hardCutReasons || []);
+      triFixedReasons = (chosen?.triFixedReasons || []);
+      softDownReasons = (chosen?.softDownReasons || []);
     } else {
-      pushLog({
-        date: meta.date,
-        track: meta.track, surface: meta.surface, dist: meta.dist,
-        cond: meta.condition, flow: meta.flow,
-        raceNo: meta.raceNo, race: meta.raceName,
-        horse: "-",
-        score: null,
-        dec: "SKIP",
-        risk: risk || "USER_SKIP",
-        tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
-        research: state.research ? 1 : 0,
-        at: now
-      });
-      afterSaveUI("見送りで保存しました");
+      // skip: summarize alive max 3 for log readability
+      const pickAlive = alive.slice(0,3);
+      hardCutReasons = []; // skip doesn't need hard reasons; keep blank
+      triFixedReasons = uniq(pickAlive.flatMap(x => x.triFixedReasons || []));
+      softDownReasons = uniq(pickAlive.flatMap(x => x.softDownReasons || []));
     }
 
-    els.btnFinalBuy.disabled = true;
-  }
+    // keep old fields as 0 to preserve export compatibility
+    const legacyZeros = {
+      tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0
+    };
 
-  function saveSkip(reason){
-    const meta = getRaceMeta();
-    const now = new Date().toISOString();
-    if (!meta.date) { alert("日付を選んでください。"); return; }
-    if (!meta.raceNo) { alert("レース番号を選んでください。"); return; }
-
-    pushLog({
+    const common = {
       date: meta.date,
       track: meta.track, surface: meta.surface, dist: meta.dist,
       cond: meta.condition, flow: meta.flow,
       raceNo: meta.raceNo, race: meta.raceName,
-      horse: "-",
-      score: null,
-      dec: "SKIP",
-      risk: reason,
-      tag58: 0, discountA: 0, flowDiscount: 0, restMid: 0, restLong: 0,
+      dec,
+      risk: risk || (dec === "SKIP" ? "USER_SKIP" : ""),
       research: state.research ? 1 : 0,
-      at: now
-    });
+      ...legacyZeros,
 
-    setStep(5);
-    els.resultDisplay.innerHTML = `
-      <div class="res-box">
-        <div class="res-score" style="color:var(--bad);">見送り</div>
-        <div style="text-align:center">理由: ${escapeHtml(reason)}</div>
-      </div>
-    `;
-    afterSaveUI("全滅・見送りで保存しました");
+      // v5.5 fields
+      hardCutReasons: hardCutReasons.join(";"),
+      convergedTriggered: state.convergedTriggered ? 1 : 0,
+      triFixedReasons: triFixedReasons.join(";"),
+      softDownReasons: softDownReasons.join(";"),
+      finalTemplate: state.finalReasonTemplate || "",
+      shortlist: shortlistStr,
+      at: now
+    };
+
+    if (dec === "BUY" && state.best){
+      return {
+        ...common,
+        horse: state.best.num,
+        score: state.best.score
+      };
+    }
+
+    return {
+      ...common,
+      horse: "-",
+      score: null
+    };
+  }
+
+  function saveFinal(dec){
+    const meta = getRaceMeta();
+    if (!meta.date) { alert("日付を選んでください。"); return; }
+    if (!meta.raceNo) { alert("レース番号を選んでください。"); return; }
+
+    if (dec === "BUY"){
+      if (!state.best || state.finalDecision !== "BUY"){
+        alert("まだBUYの結論が出ていません（見送りなら見送り保存）。");
+        return;
+      }
+      pushLog(buildLogPayload("BUY"));
+      afterSaveUI("BUYで保存しました（複勝1点/500円）");
+      els.btnFinalBuy.disabled = true;
+      return;
+    }
+
+    // SKIP
+    pushLog(buildLogPayload("SKIP"));
+    afterSaveUI("見送りで保存しました");
     els.btnFinalBuy.disabled = true;
   }
 
@@ -1258,25 +1750,21 @@
       const raceName = escapeHtml(l.race || "不明");
       const horse = escapeHtml(l.horse);
       const dec = escapeHtml(l.dec || "");
-      const score = (l.score != null) ? ` (安定感: ${escapeHtml(l.score)})` : "";
+      const score = (l.score != null) ? ` (Score:${escapeHtml(l.score)})` : "";
       const risk = escapeHtml(l.risk || "記載なし");
       const bar = (l.dec === "BUY") ? "var(--good)" : "var(--muted)";
+      const tpl = escapeHtml(l.finalTemplate || "");
 
-      const tags = [
-        l.tag58 ? "5〜8" : null,
-        l.discountA ? "割引A" : null,
-        l.flowDiscount ? "流れ割引" : null,
-        l.restMid ? "休B" : null,
-        l.restLong ? "休C" : null,
-        l.research ? "研究" : null,
-      ].filter(Boolean);
-
-      const tagStr = tags.length ? ` / ${tags.join(",")}` : "";
+      const extra = [];
+      if (l.convergedTriggered) extra.push("収束");
+      if (l.triFixedReasons) extra.push("△");
+      if (l.softDownReasons) extra.push("下げ");
+      const extraStr = extra.length ? ` / ${extra.join(",")}` : "";
 
       return `
         <div style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px; border-left:4px solid ${bar}">
-          <b>${date} ${place}(${cond}) 流れ:${flow} ${r} ${raceName}</b> [${dec}] 馬${horse}${score}${tagStr}<br>
-          <span style="color:var(--muted)">リスク: ${risk}</span>
+          <b>${date} ${place}(${cond}) 流れ:${flow} ${r} ${raceName}</b> [${dec}] 馬${horse}${score}${extraStr}<br>
+          <span style="color:var(--muted)">テンプレ: ${tpl || "-"} / リスク: ${risk}</span>
         </div>
       `;
     }).join("");
@@ -1313,14 +1801,18 @@
 
   function resetForNew(){
     state.step = 1;
-    state.step1Out = [];
-    state.step2Out = [];
-    state.tag58 = [];
-    state.discountA = [];
-    state.restMid = [];
-    state.restLong = [];
-    state.scores = {};
+    state.hardApplied = false;
+    state.softApplied = false;
+    state.converged = false;
+    state.convergedTriggered = false;
+    state.convergedTieSkip = false;
+    state.shortlist = [];
     state.best = null;
+    state.finalDecision = null;
+    state.finalReasonTemplate = "";
+
+    // candidates keep? => 初期は空（買い足し抑止）
+    state.candidates = [];
 
     if (els.risk) els.risk.value = "";
     if (els.scoringArea) els.scoringArea.innerHTML = "";
@@ -1328,28 +1820,45 @@
     els.btnFinalBuy.disabled = true;
 
     setStep(1);
-    renderGrid(1);
-    renderGrid(2);
-    renderTag58Grid();
-    renderDiscountAGrid();
-    renderRestMidGrid();
-    renderRestLongGrid();
-    updateCount(1);
-    updateCount(2);
+    renderCandidates();
+    updateLiveRemain();
   }
 
-  // ---------- Events ----------
+  // =========================
+  // Bulk add helpers
+  // =========================
+  function parseBulk(text){
+    const cleaned = (text || "").replace(/[，、]/g, ",").replace(/\s+/g, ",");
+    const parts = cleaned.split(",").map(s => s.trim()).filter(Boolean);
+    const nums = parts.map(p => normalizeHorseNum(p)).filter(Boolean);
+    return uniq(nums);
+  }
+
+  function addCandidates(nums){
+    const toAdd = uniq(nums).filter(n => n>=1 && n<=MAX_HORSES);
+    for (const n of toAdd){
+      if (!findCand(n)) replaceOrAddCand(makeCandidate(n));
+    }
+    renderCandidates();
+  }
+
+  // =========================
+  // Events
+  // =========================
   function bindEvents(){
     els.condDry?.addEventListener("click", () => setCond("dry"));
     els.condWet?.addEventListener("click", () => setCond("wet"));
 
-    els.flowFew?.addEventListener("click", () => setFlow("few"));
-    els.flowMid?.addEventListener("click", () => setFlow("mid"));
-    els.flowMany?.addEventListener("click", () => setFlow("many"));
-
+    // flow: keep as memo buttons (not shown in UI now); use default mid
+    // research
     els.researchOff?.addEventListener("click", () => setResearch(false));
     els.researchOn?.addEventListener("click", () => setResearch(true));
 
+    // mode
+    els.mode3?.addEventListener("click", () => setInputMode("mode3"));
+    els.modeAll?.addEventListener("click", () => setInputMode("modeAll"));
+
+    // meta change
     els.raceDate?.addEventListener("change", updateBadge);
     els.track?.addEventListener("change", updateBadge);
     els.surface?.addEventListener("change", updateBadge);
@@ -1358,10 +1867,84 @@
     els.raceName?.addEventListener("input", updateBadge);
 
     els.btnStart?.addEventListener("click", () => setStep(2));
-    els.btnToStep2?.addEventListener("click", () => setStep(3));
 
-    els.btnToScore?.addEventListener("click", setupScoring);
-    els.btnSkipAll?.addEventListener("click", () => saveSkip("NO_SURVIVORS"));
+    // quick fill
+    els.btnQuick123?.addEventListener("click", () => {
+      if (state.inputMode !== "mode3") return;
+      state.candidates = [makeCandidate(1), makeCandidate(2), makeCandidate(3)];
+      renderCandidates();
+    });
+
+    els.btnClearCands?.addEventListener("click", () => {
+      if (!confirm("候補をリセットしますか？")) return;
+      state.candidates = [];
+      renderCandidates();
+    });
+
+    // bulk add
+    els.btnBulkApply?.addEventListener("click", () => {
+      const nums = parseBulk(els.bulkAdd?.value || "");
+      if (!nums.length) { alert("馬番が読めませんでした"); return; }
+      addCandidates(nums);
+      if (els.bulkAdd) els.bulkAdd.value = "";
+    });
+    els.btnAddAll18?.addEventListener("click", () => {
+      addCandidates(Array.from({length:MAX_HORSES},(_,i)=>i+1));
+    });
+
+    // apply hard -> go step2
+    els.btnApplyHard?.addEventListener("click", () => {
+      const nums = uniq(state.candidates.map(c => c.num)).filter(Boolean);
+
+      if (nums.length === 0){
+        alert("候補が0頭です。まず馬番を入れてね。");
+        return;
+      }
+      if (state.inputMode === "mode3" && nums.length > 3){
+        // should not happen due to render enforcement, but keep safe
+        state.candidates = nums.slice(0,3).map(n => findCand(n) || makeCandidate(n));
+      }
+
+      const cands = nums.map(n => findCand(n)).filter(Boolean);
+      applyHardCuts(cands);
+      state.hardApplied = true;
+
+      // show quick feedback by rerender
+      renderCandidates();
+
+      const alive = cands.filter(c => !c.hardCut);
+      if (alive.length === 0){
+        if (!confirm("ハード足切りで全滅しました。見送りへ進みますか？")) return;
+        state.finalDecision = "SKIP";
+        state.best = null;
+        state.shortlist = [];
+        state.finalReasonTemplate = "全滅（ハード足切り）";
+        renderFinal();
+        setStep(5);
+        return;
+      }
+
+      setStep(3);
+    });
+
+    els.btnSkipFromStep1?.addEventListener("click", () => {
+      state.finalDecision = "SKIP";
+      state.best = null;
+      state.shortlist = [];
+      state.finalReasonTemplate = "入力不足→見送り";
+      renderFinal();
+      setStep(5);
+    });
+
+    els.btnToScore?.addEventListener("click", () => setStep(4));
+    els.btnSkipFromStep2?.addEventListener("click", () => {
+      state.finalDecision = "SKIP";
+      state.best = null;
+      state.shortlist = [];
+      state.finalReasonTemplate = "直前不安/迷い→見送り";
+      renderFinal();
+      setStep(5);
+    });
 
     els.btnCalc?.addEventListener("click", calcResult);
 
@@ -1373,11 +1956,12 @@
 
     els.btnRestart?.addEventListener("click", resetForNew);
 
-    els.raceName?.addEventListener("keydown", (e) => { if (e.key === "Enter") setStep(2); });
     $("#btnExportCsv")?.addEventListener("click", exportLogsToCsv);
   }
 
-  // ---------- Init ----------
+  // =========================
+  // Init
+  // =========================
   function init(){
     bindEvents();
 
@@ -1386,23 +1970,16 @@
 
     els.btnFinalBuy.disabled = true;
 
-    updateStep1Note();
-    updateStep2Note();
     setCond("dry");
     setFlow("mid");
-
-    // ★研究モード初期：OFF
     setResearch(false);
+    setInputMode("mode3");
 
     updateBadge();
     setStep(1);
 
-    renderGrid(1);
-    renderGrid(2);
-    renderTag58Grid();
-    renderDiscountAGrid();
-    renderRestMidGrid();
-    renderRestLongGrid();
+    renderCandidates();
+    updateLiveRemain();
     renderHistory();
   }
 
